@@ -1,2 +1,2 @@
 # meteor
-C2
+C2 with docker and a database and stuff
