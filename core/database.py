@@ -4,12 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, exc
 from sqlalchemy.orm import sessionmaker
 
-
 Base = declarative_base()
 engine = create_engine('sqlite:////tmp/test.db', echo=True)
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
 
 class Host(Base):
     __tablename__ = 'hosts'
@@ -124,3 +120,8 @@ class Response(Base):
 
     def __repr__(self):
         return "<Respnose(id='%d', data='%s', actionid='%d')>" % (self.id, self.data, self.actionid)
+
+
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+session = Session()
