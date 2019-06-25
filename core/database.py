@@ -19,7 +19,7 @@ class Host(Base):
     interface = Column(String)
     groupid = Column(Integer, ForeignKey('groups.id'))
 
-    def __init__(self, hostname, interface, groupid)
+    def __init__(self, hostname, interface, groupid):
         self.hostname = hostname
         self.interface = interface
         self.groupid = groupid
