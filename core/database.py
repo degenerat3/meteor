@@ -82,7 +82,7 @@ class Action(Base):
     options = Column(String)
     queued = Column(Boolean)
     responded = Column(Boolean)
-    hostid = Column(Integer, ForeignKey('host.id'))
+    hostid = Column(Integer, ForeignKey('hosts.id'))
 
     def __init__(self, mode, arguments, options, queued, responded, hostid):
         self.mode = mode
@@ -106,7 +106,7 @@ class Response(Base):
 
     id = Column(Integer, primary_key=True)
     data = Column(String)
-    actionid = Column(Integer, ForeignKey('action.id'))
+    actionid = Column(Integer, ForeignKey('actions.id'))
 
     def __init__(self, data, actionid):
         self.data = data
