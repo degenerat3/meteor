@@ -1,7 +1,7 @@
 import sys
 
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, exc
 from sqlalchemy.orm import sessionmaker
 
 
