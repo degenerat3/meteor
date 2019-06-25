@@ -53,7 +53,7 @@ class Action(Base):
     hostid = Column(Integer, ForeignKey('host.id'))
 
     def __repr__(self):
-        return "<Action(id='%d', mode='%s', arguments='%s', options='%s', queued='%s', responded='%s', hostid='%d')>" % self.id, self.mode, self.arguments, self.options, self.queued, self.responded, self.hostid)
+        return "<Action(id='%d', mode='%s', arguments='%s', options='%s', queued='%s', responded='%s', hostid='%d')>" % (self.id, self.mode, self.arguments, self.options, self.queued, self.responded, self.hostid)
     
 class Response(Base):
     __tablename__ = 'responses'
