@@ -2,7 +2,7 @@ from .database import *
 
 def registerBot(uuid, interval, delta, hostname):
     print("registering bot")
-    q = session.query().filter(Host.hostname == hostname).one()
+    q = session.query(Host).filter(Host.hostname == hostname).one()
     hostid = q.id
     b = Bot(uuid, interval, delta, hostid)
     return [True, "None"]
@@ -10,7 +10,7 @@ def registerBot(uuid, interval, delta, hostname):
 
 def registerHost(hostname, interface, groupname):
     print("registering host")
-    q = session.query().filter(Group.name == groupname).one()
+    q = session.query(Group).filter(Group.name == groupname).one()
     groupid = q.id
     h = Host(hostname, interface, groupid)
     return [True, "None"]
