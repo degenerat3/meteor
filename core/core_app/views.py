@@ -48,6 +48,7 @@ def newgroup():
         groupname = content['groupname']
     except:
         return "Missing required field"
+    reg_status = registerGroup(groupname)
     if reg_status[0]:
         return "Success"
     failure_str = "500: Register failure- " + reg_status[1]
