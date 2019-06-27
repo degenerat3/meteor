@@ -2,16 +2,22 @@ from .database import *
 
 def registerBot(uuid, interval, delta, hostname):
     print("registering bot")
-    q = session.query(Host).filter(Host.hostname == hostname).one()
-    hostid = q.id
+    try:
+        q = session.query(Host).filter(Host.hostname == hostname).one()
+        hostid = q.id
+    except:
+        return [False, "Unknown hostname - register failed"]
     b = Bot(uuid, interval, delta, hostid)
     return [True, "None"]
 
 
 def registerHost(hostname, interface, groupname):
     print("registering host")
-    q = session.query(Group).filter(Group.name == groupname).one()
-    groupid = q.id
+    try:
+        q = session.query(Group).filter(Group.name == groupname).one()
+        groupid = q.id
+    except:
+        return [False, "Unknown group - register failed"]
     h = Host(hostname, interface, groupid)
     return [True, "None"]
 
