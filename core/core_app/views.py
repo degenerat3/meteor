@@ -54,5 +54,6 @@ def newgroup():
     return failure_str
 
 @app.route('/dumpdb')
+def dumpdb():
     data = dumpDatabase()
     return data
