@@ -11,7 +11,7 @@ class Host(Base):
     __tablename__ = 'hosts'
 
     id = Column(Integer, primary_key=True)
-    hostname = Column(String)
+    hostname = Column(String, unique=True)
     interface = Column(String)
     groupid = Column(Integer, ForeignKey('groups.id'))
 
@@ -34,7 +34,7 @@ class Bot(Base):
     __tablename__ = 'bots'
 
     id = Column(Integer, primary_key=True)
-    uuid = Column(String)
+    uuid = Column(String, unique=True)
     interval = Column(Integer)
     delta = Column(Integer)
     hostid = Column(Integer, ForeignKey('hosts.id'))
@@ -59,8 +59,8 @@ class Group(Base):
     __tablename__ = 'groups'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String)
-
+    name = Column(String, unique=True)
+    
     def __init__(self, name):
         self.name = name
         session.add(self)
