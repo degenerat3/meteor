@@ -6,7 +6,7 @@ def registerBot(uuid, interval, delta, hostname):
         q = session.query(Host).filter(Host.hostname == hostname).one()
         hostid = q.id
     except:
-        return [False, "Unknown hostname - register failed"]
+        return [False, "Unknown hostname"]
     b = Bot(uuid, interval, delta, hostid)
     return [True, "None"]
 
@@ -17,7 +17,7 @@ def registerHost(hostname, interface, groupname):
         q = session.query(Group).filter(Group.name == groupname).one()
         groupid = q.id
     except:
-        return [False, "Unknown group - register failed"]
+        return [False, "Unknown group"]
     h = Host(hostname, interface, groupid)
     return [True, "None"]
 
