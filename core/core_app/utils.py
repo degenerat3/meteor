@@ -31,11 +31,11 @@ def dumpDatabase():
         data += str(instance) + "\n"
     data += "\nGROUPS:\n"
     for instance in session.query(Group).order_by(Group.id):
-        data += (instance) + "\n"
+        data += str(instance) + "\n"
     data += "\nACTIONS:\n"
     for instance in session.query(Action).order_by(Action.id):
-        data += (instance) + "\n"
+        data += str(instance) + "\n"
     data += "\nRESPONSES:\n"
     for instance in session.query(Response).order_by(Response.id):
-        data += (instance) + "\n"
+        data += str(instance) + "\n"
     return data
