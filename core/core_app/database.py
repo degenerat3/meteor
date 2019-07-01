@@ -60,7 +60,7 @@ class Group(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    
+
     def __init__(self, name):
         self.name = name
         session.add(self)
@@ -123,5 +123,5 @@ class Response(Base):
 
 
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
+Session = scoped_sessionmaker(bind=engine)
 session = Session()
