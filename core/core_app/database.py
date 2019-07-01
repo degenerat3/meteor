@@ -123,5 +123,5 @@ class Response(Base):
 
 
 Base.metadata.create_all(engine)
-Session = scoped_sessionmaker(bind=engine)
+Session = scoped_session(sessionmaker(bind=engine))
 session = Session()
