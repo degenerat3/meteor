@@ -54,6 +54,51 @@ def newgroup():
     failure_str = "500: Register failure- " + reg_status[1]
     return failure_str
 
+
+@app.route('/add/command/single', methods=['POST'])
+def newaction():
+    content = request.json
+    try:
+        hostname = content['hostname']
+        mode = content['mode']
+        arguments = content['arguments']
+        options = content['options']
+    except:
+        return "Missing required field"
+    hostid = hostlookup(hostname)
+    if hostid == "ERROR":
+        return "Unknown host"
+    singlecommandadd(mode, arguments, options, hostid)
+    return "success"
+
+@app.route('/add/command/group', methods=['POST'])
+def newgroupaction():
+    content = request.json
+    try:
+        groupname = content['groupname']
+        mode = content['mode']
+        arguments = content['arguments']
+        options = content['options']
+    except:
+        return "Missing required field"
+    groupid = grouplookup(groupname)
+    if groupid == "ERROR":
+        return "Unknown group"
+    
+    return "success"
+
+
+@app.route('/add/actionresult', methods=['POST'])
+def newactionres():
+    return "success"
+
+@app.route('/get/command', methods=['POST'])
+def getcommand():
+    return "success"
+
+@app.route('/get/actionresult', methods=['POST'])
+    return "success"
+
 @app.route('/dumpdb')
 def dumpdb():
     data = dumpDatabase()
