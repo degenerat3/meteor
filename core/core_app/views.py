@@ -97,6 +97,7 @@ def getcommand():
     return "success"
 
 @app.route('/get/actionresult', methods=['POST'])
+def getactionresult():
     return "success"
 
 @app.route('/dumpdb')

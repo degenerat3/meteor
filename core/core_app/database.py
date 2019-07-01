@@ -2,7 +2,7 @@ import sys
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, exc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 Base = declarative_base()
 engine = create_engine('sqlite:////tmp/meteor/meteor.db', echo=True)
