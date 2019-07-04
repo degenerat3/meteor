@@ -52,7 +52,9 @@ def singlecommandadd(mode, arguments, options, hostid):
 def groupcommandadd(mode, arguments, options, groupid):
     q = session.query(Host).filter(Host.groupid == groupid)
     for result in q:
-        print(result)
+        hid = result.id
+        singlecommandadd(mode, arguments, options, hid)
+    return [True, "None"]
 
 
 def addGroupAction(groupname, mode, arguments, options):
