@@ -63,7 +63,29 @@ def addGroupAction(groupname, mode, arguments, options):
         return [False, "Unknown host"]
     groupcommandadd(mode, arguments, options, gid)
 
+def listHostsUtil():
+    data = ""
+    for instance in session.query(Host).order_by(Host.id):
+        data += str(instance) + "\n"
+    return data
 
+def listBotsUtil():
+    data = ""
+    for instance in session.query(Bot).order_by(Bot.id):
+        data += str(instance) + "\n"
+    return data
+
+def listGroupsUtil():
+    data = ""
+    for instance in session.query(Group).order_by(Group.id):
+        data += str(instance) + "\n"
+    return data
+
+def listActionsUtil():
+    data = ""
+    for instance in session.query(Action).order_by(Action.id):
+        data += str(instance) + "\n"
+    return data
 
 def dumpDatabase():
     data = "HOSTS:\n"
