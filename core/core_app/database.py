@@ -5,7 +5,7 @@ from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engi
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 Base = declarative_base()
-engine = create_engine('sqlite:////tmp/meteor/meteor.db', echo=True)
+engine = create_engine('postgresql://deg:letmein@127.0.0.1/meteor', echo=True)
 
 class Host(Base):
     __tablename__ = 'hosts'
