@@ -19,7 +19,7 @@ request = requests.post(server + "/register/bot", headers=header, data=json.dump
 print(request.text)
 
 header = {'Content-type': 'application/json'}
-data = {"groupname": "webservers", "mode": "shell", "arguments": "", "options": ""}
+data = {"groupname": "Webservers", "mode": "shell", "arguments": "", "options": ""}
 request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data))
 print(request.text)
 

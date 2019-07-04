@@ -41,7 +41,7 @@ def grouplookup(groupname):
     try:
         q = session.query(Group).filter(Group.name == groupname).one()
         gid = q.id
-        return qid
+        return gid
     except:
         return "ERROR"
 
@@ -52,8 +52,13 @@ def singlecommandadd(mode, arguments, options, hostid):
 def groupcommandadd(mode, arguments, options, groupid):
     q = session.query(Host).filter(Host.groupid == groupid)
     for result in q:
-        print(result.hostname)
-    
+        print(result)
+
+
+def addGroupAction(groupname, mode, arguments, options):
+    gid = grouplookup(groupname)
+    groupcommandadd(mode, arguments, options, groupid)
+
 
 
 def dumpDatabase():
