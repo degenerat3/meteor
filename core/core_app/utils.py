@@ -28,6 +28,43 @@ def registerGroup(groupname):
     return [True, "None"]
 
 
+def hostlookup(hostname):
+    try:
+        q = session.query(Host).filter(Host.hostname == hostname).one()
+        hostid = q.id
+        return hostid
+    except:
+        return "ERROR"
+
+
+def grouplookup(groupname):
+    try:
+        q = session.query(Group).filter(Group.name == groupname).one()
+        gid = q.id
+        return gid
+    except:
+        return "ERROR"
+
+
+def singlecommandadd(mode, arguments, options, hostid):
+    a = Action(mode, arguments, options, False, False, hostid)
+
+def groupcommandadd(mode, arguments, options, groupid):
+    q = session.query(Host).filter(Host.groupid == groupid)
+    for result in q:
+        hid = result.id
+        singlecommandadd(mode, arguments, options, hid)
+    return [True, "None"]
+
+
+def addGroupAction(groupname, mode, arguments, options):
+    gid = grouplookup(groupname)
+    if gid == "Error":
+        return [False, "Unknown host"]
+    groupcommandadd(mode, arguments, options, gid)
+
+
+
 def dumpDatabase():
     data = "HOSTS:\n"
     for instance in session.query(Host).order_by(Host.id):

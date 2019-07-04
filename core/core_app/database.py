@@ -2,10 +2,10 @@ import sys
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, exc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 Base = declarative_base()
-engine = create_engine('sqlite:////tmp/meteor/meteor.db', echo=True)
+engine = create_engine('postgresql://deg:letmein@127.0.0.1/meteor', echo=True)
 
 class Host(Base):
     __tablename__ = 'hosts'
@@ -60,7 +60,7 @@ class Group(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True)
-    
+
     def __init__(self, name):
         self.name = name
         session.add(self)
@@ -123,5 +123,5 @@ class Response(Base):
 
 
 Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
+Session = scoped_session(sessionmaker(bind=engine))
 session = Session()

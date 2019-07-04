@@ -18,5 +18,10 @@ data = {"uuid": "aklsjflasdjfl", "interval": 60, "delta": 5, "hostname": "192.69
 request = requests.post(server + "/register/bot", headers=header, data=json.dumps(data))
 print(request.text)
 
+header = {'Content-type': 'application/json'}
+data = {"groupname": "Webservers", "mode": "shell", "arguments": "", "options": ""}
+request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data))
+print(request.text)
+
 request = requests.get(server + "/dumpdb")
 print(request.text)
