@@ -98,6 +98,26 @@ def getcommand():
 def getactionresult():
     return "success"
 
+@app.route('/list/bots')
+def listbots():
+    data = listBotsUtil()
+    return data
+
+@app.route('/list/hosts')
+def listhosts()
+    data = listHostsUtil()
+    return data
+
+@app.route('/list/groups')
+def listgroups():
+    data = listGroupsUtil()
+    return data
+
+@app.route('/list/actions')
+def listactions():
+    data = listActionsUtil()
+    return data
+
 @app.route('/dumpdb')
 def dumpdb():
     data = dumpDatabase()
