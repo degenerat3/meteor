@@ -81,9 +81,7 @@ def newgroupaction():
         options = content['options']
     except:
         return "Missing required field"
-    groupid = grouplookup(groupname)
-    if groupid == "ERROR":
-        return "Unknown group"
+    res = addGroupAction(groupname, mode, arguments, options)
     
     return "success"
 

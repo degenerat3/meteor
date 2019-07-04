@@ -59,6 +59,8 @@ def groupcommandadd(mode, arguments, options, groupid):
 
 def addGroupAction(groupname, mode, arguments, options):
     gid = grouplookup(groupname)
+    if gid == "Error":
+        return [False, "Unknown host"]
     groupcommandadd(mode, arguments, options, groupid)
 
 
