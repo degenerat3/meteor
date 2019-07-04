@@ -104,7 +104,7 @@ def listbots():
     return data
 
 @app.route('/list/hosts')
-def listhosts()
+def listhosts():
     data = listHostsUtil()
     return data
 
