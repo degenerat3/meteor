@@ -105,7 +105,7 @@ def getcommand():
     except:
         return "Missing required field"
     cmds = getCommandUtil(hostname)
-    return cmds
+    return str(cmds)
 
 @app.route('/get/actionresult', methods=['POST'])
 def getactionresult():

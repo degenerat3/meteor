@@ -106,7 +106,7 @@ class Response(Base):
 
     id = Column(Integer, primary_key=True)
     data = Column(String)
-    actionid = Column(Integer, ForeignKey('actions.id'))
+    actionid = Column(Integer, ForeignKey('actions.id'), unique=True)
 
     def __init__(self, data, actionid):
         self.data = data
@@ -119,7 +119,7 @@ class Response(Base):
             sys.stderr.write("Error creating Response...\n")
 
     def __repr__(self):
-        return "<Respnose(id='%d', data='%s', actionid='%d')>" % (self.id, self.data, self.actionid)
+        return "<Response(id='%d', data='%s', actionid='%d')>" % (self.id, self.data, self.actionid)
 
 
 Base.metadata.create_all(engine)
