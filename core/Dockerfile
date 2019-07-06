@@ -1,8 +1,6 @@
-FROM library/postgres:12-alpine
+FROM alpine:latest
 RUN apk add --update python3 tzdata
 
-# Have DB/user get created on startup
-COPY ini.sql /docker-entrypoint-initdb.d/
 
 # Set the timezone
 ENV TZ=America/New_York

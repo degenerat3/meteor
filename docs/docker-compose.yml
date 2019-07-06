@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  core:
+    build:
+      context: core/
+    ports:
+      - "9999:9999"
+    networks:
+      meteornet:
+        ipv4_address: 172.69.1.1
+
+  db:
+    build:
+      context: database/
+    ports:
+      - "5432:5432"
+    networks:
+      meteornet:
+        ipv4_address: 172.69.1.2
+
+networks:
+  meteornet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.69.0.0/16
