@@ -1,11 +1,12 @@
 FROM library/postgres:12-alpine
-RUN apk add --update python3 
+RUN apk add --update python3 tzdata
 
 # Have DB/user get created on startup
-COPY init.sql /docker-entrypoint-initdb.d/
+COPY ini.sql /docker-entrypoint-initdb.d/
 
 # Set the timezone
 ENV TZ=America/New_York
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY ./requirements.txt /app/requirements.txt
 WORKDIR /app
