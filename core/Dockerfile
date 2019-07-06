@@ -1,5 +1,5 @@
 FROM alpine:latest
-RUN apk add --update python3 tzdata
+RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev tzdata
 
 
 # Set the timezone
