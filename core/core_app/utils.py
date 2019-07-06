@@ -129,11 +129,14 @@ def dumpDatabase():
 
 
 def clearDbUtil():
-    meta = MetaData()
-    for table in reversed(meta.sorted_tables):
-        session.execute(table.delete())
+    session.query(Response).delete()
+    session.query(Action).delete()
+    session.query(Bot).delete()
+    session.query(Host).delete()
+    session.query(Group).delete()
     try:
         session.commit()
+        return "Success\n"
     except:
-        return "Failure"
-    return "Success"
+        session.rollback()
+        return "Error\n"
