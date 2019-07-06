@@ -23,5 +23,20 @@ data = {"groupname": "Webservers", "mode": "shell", "arguments": "", "options": 
 request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data))
 print(request.text)
 
+header = {'Content-type': 'application/json'}
+data = {"hostname": "192.69.4.20"}
+request = requests.post(server + "/get/command", headers=header, data=json.dumps(data))
+print(request.text)
+
+header = {'Content-type': 'application/json'}
+data = {"actionid": "1", "data": "Command Executed With No Error"}
+request = requests.post(server + "/add/actionresult", headers=header, data=json.dumps(data))
+print(request.text)
+
+header = {'Content-type': 'application/json'}
+data = {"actionid": "1"}
+request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data))
+print(request.text)
+
 request = requests.get(server + "/dumpdb")
 print(request.text)
