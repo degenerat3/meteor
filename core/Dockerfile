@@ -1,6 +1,7 @@
 FROM alpine:latest
 RUN apk update && apk add postgresql-dev gcc python3-dev musl-dev tzdata
 
+RUN sleep 5
 
 # Set the timezone
 ENV TZ=America/New_York
