@@ -141,3 +141,8 @@ def listactions():
 def dumpdb():
     data = dumpDatabase()
     return data
+
+@app.route('/cleardb', methods=['GET'])
+def dumpdb():
+    data = clearDbUtil
+    return data

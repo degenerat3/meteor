@@ -126,3 +126,15 @@ def dumpDatabase():
     for instance in session.query(Response).order_by(Response.id):
         data += str(instance) + "\n"
     return data
+
+
+def clearDbUtil():
+    meta = db.metadata
+    for table in reversed(meta.sorted_tables):
+        print 'Clear table %s' % table
+        session.execute(table.delete())
+    try:
+        session.commit()
+    except:
+        return "Failure"
+    return "Success"
