@@ -129,7 +129,7 @@ def dumpDatabase():
 
 
 def clearDbUtil():
-    meta = db.metadata
+    meta = MetaData()
     for table in reversed(meta.sorted_tables):
         session.execute(table.delete())
     try:
