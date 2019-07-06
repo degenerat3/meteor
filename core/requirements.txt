@@ -1,2 +1,4 @@
 SQLAlchemy
 requests
+flask
+psycopg2
