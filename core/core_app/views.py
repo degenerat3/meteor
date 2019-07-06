@@ -94,7 +94,7 @@ def newactionres():
         data = content['data']
     except:
         return "Missing required field"
-    res = newActionResultUtil(actionid, data)
+    res = newActionResultUtil(aid, data)
     return "success"
 
 @app.route('/get/command', methods=['POST'])
