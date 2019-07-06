@@ -143,6 +143,6 @@ def dumpdb():
     return data
 
 @app.route('/cleardb', methods=['GET'])
-def dumpdb():
-    data = clearDbUtil
+def cleardb():
+    data = clearDbUtil()
     return data
