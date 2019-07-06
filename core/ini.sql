@@ -1,3 +1,3 @@
-CREATE USER meteoruser with password "dbpassword";
+CREATE USER met WITH PASSWORD 'dbpassword';
 CREATE DATABASE meteor;
-GRANT ALL PRIVILEGES ON DATABASE meteor TO meteoruser;
+GRANT ALL PRIVILEGES ON DATABASE "meteor" TO meteoruser;
