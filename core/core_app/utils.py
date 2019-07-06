@@ -63,6 +63,28 @@ def addGroupAction(groupname, mode, arguments, options):
         return [False, "Unknown host"]
     groupcommandadd(mode, arguments, options, gid)
 
+def getCommandUtil(hostname):
+    hid = hostlookup(hostname)
+    q = session.query(Action).filter(Action.hostid == hid)
+    cmds = []
+    for actn in q:
+        mode = actn.mode
+        args = actn.arguments
+        opts = actn.options
+        actn.queued = True
+        cmd = {"mode": mode, "arguments": args, "options": opts}
+        cmds.append(cmd)
+    session.commit()
+    return cmds
+
+def newActionResultUtil(actionid, data):
+    Response(data, actionid)
+    return "Success"
+
+def getActionResultUtil(actionid):
+    q = session.query(Response).filter(Response.actionid == actionid).one()
+    return q.data
+
 def listHostsUtil():
     data = ""
     for instance in session.query(Host).order_by(Host.id):
