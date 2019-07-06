@@ -1,4 +1,4 @@
-FROM library/postgres
+FROM library/postgres:12-alpine
 RUN apk add --update python3 
 
 # Have DB/user get created on startup
