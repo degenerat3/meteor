@@ -68,11 +68,12 @@ def getCommandUtil(hostname):
     q = session.query(Action).filter(Action.hostid == hid)
     cmds = []
     for actn in q:
+        aid = actn.id
         mode = actn.mode
         args = actn.arguments
         opts = actn.options
         actn.queued = True
-        cmd = {"mode": mode, "arguments": args, "options": opts}
+        cmd = {"id": aid, "mode": mode, "arguments": args, "options": opts}
         cmds.append(cmd)
     session.commit()
     return cmds
