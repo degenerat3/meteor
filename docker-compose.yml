@@ -24,6 +24,8 @@ services:
   daddytops:
     build:
       context: modules/daddy_tops/
+    ports:
+      - "8888:8888"
     networks:
       meteornet: 
         ipv4_address: 172.69.1.3
