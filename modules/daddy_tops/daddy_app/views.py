@@ -83,29 +83,29 @@ def getactionresult():
 @app.route('/list/bots', methods=['GET'])
 def listbots():
     data = requests.get(core + "/list/bots")
-    return data
+    return data.text
 
 @app.route('/list/hosts', methods=['GET'])
 def listhosts():
     data = requests.get(core + "/list/hosts")
-    return data
+    return data.text
 
 @app.route('/list/groups', methods=['GET'])
 def listgroups():
     data = requests.get(core + "/list/groups")
-    return data
+    return data.text
 
 @app.route('/list/actions', methods=['GET'])
 def listactions():
     data = requests.get(core + "/list/actions")
-    return data
+    return data.text
 
 @app.route('/dumpdb', methods=['GET'])
 def dumpdb():
     data = requests.get(core + "/dumpdb")
-    return data
+    return data.text
 
 @app.route('/cleardb', methods=['GET'])
 def cleardb():
     data = requests.get(core + "/cleardb")
-    return data
+    return data.text
