@@ -105,8 +105,3 @@ def listactions():
 def dumpdb():
     data = requests.get(core + "/dumpdb")
     return data.text
-
-@app.route('/cleardb', methods=['GET'])
-def cleardb():
-    data = requests.get(core + "/cleardb")
-    return data.text
