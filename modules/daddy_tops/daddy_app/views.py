@@ -21,8 +21,8 @@ def newhost():
         return "Missing required fields"
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "interface": interface, "groupname": groupname}
-    request = requests.post(server + "/register/host", headers=header, data=json.dumps(data))
-    return request.text
+    req = requests.post(server + "/register/host", headers=header, data=json.dumps(data))
+    return req.text
 
 @app.route('/register/group', methods=['POST'])
 def newgroup():
@@ -33,8 +33,8 @@ def newgroup():
         return "Missing required field"
     header = {'Content-type': 'application/json'}
     data = {"groupname": groupname}
-    request = requests.post(core + "/register/group", headers=header, data=json.dumps(data))
-    return request.text
+    req = requests.post(core + "/register/group", headers=header, data=json.dumps(data))
+    return req.text
 
 
 @app.route('/add/command/single', methods=['POST'])
@@ -49,8 +49,8 @@ def newaction():
         return "Missing required field"
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "mode": mode, "arguments": arguments, "options": options}
-    request = requests.post(core + "/add/command/single", headers=header, data=json.dumps(data))
-    return request.text
+    req = requests.post(core + "/add/command/single", headers=header, data=json.dumps(data))
+    return req.text
 
 @app.route('/add/command/group', methods=['POST'])
 def newgroupaction():
@@ -64,8 +64,8 @@ def newgroupaction():
         return "Missing required field"
     header = {'Content-type': 'application/json'}
     data = {"groupname": groupname, "mode": mode, "arguments": arguments, "options": options}
-    request = requests.post(core + "/add/command/group", headers=header, data=json.dumps(data))
-    return request.text
+    req = requests.post(core + "/add/command/group", headers=header, data=json.dumps(data))
+    return req.text
 
 
 @app.route('/get/actionresult', methods=['POST'])
@@ -77,8 +77,8 @@ def getactionresult():
         return "Missing required field"
     header = {'Content-type': 'application/json'}
     data = {"actionid": aid}
-    request = requests.post(core + "/get/actionresult", headers=header, data=json.dumps(data))
-    return request.text
+    req = requests.post(core + "/get/actionresult", headers=header, data=json.dumps(data))
+    return req.text
 
 @app.route('/list/bots', methods=['GET'])
 def listbots():
