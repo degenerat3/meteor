@@ -73,7 +73,7 @@ def getCommandUtil(hostname):
         args = actn.arguments
         opts = actn.options
         actn.queued = True
-        cmd = {"id": aid, mode": mode, "arguments": args, "options": opts}
+        cmd = {"id": aid, "mode": mode, "arguments": args, "options": opts}
         cmds.append(cmd)
     session.commit()
     return cmds
