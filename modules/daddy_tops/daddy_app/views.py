@@ -1,6 +1,7 @@
 from flask import Flask, request
 from . import app
 import requests
+import json
 
 core = "http://172.69.1.1:9999"
 
@@ -21,7 +22,7 @@ def newhost():
         return "Missing required fields"
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "interface": interface, "groupname": groupname}
-    req = requests.post(server + "/register/host", headers=header, data=json.dumps(data))
+    req = requests.post(core + "/register/host", headers=header, data=json.dumps(data))
     return req.text
 
 @app.route('/register/group', methods=['POST'])
