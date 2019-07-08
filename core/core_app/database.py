@@ -13,11 +13,13 @@ class Host(Base):
     id = Column(Integer, primary_key=True)
     hostname = Column(String, unique=True)
     interface = Column(String)
+    lastseen = Column(Integer)
     groupid = Column(Integer, ForeignKey('groups.id'))
 
     def __init__(self, hostname, interface, groupid):
         self.hostname = hostname
         self.interface = interface
+        self.lastseen = 0
         self.groupid = groupid
         session.add(self)
         try:
@@ -37,12 +39,14 @@ class Bot(Base):
     uuid = Column(String, unique=True)
     interval = Column(Integer)
     delta = Column(Integer)
+    lastseen = Column(Integer)
     hostid = Column(Integer, ForeignKey('hosts.id'))
 
     def __init__(self, uuid, interval, delta, hostid):
         self.uuid = uuid
         self.interval = interval
         self.delta = delta
+        self.lastseen = 0
         self.hostid = hostid
         session.add(self)
         try:

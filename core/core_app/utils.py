@@ -1,3 +1,4 @@
+import time
 from .database import *
 
 def registerBot(uuid, interval, delta, hostname):
@@ -63,8 +64,13 @@ def addGroupAction(groupname, mode, arguments, options):
         return [False, "Unknown host"]
     groupcommandadd(mode, arguments, options, gid)
 
-def getCommandUtil(hostname):
+def getCommandUtil(hostname, uuid):
+    t = int(time.time())
     hid = hostlookup(hostname)
+    h = session.query(Host).filter(Host.id == hid).one()
+    h.lastseen = t
+    b = session.query(Bot).filter(Bot.uuid == uuid).one()
+    b.lastseen = t
     q = session.query(Action).filter(Action.hostid == hid)
     cmds = []
     for actn in q:
