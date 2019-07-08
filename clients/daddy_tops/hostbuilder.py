@@ -1,4 +1,6 @@
 # Reads a topology, populates the DB with hosts/groups
+import requests
+import json
 import yaml
 from yaml import Loader
 
@@ -19,7 +21,7 @@ inp = "example_input.yml"
 y = yaml.load(open(inp), Loader=Loader)
 
 for key in y:
-    #registerGroup(key)
+    registerGroup(key)
     for host in y[key]:
         host = host.split(":")
         hostname = host[0]
