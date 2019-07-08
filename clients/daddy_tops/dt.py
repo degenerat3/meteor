@@ -73,7 +73,7 @@ def listObj(args):
         return
     if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result"]:
         print("Unknown object: " + obj + "...")
-        print("Options are (not case-sens): bots, hosts, actions, groups, db, result)
+        print("Options are (not case-sens): bots, hosts, actions, groups, db, result")
         help()
         return
     if "result" not in obj:
