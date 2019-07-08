@@ -24,7 +24,7 @@ request = requests.post(server + "/add/command/group", headers=header, data=json
 print(request.text)
 
 header = {'Content-type': 'application/json'}
-data = {"hostname": "192.69.4.20"}
+data = {"hostname": "192.69.4.20", "uuid": "aklsjflasdjfl"}
 request = requests.post(server + "/get/command", headers=header, data=json.dumps(data))
 print(request.text)
 
