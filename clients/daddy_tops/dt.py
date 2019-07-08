@@ -4,7 +4,7 @@ import requests
 import json
 
 server = "http://localhost:8888"
-user = "Jim"
+user = "<username_for_logging>"
 
 
 def help():
