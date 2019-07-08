@@ -29,7 +29,7 @@ class Host(Base):
             sys.stderr.write("Error creating Host...\n")
 
     def __repr__(self):
-        return "<Host(id='%d', hostname='%s', interface='%s', groupid='%d')>" % (self.id, self.hostname, self.interface, self.groupid)
+        return "<Host(id='%d', hostname='%s', interface='%s', lastseen='%d', groupid='%d')>" % (self.id, self.hostname, self.interface, self.lastseen, self.groupid)
 
     
 class Bot(Base):
@@ -56,7 +56,7 @@ class Bot(Base):
             sys.stderr.write("Error creating Bot...\n")
 
     def __repr__(self):
-        return "<Bot(id='%s', uuid='%s', interval='%d', delta='%d', hostid='%d')>" % (self.id, self.uuid, self.interval, self.delta, self.hostid)
+        return "<Bot(id='%s', uuid='%s', interval='%d', delta='%d', lastseen='%d', hostid='%d')>" % (self.id, self.uuid, self.interval, self.delta, self.lastseen, self.hostid)
 
 
 class Group(Base):
