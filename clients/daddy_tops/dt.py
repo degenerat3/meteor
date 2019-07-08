@@ -71,12 +71,12 @@ def listObj(args):
         print("Invalid syntax...")
         help()
         return
-    if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result", "action"]:
+    if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result"]:
         print("Unknown object: " + obj + "...")
-        print("Options are (not case-sens): bots, hosts, actions, groups, db, result, action")
+        print("Options are (not case-sens): bots, hosts, actions, groups, db, result)
         help()
         return
-    if "result" not in obj and "action" not in obj:
+    if "result" not in obj:
         url = server + "/list/" + obj
         request = requests.get(url)
         print(request.text)
