@@ -13,11 +13,13 @@ class Host(Base):
     id = Column(Integer, primary_key=True)
     hostname = Column(String, unique=True)
     interface = Column(String)
+    lastseen = Column(Integer)
     groupid = Column(Integer, ForeignKey('groups.id'))
 
     def __init__(self, hostname, interface, groupid):
         self.hostname = hostname
         self.interface = interface
+        self.lastseen = 0
         self.groupid = groupid
         session.add(self)
         try:
@@ -27,7 +29,7 @@ class Host(Base):
             sys.stderr.write("Error creating Host...\n")
 
     def __repr__(self):
-        return "<Host(id='%d', hostname='%s', interface='%s', groupid='%d')>" % (self.id, self.hostname, self.interface, self.groupid)
+        return "<Host(id='%d', hostname='%s', interface='%s', lastseen='%d', groupid='%d')>" % (self.id, self.hostname, self.interface, self.lastseen, self.groupid)
 
     
 class Bot(Base):
@@ -37,12 +39,14 @@ class Bot(Base):
     uuid = Column(String, unique=True)
     interval = Column(Integer)
     delta = Column(Integer)
+    lastseen = Column(Integer)
     hostid = Column(Integer, ForeignKey('hosts.id'))
 
     def __init__(self, uuid, interval, delta, hostid):
         self.uuid = uuid
         self.interval = interval
         self.delta = delta
+        self.lastseen = 0
         self.hostid = hostid
         session.add(self)
         try:
@@ -52,7 +56,7 @@ class Bot(Base):
             sys.stderr.write("Error creating Bot...\n")
 
     def __repr__(self):
-        return "<Bot(id='%s', uuid='%s', interval='%d', delta='%d', hostid='%d')>" % (self.id, self.uuid, self.interval, self.delta, self.hostid)
+        return "<Bot(id='%s', uuid='%s', interval='%d', delta='%d', lastseen='%d', hostid='%d')>" % (self.id, self.uuid, self.interval, self.delta, self.lastseen, self.hostid)
 
 
 class Group(Base):
