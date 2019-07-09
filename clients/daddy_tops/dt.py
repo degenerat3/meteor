@@ -31,7 +31,6 @@ def newAction(args):
         argum = args[3].strip()
     except:
         print("Invalid syntax...")
-        help()
         return
     opt = ""
     header = {'Content-type': 'application/json'}
@@ -51,7 +50,6 @@ def newGroupAction(args):
         argum = args[3].strip()
     except:
         print("Invalid syntax...")
-        help()
         return
     opt = ""
     header = {'Content-type': 'application/json'}
@@ -65,17 +63,16 @@ def newGroupAction(args):
 
 
 def listObj(args):
+    print("in list")
     try:
         args = args.split(":", 3)
         obj = args[1].strip()
     except:
         print("Invalid syntax...")
-        help()
         return
     if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result"]:
         print("Unknown object: " + obj + "...")
         print("Options are (not case-sens): bots, hosts, actions, groups, db, result")
-        help()
         return
     if "result" not in obj:
         url = server + "/list/" + obj
@@ -100,20 +97,32 @@ if __name__ == "__main__":
     # Show the help if we need
     try:
         if sys.argv[1] == "--interactive":
-        args = input("DTopps> ")
-        if args.startswith("action:"):
-            newAction(args)
-        elif args.startswith("gaction:"):
-            newGroupAction(args)
-        elif args.startswith("show:"):
-            listObj(args)
-        else:
-            help()
+            inter = True
     except:
-        continue
+        pass
+    if inter:
+        while True:
+            targs = input("DTopps> ")
+            args = targs
+            print(args)
+            if args.startswith("action:"):
+                newAction(args)
+            elif args.startswith("gaction:"):
+                newGroupAction(args)
+            elif args.startswith("show:"):
+                listObj(args)
+            elif args.startswith("help"):
+                help()
+            elif args.startswith("exit"):
+                exit()
+            else:
+                print("Unknown: use `help` for options")
+        exit()
+    
     if len(sys.argv) < 2:
         help()
     else:
+        print("in else")
         args = " ".join(sys.argv[1:])
         if args.startswith("action:"):
             newAction(args)
