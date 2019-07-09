@@ -15,6 +15,7 @@ def help():
     print("User: " + user)
     print()
     print("OPTIONS:")
+    print("INTERACTIVE MODE:        --interactive")
     print("NEW ACTION:              action: <target_hostname>: <mode>: <arguments>")
     print("NEW GROUP ACTION:        gaction: <target_groupname>: <mode>: <arguments>")
     print("SHOW ACTION RESULT:      show: result: <actionid>")
@@ -97,6 +98,19 @@ def listObj(args):
 
 if __name__ == "__main__":
     # Show the help if we need
+    try:
+        if sys.argv[1] == "--interactive":
+        args = input("DTopps> ")
+        if args.startswith("action:"):
+            newAction(args)
+        elif args.startswith("gaction:"):
+            newGroupAction(args)
+        elif args.startswith("show:"):
+            listObj(args)
+        else:
+            help()
+    except:
+        continue
     if len(sys.argv) < 2:
         help()
     else:
