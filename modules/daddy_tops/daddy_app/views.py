@@ -85,6 +85,7 @@ def newgroupaction():
         mode = content['mode']
         arguments = content['arguments']
         options = content['options']
+        dt_user = content['dtuser']
     except:
         return "Missing required field"
     header = {'Content-type': 'application/json'}
