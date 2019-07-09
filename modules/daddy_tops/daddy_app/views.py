@@ -40,7 +40,7 @@ def newhost():
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "interface": interface, "groupname": groupname}
     req = requests.post(core + "/register/host", headers=header, data=json.dumps(data))
-    logstr = "Host <" + str(hostname) + "> has been registered"
+    logstr = "Host <" + str(hostname) + "> has been registered\n"
     logAction(logstr)
     return req.text
 
@@ -54,7 +54,7 @@ def newgroup():
     header = {'Content-type': 'application/json'}
     data = {"groupname": groupname}
     req = requests.post(core + "/register/group", headers=header, data=json.dumps(data))
-    logstr = "Group <" + str(groupname) + "> has been registered"
+    logstr = "Group <" + str(groupname) + "> has been registered\n"
     logAction(logstr)
     return req.text
 
@@ -73,7 +73,7 @@ def newaction():
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "mode": mode, "arguments": arguments, "options": options}
     req = requests.post(core + "/add/command/single", headers=header, data=json.dumps(data))
-    logstr = "User <" + dt_user + "> queued action [<mode: " + mode + ">, " + "args: " + arguments + ">] against host <" + hostname + ">"
+    logstr = "User <" + dt_user + "> queued action [mode: <" + mode + ">, " + "args: <" + arguments + ">] against host <" + hostname + ">\n"
     logAction(logstr) 
     return req.text
 
@@ -90,7 +90,7 @@ def newgroupaction():
     header = {'Content-type': 'application/json'}
     data = {"groupname": groupname, "mode": mode, "arguments": arguments, "options": options}
     req = requests.post(core + "/add/command/group", headers=header, data=json.dumps(data))
-    logstr = "User <" + dt_user + "> queued action [<mode: " + mode + ">, " + "args: " + arguments + ">] against group <" + groupname + ">"
+    logstr = "User <" + dt_user + "> queued action [mode: <" + mode + ">, " + "args: <" + arguments + ">] against group <" + groupname + ">\n"
     logAction(logstr) 
     return req.text
 
