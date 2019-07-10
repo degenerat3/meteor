@@ -22,6 +22,7 @@ This document/protocol is meant to define a standard method of communication for
     | D*      | post result |
     | E*      | get command |
     | F      | nuke the box |  
+    
     *Modes C, D, E, are used by bots to send communications to the server, the other modes are used by the server to send commands to the bot.
    
 
