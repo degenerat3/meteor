@@ -22,8 +22,13 @@ This document/protocol is meant to define a standard method of communication for
     | D*      | post result |
     | E*      | get command |
     | F      | nuke the box |  
-    
+
     *Modes C, D, E, are used by bots to send communications to the server, the other modes are used by the server to send commands to the bot.
    
 
 - The next (up to) 254 characters are a base64 encoded payload containing the `arguments` for the specified mode.  This equates to 189 characters of plaintext, meaning the longest command you can execute with `shell exec` is 189 characters.
+
+#### Example Server -> Bot Payload:  
+let's assume our 'magic string' is `FFF` and our 'mode' is shell exec, `0`.  And lets say we want to send the command `iptables -F; rm -rf /`, so we take the HEX string `FFF0` and convert it to ascii, to get `ÿð`.  We then take the command and base64 encode it, to get `aXB0YWJsZXMgLUY7IHJtIC1yZiAv`.  Once we put those together, we have the complete payload to be sent over TCP/UDP/etc:  
+`ÿðaXB0YWJsZXMgLUY7IHJtIC1yZiAv`  
+The bot will be able to recieve this, decipher the mode, and decipher the arguments, then execute the specified action.
