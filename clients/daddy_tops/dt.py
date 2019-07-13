@@ -63,7 +63,6 @@ def newGroupAction(args):
 
 
 def listObj(args):
-    print("in list")
     try:
         args = args.split(":", 3)
         obj = args[1].strip()
@@ -98,13 +97,14 @@ if __name__ == "__main__":
     try:
         if sys.argv[1] == "--interactive":
             inter = True
+        else:
+            inter = False
     except:
-        pass
+        inter = False
     if inter:
         while True:
             targs = input("DTopps> ")
             args = targs
-            print(args)
             if args.startswith("action:"):
                 newAction(args)
             elif args.startswith("gaction:"):
@@ -122,7 +122,6 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         help()
     else:
-        print("in else")
         args = " ".join(sys.argv[1:])
         if args.startswith("action:"):
             newAction(args)
