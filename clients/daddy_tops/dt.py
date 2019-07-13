@@ -99,7 +99,7 @@ if __name__ == "__main__":
         if sys.argv[1] == "--interactive":
             inter = True
     except:
-        pass
+        inter = False
     if inter:
         while True:
             targs = input("DTopps> ")
