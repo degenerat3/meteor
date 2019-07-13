@@ -98,6 +98,8 @@ if __name__ == "__main__":
     try:
         if sys.argv[1] == "--interactive":
             inter = True
+        else:
+            inter = False
     except:
         inter = False
     if inter:
