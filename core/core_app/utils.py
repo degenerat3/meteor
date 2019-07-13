@@ -71,7 +71,7 @@ def getCommandUtil(uuid):
     hid = b.hostid
     h = session.query(Host).filter(Host.id == hid).one()
     h.lastseen = t
-    q = session.query(Action).filter(Action.hostid == hid)
+    q = session.query(Action).filter(Action.hostid == hid, Action.queued == False)
     cmds = []
     for actn in q:
         aid = actn.id
