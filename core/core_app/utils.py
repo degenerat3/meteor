@@ -64,13 +64,13 @@ def addGroupAction(groupname, mode, arguments, options):
         return [False, "Unknown group"]
     groupcommandadd(mode, arguments, options, gid)
 
-def getCommandUtil(hostname, uuid):
+def getCommandUtil(uuid):
     t = int(time.time())
-    hid = hostlookup(hostname)
-    h = session.query(Host).filter(Host.id == hid).one()
-    h.lastseen = t
     b = session.query(Bot).filter(Bot.uuid == uuid).one()
     b.lastseen = t
+    hid = b.hostid
+    h = session.query(Host).filter(Host.id == hid).one()
+    h.lastseen = t
     q = session.query(Action).filter(Action.hostid == hid)
     cmds = []
     for actn in q:

@@ -103,11 +103,10 @@ def newactionres():
 def getcommand():
     content = request.json
     try:
-        hostname = content['hostname']
         uuid = content['uuid']
     except:
         return "Missing required field"
-    cmds = getCommandUtil(hostname, uuid)
+    cmds = getCommandUtil(uuid)
     return str(cmds)
 
 @app.route('/get/actionresult', methods=['POST'])
