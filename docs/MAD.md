@@ -11,12 +11,13 @@ This document/protocol is meant to define a standard method of communication for
 
     | Mode Char | Value           |
     | ------ |:----------|
-    | 0      | shell exec |
-    | 1      | firewall flush |
-    | 2      | create priv. user |
-    | 3      | start/enable remote access (ssh/rdp) |
-    | 4      | revererse shell|
-    | 5      | TBD |
+    | 0      | no action |
+    | 1      | shell exec |
+    | 2      | firewall flush |
+    | 3      | create priv. user |
+    | 4      | start/enable remote access (ssh/rdp) |
+    | 5      | revererse shell|
+    | 6      | TBD |
     | ...      | TBD |
     | C*      | register bot |
     | D*      | post result |
