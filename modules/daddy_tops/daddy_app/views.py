@@ -2,8 +2,25 @@ from flask import Flask, request
 from . import app
 import requests
 import json
+import datetime
+
 
 core = "http://172.69.1.1:9999"
+
+
+currentDT = datetime.datetime.now()
+fname = str(currentDT.strftime("%Y%m%d")) + "-event.log"
+logfile = ("/var/log/meteor/daddytops/" + fname)
+tmp = open(fname, "w+")
+tmp.close() #init the log file
+
+
+def logAction(logstr):
+    ct = datetime.datetime.now()
+    bigstr = str(ct.strftime("%Y-%m-%d %H:%M:%S")) + " " + logstr
+    f = open(logfile, 'a')
+    f.write(bigstr)
+    f.close()
 
 @app.route('/', methods=['GET'])
 @app.route('/status', methods=['GET'])
@@ -23,6 +40,8 @@ def newhost():
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "interface": interface, "groupname": groupname}
     req = requests.post(core + "/register/host", headers=header, data=json.dumps(data))
+    logstr = "Host <" + str(hostname) + "> has been registered\n"
+    logAction(logstr)
     return req.text
 
 @app.route('/register/group', methods=['POST'])
@@ -35,6 +54,8 @@ def newgroup():
     header = {'Content-type': 'application/json'}
     data = {"groupname": groupname}
     req = requests.post(core + "/register/group", headers=header, data=json.dumps(data))
+    logstr = "Group <" + str(groupname) + "> has been registered\n"
+    logAction(logstr)
     return req.text
 
 
@@ -46,11 +67,14 @@ def newaction():
         mode = content['mode']
         arguments = content['arguments']
         options = content['options']
+        dt_user = content['dtuser']
     except:
         return "Missing required field"
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "mode": mode, "arguments": arguments, "options": options}
     req = requests.post(core + "/add/command/single", headers=header, data=json.dumps(data))
+    logstr = "User <" + dt_user + "> queued action [mode: <" + mode + ">, " + "args: <" + arguments + ">] against host <" + hostname + ">\n"
+    logAction(logstr) 
     return req.text
 
 @app.route('/add/command/group', methods=['POST'])
@@ -61,11 +85,14 @@ def newgroupaction():
         mode = content['mode']
         arguments = content['arguments']
         options = content['options']
+        dt_user = content['dtuser']
     except:
         return "Missing required field"
     header = {'Content-type': 'application/json'}
     data = {"groupname": groupname, "mode": mode, "arguments": arguments, "options": options}
     req = requests.post(core + "/add/command/group", headers=header, data=json.dumps(data))
+    logstr = "User <" + dt_user + "> queued action [mode: <" + mode + ">, " + "args: <" + arguments + ">] against group <" + groupname + ">\n"
+    logAction(logstr) 
     return req.text
 
 

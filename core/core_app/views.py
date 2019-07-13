@@ -82,6 +82,8 @@ def newgroupaction():
     except:
         return "Missing required field"
     res = addGroupAction(groupname, mode, arguments, options)
+    if res[0] == False:
+        return str(res[1])
     
     return "success"
 
