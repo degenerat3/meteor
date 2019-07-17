@@ -2,10 +2,10 @@
 package main
 
 import (
-	"bufio"
 	"encoding/binary"
 	"encoding/hex"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net"
 	"os"
@@ -53,12 +53,12 @@ func main() {
 }
 
 func connHandle(conn net.Conn) {
-	message, err := bufio.NewReader(conn).ReadString(magicStr)
+	message, err := ioutil.ReadAll(conn)
 	fmt.Printf("%s\n", message)
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	}
-	resp := magicStr + "gottem" + magicStr
+	resp := string(magicStr) + "gottem"
 	conn.Write([]byte(resp))
 	conn.Close()
 }
