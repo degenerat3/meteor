@@ -62,3 +62,38 @@ func connHandle(conn net.Conn) {
 	conn.Write([]byte(resp))
 	conn.Close()
 }
+
+// take buffer from conn handler, turn it into a string
+func decodePayload() string {
+	return ""
+}
+
+// take string of payload, depending on mode/arguments: handle it
+func handlePayload(payload string) bool {
+	return true
+}
+
+// take params from bot and register it in the DB
+func registerBot(uuid string, hostname string, interval int, delta int) bool {
+	return true
+}
+
+// pull all commands from DB with associated uuid
+func getCommand(uuid string) []string {
+	return nil
+}
+
+// send the action result back to the DB for feedback tracking
+func addResult(result string, actionid int) bool {
+	return true
+}
+
+// generate the formatted and base64 encoded string, ready to be sent accross wire
+func buildPayload(mode string, arguments string, actionid int) string {
+	return ""
+}
+
+// send payload via defined connection
+func sendPayload(conn net.Conn, payload string) bool {
+	return true
+}
