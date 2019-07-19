@@ -2,34 +2,28 @@
 package main
 
 import (
-	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"os"
 )
 
 // HOST : server to listen on (pretty much always localhost)
-var HOST = "localhost"
+var HOST = "192.168.206.183"
 
 // PORT : port to listen on
 var PORT = "5656"
 
 // MAGIC : the shared hex bytes that will signify the start/end of each MAD payload
-var MAGIC uint16 = 0xAAAA
+var MAGIC = []byte("AAAA")
 var magicStr = genMagStr()
 
-func genMagStr() []byte {
-	b := make([]byte, 2)
-	binary.LittleEndian.PutUint16(b, MAGIC)
-	mstr := make([]byte, hex.DecodedLen(len(b)))
-	_, err := hex.Decode(mstr, b)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return mstr
+func genMagStr() string {
+	dst := make([]byte, hex.DecodedLen(len(MAGIC)))
+	n, _ := hex.Decode(dst, MAGIC)
+	ret := string(dst[:n])
+	return ret
 }
 
 func main() {

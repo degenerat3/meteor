@@ -1,35 +1,33 @@
 package main
 
 import (
-	"encoding/binary"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"net"
 )
 
 // HOST : server to call
-var serv = "127.0.0.1:5656"
+var serv = "192.168.206.183:5656"
 
 // MAGIC : the shared hex bytes that will signify the start/end of each MAD payload
-var MAGIC uint16 = 0xAAAA
+var MAGIC = []byte("AAAA")
 var magicStr = genMagStr()
 
-func genMagStr() []byte {
-	b := make([]byte, 2)
-	binary.LittleEndian.PutUint16(b, MAGIC)
-	mstr := make([]byte, hex.DecodedLen(len(b)))
-	_, err := hex.Decode(mstr, b)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return mstr
+func genMagStr() string {
+	dst := make([]byte, hex.DecodedLen(len(MAGIC)))
+	n, _ := hex.Decode(dst, MAGIC)
+	ret := string(dst[:n])
+	return ret
 }
 
 func sendData(data string) string {
-	fmt.Printf("sending: %s", data)
-	conn, _ := net.Dial("tcp", serv)
-	outText := []byte(data)
+	payload := magicStr + data
+	fmt.Printf("sending: %s", payload)
+	conn, err := net.Dial("tcp", serv)
+	if err != nil {
+		panic(err)
+	}
+	outText := []byte(payload)
 	conn.Write(outText)
 	resp := make([]byte, 256)
 	conn.Read(resp)
@@ -38,6 +36,6 @@ func sendData(data string) string {
 }
 
 func main() {
-	a := sendData("")
+	a := sendData("testing can you recv the payload")
 	print("GOT: %s", a)
 }
