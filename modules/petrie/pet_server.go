@@ -2,22 +2,33 @@
 package main
 
 import (
+	"bufio"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 )
 
-// HOST : server to listen on (pretty much always localhost)
-var HOST = "192.168.206.183"
-
 // PORT : port to listen on
 var PORT = "5656"
 
-// MAGIC : the shared hex bytes that will signify the start/end of each MAD payload
-var MAGIC = []byte("AAAA")
-var magicStr = genMagStr()
+// MAGIC : the shared hex byte that will signify the start of each MAD payload
+var MAGIC = []byte{0xAA}
+
+// MAGICBYTE is the single byte (rather than a byte array)
+var MAGICBYTE = MAGIC[0]
+
+//MAGICSTR is the ascii representation of the magic byte
+var MAGICSTR = string(MAGIC)
+
+// MAGICTERM : the shared hex byte that will signify the end of each MAD payload
+var MAGICTERM = []byte{0xAB}
+
+// MAGICTERMBYTE is the single byte (rather than a byte array)
+var MAGICTERMBYTE = MAGICTERM[0]
+
+//MAGICTERMSTR is the ascii representation of the magic byte
+var MAGICTERMSTR = string(MAGICTERM)
 
 func genMagStr() string {
 	dst := make([]byte, hex.DecodedLen(len(MAGIC)))
@@ -27,14 +38,14 @@ func genMagStr() string {
 }
 
 func main() {
-
-	l, err := net.Listen("tcp", HOST+":"+PORT)
+	portStr := ":" + PORT
+	l, err := net.Listen("tcp4", portStr)
 	if err != nil {
 		os.Exit(1)
 	}
 
 	defer l.Close()
-	fmt.Println("Listening for Petrie connections on " + HOST + ":" + PORT)
+	fmt.Println("Listening for Petrie connections on port:" + PORT)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -47,12 +58,13 @@ func main() {
 }
 
 func connHandle(conn net.Conn) {
-	message, err := ioutil.ReadAll(conn)
-	fmt.Printf("%s\n", message)
+	message, err := bufio.NewReader(conn).ReadString(MAGICTERMBYTE)
+	fmt.Printf("Incoming Message: %s\n", message)
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	}
-	resp := string(magicStr) + "gottem"
+	resp := MAGICSTR + "gottem" + MAGICTERMSTR
+	fmt.Println("sending: " + resp)
 	conn.Write([]byte(resp))
 	conn.Close()
 }
