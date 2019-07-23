@@ -3,10 +3,11 @@ package main
 
 import (
 	"bufio"
-	"encoding/hex"
+	"encoding/base64"
 	"fmt"
 	"net"
 	"os"
+	"strings"
 )
 
 // PORT : port to listen on
@@ -30,13 +31,6 @@ var MAGICTERMBYTE = MAGICTERM[0]
 //MAGICTERMSTR is the ascii representation of the magic byte
 var MAGICTERMSTR = string(MAGICTERM)
 
-func genMagStr() string {
-	dst := make([]byte, hex.DecodedLen(len(MAGIC)))
-	n, _ := hex.Decode(dst, MAGIC)
-	ret := string(dst[:n])
-	return ret
-}
-
 func main() {
 	portStr := ":" + PORT
 	l, err := net.Listen("tcp4", portStr)
@@ -59,7 +53,8 @@ func main() {
 
 func connHandle(conn net.Conn) {
 	message, err := bufio.NewReader(conn).ReadString(MAGICTERMBYTE)
-	fmt.Printf("Incoming Message: %s\n", message)
+	decMsg := decodePayload(message)
+	fmt.Printf("Incoming Message: %s\n", decMsg)
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	}
@@ -70,8 +65,15 @@ func connHandle(conn net.Conn) {
 }
 
 // take buffer from conn handler, turn it into a string
-func decodePayload() string {
-	return ""
+func decodePayload(payload string) string {
+	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
+	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
+	data, err := base64.StdEncoding.DecodeString(encodedPayload)
+	if err != nil {
+		fmt.Println("error:", err)
+		return ""
+	}
+	return string(data)
 }
 
 // take string of payload, depending on mode/arguments: handle it
