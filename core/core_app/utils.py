@@ -86,6 +86,9 @@ def getCommandUtil(uuid):
 
 def newActionResultUtil(actionid, data):
     Response(data, actionid)
+    q = session.query(Action).filter(Action.id == actionid).one()
+    q.responded = True
+    session.commit()
     return "Success"
 
 def getActionResultUtil(actionid):
