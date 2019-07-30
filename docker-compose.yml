@@ -32,6 +32,17 @@ services:
       meteornet: 
         ipv4_address: 172.69.1.3
 
+  petrie:
+    build:
+      context: modules/petrie/
+    ports:
+      - "5656:5656"
+    volumes:
+      - /var/log/meteor/petrie:/var/log/meteor/petrie
+    networks:
+      meteornet:
+        ipv4_address: 172.69.1.4
+
 networks:
   meteornet:
     ipam:
