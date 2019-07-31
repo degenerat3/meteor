@@ -25,7 +25,6 @@ Separate from the core, but connected via private docker network, are the "modul
 For the server, just `docker-compose up` from the root directory of the project and you should be good to go (be careful with that because everything is in debug mode, so you'll see lots of output).  
 
 For the client(s): they have to be slightly customized with IP/port information, then compiled for the target OS.
-Next on the list (besides docs) are ICMP and DNS modules.  
-Don't be upset with the lack of any coherent documentation (or any at all for that matter)... it's coming soon<sup>TM</sup>
+
 
 ![The Land Before Time](docs/images/lbft.jpeg?raw=true "Image source: Hulu.com")
