@@ -98,10 +98,10 @@ Method: GET
 
 ## Other Endpoints
 ### /dumpdb
-Description:  show every record in every table of the meteor DB
+Description:  show every record in every table of the meteor DB  
 Method: GET
 
 ### /cleardb
-Description:  delete every record in every table of the meteor DB
+Description:  delete every record in every table of the meteor DB  
 Method: GET
 
