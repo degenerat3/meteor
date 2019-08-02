@@ -45,7 +45,7 @@ services:
 
   littlefoot:
     build:
-      context: modules/littlefoot/
+      context: modules/little_foot/
     ports:
       - "8080:8080"
     volumes:
