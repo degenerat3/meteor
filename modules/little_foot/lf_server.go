@@ -23,7 +23,7 @@ var MAGIC = []byte{0xAA}
 var MAGICBYTE = MAGIC[0]
 
 //MAGICSTR is the ascii representation of the magic byte
-var MAGICSTR = string(MAGIC)
+var MAGICSTR = "XXXXX" //string(MAGIC)
 
 // MAGICTERM : the shared hex byte that will signify the end of each MAD payload
 var MAGICTERM = []byte{0xAB}
@@ -32,7 +32,7 @@ var MAGICTERM = []byte{0xAB}
 var MAGICTERMBYTE = MAGICTERM[0]
 
 //MAGICTERMSTR is the ascii representation of the magic byte
-var MAGICTERMSTR = string(MAGICTERM)
+var MAGICTERMSTR = "YYYYY" //string(MAGICTERM)
 
 //take the MAD payload and do stuff with it
 func connHandle(rw http.ResponseWriter, req *http.Request) {
@@ -52,6 +52,9 @@ func connHandle(rw http.ResponseWriter, req *http.Request) {
 func decodePayload(payload string) string {
 	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
+	encodedPayload = strings.Replace(encodedPayload, "{\"comms\":\"", "", 1)
+	encodedPayload = strings.Replace(encodedPayload, "\"}", "", 1)
+	fmt.Println("enc: " + encodedPayload)
 	data, err := base64.StdEncoding.DecodeString(encodedPayload)
 	if err != nil {
 		fmt.Println("error:", err)
