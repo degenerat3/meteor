@@ -43,6 +43,17 @@ services:
       meteornet:
         ipv4_address: 172.69.1.4
 
+  littlefoot:
+    build:
+      context: modules/little_foot/
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/log/meteor/littlefoot:/var/log/meteor/littlefoot
+    networks:
+      meteornet:
+        ipv4_address: 172.69.1.5
+
 networks:
   meteornet:
     ipam:

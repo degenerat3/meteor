@@ -77,7 +77,6 @@ func decodePayload(payload string) string {
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
 	data, err := base64.StdEncoding.DecodeString(encodedPayload)
 	if err != nil {
-		fmt.Println("error:", err)
 		return ""
 	}
 	return string(data)

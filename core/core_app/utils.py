@@ -63,6 +63,7 @@ def addGroupAction(groupname, mode, arguments, options):
     if gid == "ERROR":
         return [False, "Unknown group"]
     groupcommandadd(mode, arguments, options, gid)
+    return [True, "None"]
 
 def getCommandUtil(uuid):
     t = int(time.time())
