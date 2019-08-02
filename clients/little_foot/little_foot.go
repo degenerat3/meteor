@@ -18,7 +18,7 @@ import (
 )
 
 // LFSERV : server to call
-var LFSERV = "192.168.206.183:80"
+var LFSERV = "192.168.206.183:8080"
 
 // MAGIC : the shared hex byte that will signify the start of each MAD payload
 var MAGIC = []byte{0xAA}
