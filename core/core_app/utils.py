@@ -2,7 +2,7 @@ import time
 import logging
 from .database import *
 
-LOGGING_FILE = "/var/log/meteor/core.log"
+LOGGING_FILE = "/var/log/meteor/core/core.log"
 LOGGING_LEVEL = logging.DEBUG    #can be .DEBUG, .INFO, .WARNING, .ERROR, .CRITICAL
 
 logging.basicConfig(filename=LOGGING_FILE, filemode='w+', format='%(asctime)s - %(levelname)s - METEOR - %(message)s ')
