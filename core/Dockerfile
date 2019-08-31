@@ -7,8 +7,8 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY ./requirements.txt /app/requirements.txt
 WORKDIR /app
-RUN mkdir -p /var/log/meteor
-RUN touch /var/log/meteor/core.log
+RUN mkdir -p /var/log/meteor/core
+RUN touch /var/log/meteor/core/core.log
 RUN pip3 install -r requirements.txt
 
 # Set up the data directories for the app

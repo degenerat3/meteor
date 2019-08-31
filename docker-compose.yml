@@ -9,7 +9,7 @@ services:
     depends_on:
       - "db"
     volumes:
-      - /var/log/meteor/:/var/log/meteor/core/  
+      - /var/log/meteor/core:/var/log/meteor/core
     networks:
       meteornet:
         ipv4_address: 172.69.1.1
