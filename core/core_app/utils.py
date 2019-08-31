@@ -5,7 +5,10 @@ from .database import *
 LOGGING_FILE = "/var/log/meteor/core/core.log"
 LOGGING_LEVEL = logging.DEBUG    #can be .DEBUG, .INFO, .WARNING, .ERROR, .CRITICAL
 
-logging.basicConfig(filename=LOGGING_FILE, filemode='w+', format='%(asctime)s - %(levelname)s - METEOR - %(message)s ')
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
+    
+logging.basicConfig(filename=LOGGING_FILE, filemode='w+', format='%(asctime)s - %(levelname)s - METEOR - %(message)s ', level=LOGGING_LEVEL)
 
 def registerBot(uuid, interval, delta, hostname):
     print("registering bot")
