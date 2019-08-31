@@ -1,5 +1,11 @@
 import time
+import logging
 from .database import *
+
+LOGGIG_FILE = "/var/log/meteor/core.log"
+LOGGING_LEVEL = logging.DEBUG    #can be .DEBUG, .INFO, .WARNING, .ERROR, .CRITICAL
+
+logging.basicConfig(filename=LOGGING_FILE, format='%(asctime)s - %(levelname)s - METEOR - %(message)s ')
 
 def registerBot(uuid, interval, delta, hostname):
     print("registering bot")
@@ -7,8 +13,12 @@ def registerBot(uuid, interval, delta, hostname):
         q = session.query(Host).filter(Host.hostname == hostname).one()
         hostid = q.id
     except:
+        logstr = "METEORAPP - Bot failed to register - uuid:" + uuid + " host:" + hostname
+        logging.error(logstr)
         return [False, "Unknown hostname"]
     b = Bot(uuid, interval, delta, hostid)
+    logstr = "METEORAPP - Bot registered - uuid:" + uuid + " host:" + hostname
+    logging.info(logstr)
     return [True, "None"]
 
 
@@ -18,14 +28,25 @@ def registerHost(hostname, interface, groupname):
         q = session.query(Group).filter(Group.name == groupname).one()
         groupid = q.id
     except:
+        logstr = "METEORAPP - Host failed to register - host:" + hostname + " group:" + groupname
+        logging.error(logstr)
         return [False, "Unknown group"]
     h = Host(hostname, interface, groupid)
+    logstr = "METEORAPP - Host registered - host:" + hostname + " group:" + groupname
+    logging.info(logstr)
     return [True, "None"]
 
 
 def registerGroup(groupname):
     print("registering group")
-    g = Group(groupname)
+    try:
+        g = Group(groupname)
+    except:
+        logstr = "METEORAPP - Group failed to register - group:" + groupname
+        logging.error(logstr)
+        return [False, ""]
+    logstr = "METEORAPP - Group registered - group:" + groupname
+    logging.info(logstr)
     return [True, "None"]
 
 
@@ -83,6 +104,9 @@ def getCommandUtil(uuid):
         cmd = {"id": aid, "mode": mode, "arguments": args, "options": opts}
         cmds.append(cmd)
     session.commit()
+    hstnm = h.hostname
+    logstr = "BOXACCESS " + hstnm + " via Meteor beacon"
+    logging.info(logstr)
     return cmds
 
 def newActionResultUtil(actionid, data):
@@ -147,7 +171,9 @@ def clearDbUtil():
     session.query(Group).delete()
     try:
         session.commit()
+        logging.info("Database was cleared")
         return "Success\n"
     except:
         session.rollback()
+        logging.info("Database clear failed")
         return "Error\n"
