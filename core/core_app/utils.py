@@ -7,7 +7,7 @@ LOGGING_LEVEL = logging.DEBUG    #can be .DEBUG, .INFO, .WARNING, .ERROR, .CRITI
 
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
-    
+
 logging.basicConfig(filename=LOGGING_FILE, filemode='w+', format='%(asctime)s - %(levelname)s - METEOR - %(message)s ', level=LOGGING_LEVEL)
 
 def registerBot(uuid, interval, delta, hostname):
@@ -30,11 +30,11 @@ def registerHost(hostname, interface, groupname):
     try:
         q = session.query(Group).filter(Group.name == groupname).one()
         groupid = q.id
+        h = Host(hostname, interface, groupid)
     except:
         logstr = "METEORAPP - Host failed to register - host:" + hostname + " group:" + groupname
         logging.error(logstr)
         return [False, "Unknown group"]
-    h = Host(hostname, interface, groupid)
     logstr = "METEORAPP - Host registered - host:" + hostname + " group:" + groupname
     logging.info(logstr)
     return [True, "None"]
