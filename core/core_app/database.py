@@ -1,4 +1,6 @@
 import sys
+import logging
+logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, exc, MetaData
