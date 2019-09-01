@@ -1,6 +1,7 @@
 import sys
 import logging
-logging.getLogger('sqlalchemy').setLevel(logging.ERROR)
+l = logging.getLogger('sqlalchemy')
+l.disabled = True
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, exc, MetaData
