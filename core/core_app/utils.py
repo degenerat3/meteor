@@ -108,6 +108,7 @@ def getCommandUtil(uuid):
         cmds.append(cmd)
     session.commit()
     hstnm = h.hostname
+    #updatePwnboard(hstnm)      #uncomment this to update pwnboard
     logstr = "BOXACCESS " + hstnm + " via Meteor beacon"
     logging.info(logstr)
     return cmds
@@ -180,3 +181,16 @@ def clearDbUtil():
         session.rollback()
         logging.info("Database clear failed")
         return "Error\n"
+
+def updatePwnboard(ip):
+    host = os.environ.get("PWNBOARD_URL", "")
+    msg = "Meteor received a beacon"
+    if not host:
+        return
+    data = {'ip': ip, 'application': "Meteor", 'message': msg}
+    try:
+        req = requests.post(host, json=data, timeout=3)
+        return True
+    except Exception as E:
+        print("Cannot update pwnboard: {}".format(E))
+        return False
