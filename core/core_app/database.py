@@ -1,6 +1,6 @@
 import sys
 import logging
-l = logging.getLogger('sqlalchemy')
+l = logging.getLogger('sqlalchemy.engine.base.Engine')
 l.disabled = True
 
 from sqlalchemy.ext.declarative import declarative_base
