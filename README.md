@@ -1,4 +1,5 @@
 # meteor
+THIS IS IN DEVELOPMENT: it is extremely unstable
 
 It's a dockerized C2 with a flask/postgres(sqlalchemy) backend.  Modules/bots are written in golang (for now).  
 
