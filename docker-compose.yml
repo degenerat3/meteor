@@ -47,7 +47,7 @@ services:
 
   mctest:
     build:
-      context: modules/mctest_serv/
+      context: modules/mctest/
     ports:
       - "5657:5657"
     volumes:
