@@ -7,7 +7,7 @@ import (
 )
 
 // SERV : server to call
-var SERV = "192.168.206.183:5656"
+var SERV = "192.168.206.183:5657"
 
 // MAGIC : the shared hex byte that will signify the start of each MAD payload
 var MAGIC = []byte{0xAA}

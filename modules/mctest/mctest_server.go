@@ -12,7 +12,7 @@ import (
 var CORE = "http://172.69.1.1:9999"
 
 // PORT : port to listen on
-var PORT = "5656"
+var PORT = "5657"
 
 // MAGIC : the shared hex byte that will signify the start of each MAD payload
 var MAGIC = []byte{0xAA}

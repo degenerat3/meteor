@@ -45,6 +45,17 @@ services:
       meteornet:
         ipv4_address: 172.69.1.4
 
+  mctest:
+    build:
+      context: modules/mctest_serv/
+    ports:
+      - "5657:5657"
+    volumes:
+      - /var/log/meteor/mctest_serv:/var/log/meteor/mctest
+    networks:
+      meteornet:
+        ipv4_address: 172.69.1.6
+
   littlefoot:
     build:
       context: modules/little_foot/
