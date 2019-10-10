@@ -137,6 +137,7 @@ def listObj(args):
         request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data))
         if request.text == "":
             print("None")
+        print("req:" + request.text + ":")
         print(request.text)
         return
 
