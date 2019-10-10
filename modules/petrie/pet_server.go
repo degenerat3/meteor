@@ -32,6 +32,8 @@ var MAGICTERMBYTE = MAGICTERM[0]
 //MAGICTERMSTR is the ascii representation of the magic byte
 var MAGICTERMSTR = string(MAGICTERM)
 
+var m = server.GenMetserver(CORE, MAGIC, MAGICSTR, MAGICTERM, MAGICTERMSTR)
+
 func main() {
 	portStr := ":" + PORT
 	l, err := net.Listen("tcp4", portStr)
@@ -54,7 +56,6 @@ func main() {
 
 //take the MAD payload and do stuff with it
 func connHandle(conn net.Conn) {
-	m := server.GenMetserver(CORE, MAGIC, MAGICSTR, MAGICTERM, MAGICTERMSTR)
 	message, err := bufio.NewReader(conn).ReadString(MAGICTERMBYTE)
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
