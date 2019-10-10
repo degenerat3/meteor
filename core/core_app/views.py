@@ -139,6 +139,7 @@ def listactions():
     data = listActionsUtil()
     return data
 
+@app.route('/list/db')
 @app.route('/dumpdb', methods=['GET'])
 def dumpdb():
     data = dumpDatabase()
