@@ -1,9 +1,10 @@
+import os
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import WordCompleter
 
-server = "http://localhost:8888"
+server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = "<username_for_logging>"
 dtWords = ['new', 'group', 'action', 'show', 'result']
 dtComp = WordCompleter(dtWords)
