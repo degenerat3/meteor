@@ -102,7 +102,7 @@ def showModes():
 
 
 def listObj(args):
-    if args args == "show: modes":
+    if args == "show: modes":
         showModes()
         return
     try:
