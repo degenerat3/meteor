@@ -30,6 +30,7 @@ services:
       - "8888:8888"
     volumes:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
+    restart: always
     networks:
       meteornet: 
         ipv4_address: 172.69.1.3
@@ -41,6 +42,7 @@ services:
       - "5656:5656"
     volumes:
       - /var/log/meteor/petrie:/var/log/meteor/petrie
+    restart: always
     networks:
       meteornet:
         ipv4_address: 172.69.1.4
@@ -52,6 +54,7 @@ services:
       - "5657:5657"
     volumes:
       - /var/log/meteor/mctest_serv:/var/log/meteor/mctest
+    restart: always
     networks:
       meteornet:
         ipv4_address: 172.69.1.6
@@ -63,6 +66,7 @@ services:
       - "8080:8080"
     volumes:
       - /var/log/meteor/littlefoot:/var/log/meteor/littlefoot
+    restart: always
     networks:
       meteornet:
         ipv4_address: 172.69.1.5
