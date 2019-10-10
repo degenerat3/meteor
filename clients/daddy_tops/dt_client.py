@@ -164,7 +164,7 @@ def listObj(args):
         return
 
 while True:
-    user_input = prompt('DT>', 
+    user_input = prompt('DT> ', 
                         history=FileHistory('.dt_history'), 
                         auto_suggest=AutoSuggestFromHistory(), 
                         completer=dtComp)
