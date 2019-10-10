@@ -162,7 +162,7 @@ def listObj(args):
         data = {"actionid": aid}
         request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data))
         encRes = request.text
-        res = base64.b64decode(encRes)
+        res = base64.b64decode(encRes).decode("utf-8")
         print(res)
         return
 
