@@ -7,8 +7,8 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import WordCompleter
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
-user = "<username_for_logging>"
-dtWords = ['new', 'group', 'action', 'show', 'result']
+user = os.environ.get("DT_USER", "Unknown")
+dtWords = ['action', 'gaction', 'groups', 'actions', 'show', 'result', "hosts", "bots", "modes"]
 dtComp = WordCompleter(dtWords)
 
 def handleNew(split_inp):
@@ -19,16 +19,19 @@ def handleShow(split_inp):
     print(split_inp)
     return
 
-def handleInput(inp):
-    split_inp = inp.split(":")
-    first_term = split_inp[0].lower()
-    if first_term == "new":
-        handleNew(split_inp)
-    elif first_term == "show":
-        handleShow(split_inp)
-    elif first_term == "exit" or first_term == "quit":
-        print("Goodbye...")
+def handleInput(args):
+    if args.startswith("action:"):
+        newAction(args)
+    elif args.startswith("gaction:"):
+        newGroupAction(args)
+    elif args.startswith("show:"):
+        listObj(args)
+    elif args.startswith("help"):
+        help()
+    elif args.startswith("exit"):
         exit()
+    else:
+        print("USAGE ERROR: use `help` for options")
     return
 
 def help():
