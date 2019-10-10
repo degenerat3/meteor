@@ -11,7 +11,7 @@ from prompt_toolkit.completion import WordCompleter
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = os.environ.get("DT_USER", "Unknown")
-dtWords = ['action:', 'gaction:', 'groups', 'actions', 'show:', 'result', 'hosts', "bots", 'modes', 'help', "exit"]
+dtWords = ['action:', 'gaction:', 'groups', 'actions', 'show:', 'result:', 'hosts', "bots", 'modes', 'help', "exit"]
 dtComp = WordCompleter(dtWords)
 
 def handleNew(split_inp):
