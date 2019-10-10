@@ -40,7 +40,7 @@ func main() {
 	}
 
 	defer l.Close()
-	fmt.Println("Listening for Petrie connections on port:" + PORT)
+	fmt.Println("Listening for MCTest connections on port:" + PORT)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
