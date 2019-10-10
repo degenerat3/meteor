@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import os
+import requests
+import json
 from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
