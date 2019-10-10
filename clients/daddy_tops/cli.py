@@ -50,6 +50,7 @@ def help():
     print("SHOW ACTION RESULT:      show: result: <actionid>")
     print("SHOW TABLE INFO:         show: <table>")
     print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'db'")
+    print()
     return
 
 def newAction(args):
@@ -93,18 +94,17 @@ def newGroupAction(args):
     return
 
 def showModes():
-    print("AVAILABLE ACTION MODES:")
-    print("OPCODE   MODE                            Args")
-    print("--------------------------------------------------------")
-    print("1        shell exec                      <shell command>")
-    print("2        firewall flush                  N/A")
-    print("3        create priv. user               N/A")
-    print("4        start/enable remote access      N/A")
-    print("5        start reverse shell             <ip:port>")
-    print("F        nuke the box                    N/A")
-
-
-
+    print("  AVAILABLE ACTION MODES:")
+    print("  OPCODE   MODE                            Args")
+    print("  --------------------------------------------------------")
+    print("  1        shell exec                      <shell command>")
+    print("  2        firewall flush                  N/A")
+    print("  3        create priv. user               N/A")
+    print("  4        start/enable remote access      N/A")
+    print("  5        start reverse shell             <ip:port>")
+    print("  F        nuke the box                    N/A")
+    print()
+    return
 
 def listObj(args):
     if args == "show: modes":
