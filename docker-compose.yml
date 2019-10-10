@@ -4,8 +4,6 @@ services:
   core:
     build:
       context: core/
-    ports:
-      - "9999:9999"
     depends_on:
       - "db"
     volumes:
@@ -39,7 +37,7 @@ services:
     build:
       context: modules/petrie/
     ports:
-      - "5656:5656"
+      - "5657:5657"
     volumes:
       - /var/log/meteor/petrie:/var/log/meteor/petrie
     restart: always
@@ -47,23 +45,11 @@ services:
       meteornet:
         ipv4_address: 172.69.1.4
 
-  mctest:
-    build:
-      context: modules/mctest/
-    ports:
-      - "5657:5657"
-    volumes:
-      - /var/log/meteor/mctest_serv:/var/log/meteor/mctest
-    restart: always
-    networks:
-      meteornet:
-        ipv4_address: 172.69.1.6
-
   littlefoot:
     build:
       context: modules/little_foot/
     ports:
-      - "8080:8080"
+      - "80:80"
     volumes:
       - /var/log/meteor/littlefoot:/var/log/meteor/littlefoot
     restart: always
