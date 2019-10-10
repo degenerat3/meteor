@@ -1,7 +1,7 @@
 import sys
 import logging
 l = logging.getLogger('sqlalchemy.engine.base.Engine')
-l.disabled = True
+l.disabled = False
 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, create_engine, exc, MetaData
