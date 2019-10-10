@@ -103,7 +103,6 @@ def newGroupAction(args):
             showModes()
             return
     except:
-    except:
         print("Invalid syntax...")
         return
     opt = ""
