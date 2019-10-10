@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Reads a topology, populates the DB with hosts/groups
 import requests
 import json
