@@ -56,7 +56,7 @@ def help():
 
 def newAction(args):
     try:
-        args = args.split(":", 4)
+        args = args.split(":", 3)
         target = args[1].strip()
         if target == "help":
             print("USAGE: action: <target_hostname>: <action_mode_opcode>: <arguments>")
@@ -87,7 +87,7 @@ def newAction(args):
 
 def newGroupAction(args):
     try:
-        args = args.split(":", 4)
+        args = args.split(":", 3)
         target = args[1].strip()
         if target == "help":
             print("USAGE: gaction: <target_groupname>: <action_mode_opcode>: <arguments>")
