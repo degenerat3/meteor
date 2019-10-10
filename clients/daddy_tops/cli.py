@@ -123,10 +123,10 @@ def listObj(args):
     if "result" not in obj:
         url = server + "/list/" + obj
         request = requests.get(url)
-        print(request.text)
         if request.text == "":
-            print("None")
+            print("None\n")
             return
+        print(request.text)
         return
     else:
         try:
