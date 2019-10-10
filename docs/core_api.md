@@ -97,7 +97,7 @@ Description:  show details of all registered hosts
 Method: GET
 
 ## Other Endpoints
-### /dumpdb
+### /dumpdb or /list/db
 Description:  show every record in every table of the meteor DB  
 Method: GET
 
