@@ -60,6 +60,7 @@ def newAction(args):
         if target == "help":
             print("USAGE: action: <target_hostname>: <action_mode_opcode>: <arguments>")
             listObj("show: hosts")
+            return
         mode = args[2].strip()
         if mode == "help":
             print("USAGE: action: <target_hostname>: <action_mode_opcode>: <arguments>")
@@ -69,7 +70,7 @@ def newAction(args):
         if argum == "help":
             print("USAGE: action: <target_hostname>: <action_mode_opcode>: <arguments>")
             showModes()
-            return()
+            return
     except:
         print("Invalid syntax...")
         return
@@ -90,6 +91,7 @@ def newGroupAction(args):
         if target == "help":
             print("USAGE: gaction: <target_groupname>: <action_mode_opcode>: <arguments>")
             listObj("show: groups")
+            return
         mode = args[2].strip()
         if mode == "help":
             print("USAGE: gaction: <target_groupname>: <action_mode_opcode>: <arguments>")
@@ -99,7 +101,7 @@ def newGroupAction(args):
         if argum == "help":
             print("USAGE: gaction: <target_groupname>: <action_mode_opcode>: <arguments>")
             showModes()
-            return()
+            return
     except:
     except:
         print("Invalid syntax...")
