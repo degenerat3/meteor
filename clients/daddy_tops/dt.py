@@ -2,8 +2,9 @@
 import sys
 import requests
 import json
+import os
 
-server = "http://localhost:8888"
+server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = "<username_for_logging>"
 
 
