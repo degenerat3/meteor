@@ -1,10 +1,13 @@
+#!/usr/bin/env python3
 # Reads a topology, populates the DB with hosts/groups
 import requests
 import json
+import os
+import sys
 import yaml
 from yaml import Loader
 
-server = "http://localhost:8888"
+server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 
 def registerGroup(groupname):
     header = {'Content-type': 'application/json'}
@@ -17,6 +20,11 @@ def registerHost(hostname, interface, groupname):
     requests.post(server + "/register/host", headers=header, data=json.dumps(data))
 
 inp = "example_input.yml"
+
+if len(sys.argv) > 1:
+    inp = sys.argv[1]
+else:
+    inp = input("Hosts.yml file: ")
 
 y = yaml.load(open(inp), Loader=Loader)
 

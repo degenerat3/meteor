@@ -128,6 +128,7 @@ def listactions():
     data = requests.get(core + "/list/actions")
     return data.text
 
+@app.route('/list/db', methods=['GET'])
 @app.route('/dumpdb', methods=['GET'])
 def dumpdb():
     data = requests.get(core + "/dumpdb")
