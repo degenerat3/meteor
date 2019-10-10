@@ -21,7 +21,7 @@ def registerHost(hostname, interface, groupname):
 
 inp = "example_input.yml"
 
-if sys.argc > 1:
+if len(sys.argv) > 1:
     inp = sys.argv[1]
 else:
     inp = input("Hosts.yml file: ")
