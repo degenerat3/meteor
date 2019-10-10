@@ -117,7 +117,7 @@ def getactionresult():
     except:
         return "Missing required field"
     res = getActionResultUtil(aid)
-    return "success"
+    return res
 
 @app.route('/list/bots', methods=['GET'])
 def listbots():
