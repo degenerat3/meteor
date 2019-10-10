@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import base64
 import os
 import requests
 import json
@@ -160,7 +161,9 @@ def listObj(args):
         header = {'Content-type': 'application/json'}
         data = {"actionid": aid}
         request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data))
-        print(request.text)
+        encRes = request.text
+        res = base64.b64decode(encRes)
+        print(res)
         return
 
 while True:
