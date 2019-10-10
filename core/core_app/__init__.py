@@ -4,6 +4,6 @@ import logging
 app = Flask(__name__)
 
 l = logging.getLogger('werkzeug')
-l.disabled = True
+l.disabled = False
 
 from . import views
