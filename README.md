@@ -1,5 +1,6 @@
 # meteor
-![Meteor](docs/images/meteor_art.png?raw=true "I clearly dont' do graphic design...")
+![Meteor](docs/images/meteor_art.png?raw=true "I clearly dont' do graphic design...")  
+
 THIS IS IN DEVELOPMENT: it is extremely unstable
 
 It's a dockerized C2 with a flask/postgres(sqlalchemy) backend.  Modules/bots are written in golang.  
@@ -30,5 +31,3 @@ For the server, just `docker-compose up` from the root directory of the project 
 
 For the client(s): they have to be slightly customized with IP/port information, then compiled for the target OS.
 
-
-![The Land Before Time](docs/images/lbft.jpeg?raw=true "Image source: Hulu.com")
