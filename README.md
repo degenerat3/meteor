@@ -1,5 +1,5 @@
 # meteor
-![Meteor](docs/images/meteor_art.png?=250x250 "I clearly dont' do graphic design...")  
+![Meteor](docs/images/meteor_art.png"I clearly dont' do graphic design..."){:height="50%" width="50%"}
 
 THIS IS IN DEVELOPMENT: it is extremely unstable
 
