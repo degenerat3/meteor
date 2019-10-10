@@ -135,6 +135,8 @@ def listObj(args):
         header = {'Content-type': 'application/json'}
         data = {"actionid": aid}
         request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data))
+        if request.text == "":
+            print("None")
         print(request.text)
         return
 
