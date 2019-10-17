@@ -15,7 +15,9 @@ It's a dockerized C2 with a flask/postgres(sqlalchemy) backend.  Modules/bots ar
 
 **MAD:** the pseudo "protocol" that is used by clients to communicate with their module.  All MAD formatting and payload generation is handled behind the scenes, so don't worry about this.
 
-**Metcli:** the golang package [found here](https://github.com/degenerat3/metcli) that is utilized by clients/modules to build and handle payloads. This helps keep the client and module source code very simple and clean, and hopefully makes development MUCH easier by limiting the number of functions that need to be implemented.
+**Metcli:** the golang package [found here](https://github.com/degenerat3/metcli) that is utilized by clients/modules to build and handle payloads. This helps keep the client and module source code very simple and clean, and hopefully makes development MUCH easier by limiting the number of functions that need to be implemented.  
+
+**Modes:** the modes are the "opcodes" used by the clients for action execution. For example, the mode "1" is used for shell execution, mode "2" is used to flush firewalls. Currently-supported opcodes are listed in docs/MAD.md.  
 
 **Module:** a dockerized server that is exposed to the internet and acts as an interface between clients and the internal core
 
@@ -26,8 +28,27 @@ The "core" of the project is made up of two portions: a Postgresql DB and a flas
 
 Separate from the core, but connected via private docker network, are the "modules."  The modules are golang binaries that communicate with the core via web requests  Actual spec for these modules can be found in the docs.
 
-## Installation/Usage
-For the server, just `docker-compose up` from the root directory of the project and you should be good to go (be careful with that because everything is in debug mode, so you'll see lots of output).  
+## Installation  
+#### Server   
+First, clone the repository: `git clone https://github.com/degenerat3/meteor`  
+Ensure that you have [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/install/) installed.  
+Move into the root of the `meteor` directory.  
+Build the containers: `sudo docker-compose build`  
+Start (and daemonize) the containers: `sudo docker-compose up -d`  
+To test if core is running, from localhost: `curl http://localhost:9999/`  
 
-For the client(s): they have to be slightly customized with IP/port information, then compiled for the target OS.
+#### Clients
+Each client must be slightly adjusted, since there are several global variables that must be configred. The only mandatory configuration is the "server" variable, but it is recommended that all of the following are configured (names vary slightly by client):  
+ - SERV     // the server to call back to (docker host)
+ - REGFILE  // The destination file for registration info (obfuscated UUID)
+ - OBFSEED  // The seed integer for the registration obfuscation
+ - OBFTEXT  // The seed text used for registration obfuscation  
 
+ Once the the variables are configured, the binary must be built.  
+ Set the golang env for target OS: `set goos=linux` or whatever, see [this](https://golang.org/pkg/go/build/) for more info on golang build options.  
+ Running `go build` in the client directory will generate the proper .exe or .elf file (depending on target). 
+ The compiled binary can now be run on the target victim machines, usage instructions vary per bot.
+
+
+## Usage
+The general flow is that a commander module (the default is `DaddyTops`) will be used to set up hosts/groups in the Core (only done once), then a user interacts with the command module in order to queue commands for hosts, view results, etc. Instructions on how to use the DaddyTops module can be found in `docs/daddytops.md`.
