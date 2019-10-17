@@ -22,10 +22,14 @@ else
     exit
 fi
 
-sed -i "s/&&SERV&&/${servervar}/g" $payloadpath
-sed -i "s/&&INTERVAL&&/${intervalvar}/g" $payloadpath
-sed -i "s/&&DELTA&&/${deltavarvar}/g" $payloadpath
-sed -i "s/&&OBFTEXT&&/${obftextvar}/g" $payloadpath
+echo "[+] Copying files..."
+
+cp $payloadpath tmp1.go
+
+sed -i "s/&&SERV&&/${servervar}/g" tmp1.go
+sed -i "s/&&INTERVAL&&/${intervalvar}/g" tmp1.go
+sed -i "s/&&DELTA&&/${deltavarvar}/g" tmp1.go
+sed -i "s/&&OBFTEXT&&/${obftextvar}/g" tmp1.go
 
 echo "[+] Fetching package"
 
@@ -35,4 +39,7 @@ echo "[+] Building binary"
 
 export goos=$targetos
 
-go build $payloadpath -o $outputbin
+go build tmp1.go -o $outputbin
+
+echo "[+] Cleaning up..."
+rm tmp1.go
