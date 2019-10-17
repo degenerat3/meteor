@@ -164,14 +164,15 @@ def listactions():
 @app.route('/list/groupmembers', methods=['GET'])
 @auth.login_required
 def listgroupmembers():
+    out = ""
     data = requests.get(core + "/list/groupmembers").text
     json_acceptable_string = data.replace("'", "\"")
     j = json.loads(json_acceptable_string)
     for gn in j:
-        print("   " + str(gn) + ":")
-        for val in j[gn]
-            print("      " + str(val))
-    return data.text
+        out += "   " + str(gn) + ":\n"
+        for val in j[gn]:
+            out += "      " + str(val) + "\n"
+    return out
 
 @app.route('/list/db', methods=['GET'])
 @app.route('/dumpdb', methods=['GET'])
