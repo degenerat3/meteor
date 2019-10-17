@@ -38,7 +38,10 @@ Start (and daemonize) the containers: `sudo docker-compose up -d`
 To test if core is running, from localhost: `curl http://172.69.1.1:9999/`  
 
 #### Clients
-Each client must be slightly adjusted, since there are several global variables that must be configred. The only mandatory configuration is the "server" variable, but it is recommended that all of the following are configured (names vary slightly by client):  
+Each client must be slightly adjusted, since there are several global variables that must be configred.  
+This whole build/compilation can be done automatically with the `clients/build.sh` script (run it, input prompted data, ezwin).  
+If you want to do it yourself:  
+The only mandatory configuration is the "server" variable, but it is recommended that all of the following are configured (names vary slightly by client):  
  - SERV     // the server to call back to (docker host)
  - REGFILE  // The destination file for registration info (obfuscated UUID)
  - OBFSEED  // The seed integer for the registration obfuscation
@@ -47,7 +50,8 @@ Each client must be slightly adjusted, since there are several global variables 
  Once the the variables are configured, the binary must be built.  
  Set the golang env for target OS: `set goos=linux` or whatever, see [this](https://golang.org/pkg/go/build/) for more info on golang build options.  
  Running `go build` in the client directory will generate the proper .exe or .elf file (depending on target). 
- The compiled binary can now be run on the target victim machines, usage instructions vary per bot.
+ The compiled binary can now be run on the target victim machines, usage instructions vary per bot.  
+
 
 
 ## Usage
