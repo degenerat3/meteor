@@ -25,17 +25,15 @@ def registerBot(uuid, interval, delta, hostname):
     return [True, "None"]
 
 
-def registerHost(hostname, interface, groupname):
+def registerHost(hostname, interface):
     print("registering host")
     try:
-        q = session.query(Group).filter(Group.name == groupname).one()
-        groupid = q.id
-        h = Host(hostname, interface, groupid)
+        h = Host(hostname, interface)
     except:
-        logstr = "METEORAPP - Host failed to register - host:" + hostname + " group:" + groupname
+        logstr = "METEORAPP - Host failed to register - host:" + hostname
         logging.error(logstr)
-        return [False, "Unknown group"]
-    logstr = "METEORAPP - Host registered - host:" + hostname + " group:" + groupname
+        return [False, "Host registration error"]
+    logstr = "METEORAPP - Host registered - host:" + hostname
     logging.info(logstr)
     return [True, "None"]
 
@@ -51,6 +49,18 @@ def registerGroup(groupname):
     logstr = "METEORAPP - Group registered - group:" + groupname
     logging.info(logstr)
     return [True, "None"]
+
+
+def buildGroup(buildstr):
+    sp = buildstr.split("||")
+    for item in sp:
+        if item != "":
+            t = item.split(":")
+            host = t[0]
+            group = t[1]
+            hid = session.query(Host).filter(Host.hostname == host).one()
+            gid = session.query(Group).filter(Group.name == group).one()
+            HostGroupMap(hid, gid)
 
 
 def hostlookup(hostname):
@@ -75,9 +85,9 @@ def singlecommandadd(mode, arguments, options, hostid):
     a = Action(mode, arguments, options, False, False, hostid)
 
 def groupcommandadd(mode, arguments, options, groupid):
-    q = session.query(Host).filter(Host.groupid == groupid)
+    q = session.query(HostGroupMap).filter(HostGroupMap.groupid == groupid)
     for result in q:
-        hid = result.id
+        hid = result.hostid
         singlecommandadd(mode, arguments, options, hid)
     return [True, "None"]
 

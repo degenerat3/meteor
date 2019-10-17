@@ -72,6 +72,19 @@ def newgroup():
     logAction(logstr)
     return req.text
 
+@app.route('/register/buildgroups', methods=['POST'])
+@auth.login_required
+def buildgroups():
+    content = request.json
+    try:
+        buildstr = content['buildstring']
+    except:
+        return "Missing required field"
+    header = {'Content-type': 'application/json'}
+    data = {"buildstring": buildstr}
+    req = requests.post(core + "/register/buildgroups", headers=header, data = json.dumps(data))
+    reqturn req.text
+
 
 @app.route('/add/command/single', methods=['POST'])
 @auth.login_required

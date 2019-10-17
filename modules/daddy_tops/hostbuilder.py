@@ -14,10 +14,15 @@ def registerGroup(groupname):
     data = {"groupname": groupname}
     requests.post(server + "/register/group", headers=header, data=json.dumps(data))
 
-def registerHost(hostname, interface, groupname):
+def registerHost(hostname, interface):
     header = {'Content-type': 'application/json'}
-    data = {"hostname": hostname, "interface": interface, "groupname": groupname}
+    data = {"hostname": hostname, "interface": interface}
     requests.post(server + "/register/host", headers=header, data=json.dumps(data))
+
+def buildGroups(buildstr):
+    header = {'Content-type': 'application/json'}
+    data = {"buildstring": buildstr}
+    requests.post(server + "/register/buildgroups", headers=header, data=json.dumps(data))
 
 inp = "example_input.yml"
 
@@ -28,12 +33,21 @@ else:
 
 y = yaml.load(open(inp), Loader=Loader)
 
+buildgroupstr = ""
+
 for key in y:
+    if key == "all":
+        for host in y[key]:
+            host = host.split(":")
+            hostname = host[0]
+            interface = host[1]
+            registerHost(hostname, interface)
+
     registerGroup(key)
     for host in y[key]:
-        host = host.split(":")
-        hostname = host[0]
-        interface = host[1]
-        registerHost(hostname, interface, key)
+        tmp = host + ":" + key + "||"
+        buildgroupstr += tmp
+
+buildGroups(buildgroupstr)
 
 
