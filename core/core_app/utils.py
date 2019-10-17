@@ -152,6 +152,25 @@ def listGroupsUtil():
         data += str(instance) + "\n"
     return data
 
+def listGroupMembersUtil():
+    data = ""
+    groupstuff = {}
+    for instance in session.query(HostGroupMap).order_by(HostGroupMap.id):
+        hid = instance.hostid
+        gid = instance.groupid
+        hn = session.query(Host).filter(Host.hostid == hid).one()
+        gn = session.query(Group).filter(Group.groupid == gid).one()
+        if gn == "all":
+            continue
+        if groupstuff.has_key(gn):
+            groupstuff[gn].append(hn)
+        else:
+            groupstuff[gn] = []
+            groupstuff[gn].append(hn)
+    return str(groupstuff)
+        
+
+
 def listActionsUtil():
     data = ""
     for instance in session.query(Action).order_by(Action.id):

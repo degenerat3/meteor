@@ -161,6 +161,12 @@ def listactions():
     data = requests.get(core + "/list/actions")
     return data.text
 
+@app.route('/list/groupmembers', methods=['GET'])
+@auth.login_required
+def listactions():
+    data = requests.get(core + "/list/groupmembers")
+    return data.text
+
 @app.route('/list/db', methods=['GET'])
 @app.route('/dumpdb', methods=['GET'])
 @auth.login_required

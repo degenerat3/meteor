@@ -148,6 +148,11 @@ def listactions():
     data = listActionsUtil()
     return data
 
+@app.route('/list/groupmembers', methods=['GET'])
+def listgroupmembers():
+    data = listGroupMembersUtil()
+    return data
+
 @app.route('/list/db', methods=['GET'])
 @app.route('/dumpdb', methods=['GET'])
 def dumpdb():
