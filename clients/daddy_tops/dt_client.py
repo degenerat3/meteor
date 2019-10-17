@@ -15,12 +15,16 @@ server = os.environ.get("DT_SERVER", "http://localhost:8888")
 user = os.environ.get("DT_USER", "Unknown")
 dtWords = ['action:', 'gaction:', 'groups', 'actions', 'show:', 'result:', 'hosts', "bots", 'modes', 'help', "exit"]
 dtComp = WordCompleter(dtWords)
-print("DaddyTops Login:")
+print("DaddyTops Login")
+print("===============")
 username = input("Username: ")
 password = getpass()
-
-reqauthtok = requests.get(server + "/api/token", auth=HTTPBasicAuth(username, password)).json()
-authtok = reqauthtok['token'] 
+try:
+    reqauthtok = requests.get(server + "/api/token", auth=HTTPBasicAuth(username, password)).json()
+    authtok = reqauthtok['token']
+except:
+    print("INVALID CREDENTIALS")
+    exit()
  
 
 
