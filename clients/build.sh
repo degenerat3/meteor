@@ -1,7 +1,7 @@
 #!/bin/bash
 
 read -p 'Payload(tcp|web): ' payloadvar
-read -p 'Server(include "http" and ":port"): ' servervar
+read -p 'Server(include "http" and ":port" if reqd): ' servervar
 read -p 'Interval(seconds): ' intervalvar
 read -p 'Delta(seconds): ' deltavar
 read -p 'Obfuscation text(random string): ' obftextvar
