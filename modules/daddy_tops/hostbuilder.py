@@ -7,6 +7,7 @@ import sys
 import yaml
 from yaml import Loader
 from requests.auth import HTTPBasicAuth
+from getpass import getpass
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 
