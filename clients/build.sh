@@ -33,4 +33,6 @@ go get -u github.com/degenerat3/metcli
 
 echo "[+] Building binary"
 
+goos=$targetos
+
 go build $payloadpath -o $outputbin
