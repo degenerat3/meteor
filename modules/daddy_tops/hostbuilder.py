@@ -35,10 +35,11 @@ if len(sys.argv) > 1:
 else:
     inp = input("Hosts.yml file: ")
 
+print("[+] Parsing yml...")
 y = yaml.load(open(inp), Loader=Loader)
 
 buildgroupstr = ""
-
+print("[+] Registering hosts...")
 for key in y:
     if key == "all":
         for host in y[key]:
@@ -47,8 +48,11 @@ for key in y:
             interface = host[1]
             registerHost(hostname, interface)
 
+print("[+] Building groups...")
+for key in y:
     registerGroup(key)
     for host in y[key]:
+        host = host.split(":")[0]
         tmp = host + ":" + key + "||"
         buildgroupstr += tmp
 
