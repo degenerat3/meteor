@@ -158,7 +158,7 @@ def listGroupMembersUtil():
     for instance in session.query(HostGroupMap).order_by(HostGroupMap.id):
         hid = instance.hostid
         gid = instance.groupid
-        hn = session.query(Host).filter(Host.id == hid).one().name
+        hn = session.query(Host).filter(Host.id == hid).one().hostname
         gn = session.query(Group).filter(Group.id == gid).one().name
         if gn == "all":
             continue
