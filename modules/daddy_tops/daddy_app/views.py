@@ -47,11 +47,10 @@ def newhost():
     try:
         hostname = content['hostname']
         interface = content['interface']
-        groupname = content['groupname']
     except:
         return "Missing required fields"
     header = {'Content-type': 'application/json'}
-    data = {"hostname": hostname, "interface": interface, "groupname": groupname}
+    data = {"hostname": hostname, "interface": interface}
     req = requests.post(core + "/register/host", headers=header, data=json.dumps(data))
     logstr = "Host <" + str(hostname) + "> has been registered\n"
     logAction(logstr)
