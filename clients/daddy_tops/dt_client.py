@@ -11,12 +11,14 @@ from prompt_toolkit.completion import WordCompleter
 from getpass import getpass
 from requests.auth import HTTPBasicAuth
 
+
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = os.environ.get("DT_USER", "Unknown")
 dtWords = ['action:', 'gaction:', 'groups', 'actions', 'show:', 'result:', 'hosts', "bots", 'modes', 'help', "exit"]
 dtComp = WordCompleter(dtWords)
-print("DaddyTops Login")
-print("===============")
+print(" =================")
+print("| DaddyTops Login |")
+print(" =================")
 username = input("Username: ")
 password = getpass()
 try:
