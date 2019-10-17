@@ -6,23 +6,26 @@ import os
 import sys
 import yaml
 from yaml import Loader
+from requests.auth import HTTPBasicAuth
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
+
+adminpass = getpass("admin password: ")
 
 def registerGroup(groupname):
     header = {'Content-type': 'application/json'}
     data = {"groupname": groupname}
-    requests.post(server + "/register/group", headers=header, data=json.dumps(data))
+    requests.post(server + "/register/group", headers=header, data=json.dumps(data), auth=HTTPBasicAuth('admin', adminpass))
 
 def registerHost(hostname, interface):
     header = {'Content-type': 'application/json'}
     data = {"hostname": hostname, "interface": interface}
-    requests.post(server + "/register/host", headers=header, data=json.dumps(data))
+    requests.post(server + "/register/host", headers=header, data=json.dumps(data), auth=HTTPBasicAuth('admin', adminpass))
 
 def buildGroups(buildstr):
     header = {'Content-type': 'application/json'}
     data = {"buildstring": buildstr}
-    requests.post(server + "/register/buildgroups", headers=header, data=json.dumps(data))
+    requests.post(server + "/register/buildgroups", headers=header, data=json.dumps(data), auth=HTTPBasicAuth('admin', adminpass))
 
 inp = "example_input.yml"
 
