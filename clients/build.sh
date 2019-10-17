@@ -11,11 +11,11 @@ payloadpath = ""
 echo "[+] Replacing variables..."
 if [ $payloadvar == "tcp" ]
 then
-    $payloadpath = "petrie/petrie.go"
+    $payloadpath="petrie/petrie.go"
  
 elif [ $payloadvar == "web" ]
 then
-    $payloadpath == "little_foot/little_foot.go"
+    $payloadpath="little_foot/little_foot.go"
  
 else
     echo "unknown payload type"
