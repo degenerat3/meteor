@@ -58,8 +58,8 @@ def buildGroup(buildstr):
             t = item.split(":")
             host = t[0]
             group = t[1]
-            hid = session.query(Host).filter(Host.hostname == host).one()
-            gid = session.query(Group).filter(Group.name == group).one()
+            hid = session.query(Host).filter(Host.hostname == host).one().id
+            gid = session.query(Group).filter(Group.name == group).one().id
             HostGroupMap(hid, gid)
 
 
