@@ -102,7 +102,7 @@ def newAction(args):
     data = {"hostname": target, "mode": mode, "arguments": argum, "options": opt, "dtuser": user}
     request = requests.post(server + "/add/command/single", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
     if request.text == "success":
-        print("SUCCESS! " + mode + " action queued for host: " + target)
+        print("SUCCESS! Action queued for host: " + target)
     else:
         print(request.text)
     return
@@ -134,7 +134,7 @@ def newGroupAction(args):
     data = {"groupname": target, "mode": mode, "arguments": argum, "options": opt, "dtuser": user}
     request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
     if request.text == "success":
-        print("SUCCESS! " + mode + " action queued for group: " + target)
+        print("SUCCESS! Action queued for group: " + target)
     else:
         print(request.text)
     return
