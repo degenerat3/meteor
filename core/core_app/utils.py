@@ -183,6 +183,7 @@ def clearDbUtil():
     session.query(Bot).delete()
     session.query(Host).delete()
     session.query(Group).delete()
+    session.query(HostGroupMap).delete()
     try:
         session.commit()
         logging.info("Database was cleared")
