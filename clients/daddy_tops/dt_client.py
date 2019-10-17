@@ -14,7 +14,6 @@ from shutil import get_terminal_size
 
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
-user = os.environ.get("DT_USER", "Unknown")
 dtWords = ["action:", "gaction:", "groups", "actions", "show:", "result:", "hosts", "bots", "modes", "help", "exit", "groupmembers"]
 dtComp = WordCompleter(dtWords)
 print(" =================")
@@ -22,6 +21,8 @@ print("| DaddyTops Login |")
 print(" =================")
 username = input("Username: ")
 password = getpass()
+user = username
+
 try:
     reqauthtok = requests.get(server + "/api/token", auth=HTTPBasicAuth(username, password)).json()
     authtok = reqauthtok['token']
