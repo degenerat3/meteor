@@ -162,7 +162,7 @@ def listGroupMembersUtil():
         gn = session.query(Group).filter(Group.id == gid).one()
         if gn == "all":
             continue
-        if groupstuff.has_key(gn):
+        if gn in groupstuff:
             groupstuff[gn].append(hn)
         else:
             groupstuff[gn] = []
