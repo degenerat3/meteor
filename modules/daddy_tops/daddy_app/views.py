@@ -223,10 +223,3 @@ def get_auth_token():
 @auth.login_required
 def get_resource():
     return jsonify({'data': 'Hello, %s!' % g.user.username})
-
-def initDB():
-    db.create_all()
-    user = User(username="admin")
-    user.hash_password(app.config['admin_password'])
-    db.session.add(user)
-    db.session.commit()
