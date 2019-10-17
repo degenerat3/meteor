@@ -41,6 +41,7 @@ def index():
 
 
 @app.route('/register/host', methods=['POST'])
+@auth.login_required
 def newhost():
     content = request.json
     try:
@@ -57,6 +58,7 @@ def newhost():
     return req.text
 
 @app.route('/register/group', methods=['POST'])
+@auth.login_required
 def newgroup():
     content = request.json
     try:
@@ -72,6 +74,7 @@ def newgroup():
 
 
 @app.route('/add/command/single', methods=['POST'])
+@auth.login_required
 def newaction():
     content = request.json
     try:
@@ -90,6 +93,7 @@ def newaction():
     return req.text
 
 @app.route('/add/command/group', methods=['POST'])
+@auth.login_required
 def newgroupaction():
     content = request.json
     try:
@@ -109,6 +113,7 @@ def newgroupaction():
 
 
 @app.route('/get/actionresult', methods=['POST'])
+@auth.login_required
 def getactionresult():
     content = request.json
     try:
@@ -121,27 +126,32 @@ def getactionresult():
     return req.text
 
 @app.route('/list/bots', methods=['GET'])
+@auth.login_required
 def listbots():
     data = requests.get(core + "/list/bots")
     return data.text
 
 @app.route('/list/hosts', methods=['GET'])
+@auth.login_required
 def listhosts():
     data = requests.get(core + "/list/hosts")
     return data.text
 
 @app.route('/list/groups', methods=['GET'])
+@auth.login_required
 def listgroups():
     data = requests.get(core + "/list/groups")
     return data.text
 
 @app.route('/list/actions', methods=['GET'])
+@auth.login_required
 def listactions():
     data = requests.get(core + "/list/actions")
     return data.text
 
 @app.route('/list/db', methods=['GET'])
 @app.route('/dumpdb', methods=['GET'])
+@auth.login_required
 def dumpdb():
     data = requests.get(core + "/dumpdb")
     return data.text
@@ -219,7 +229,7 @@ def get_auth_token():
     token = g.user.generate_auth_token(600)
     return jsonify({'token': token.decode('ascii'), 'duration': 6000})
 
-@app.route('/api/testresource')
+@app.route('/api/testauth')
 @auth.login_required
 def get_resource():
     return jsonify({'data': 'Hello, %s!' % g.user.username})
