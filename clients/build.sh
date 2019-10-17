@@ -7,7 +7,7 @@ read -p 'Delta(seconds): ' deltavar
 read -p 'Obfuscation text(random string): ' obftextvar
 read -p 'Target OS(linux|windows): ' targetos
 read -p 'Output binary name: ' outputbin
-payloadpath=""
+payloadpath="test"
 echo "[+] Replacing variables..."
 if [ $payloadvar == "tcp" ]
 then
@@ -21,7 +21,7 @@ else
     echo "unknown payload type"
     exit
 fi
-
+echo $payloadpath
 echo "[+] Copying files..."
 
 cp $payloadpath tmp1.go
