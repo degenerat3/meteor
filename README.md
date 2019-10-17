@@ -35,7 +35,7 @@ Ensure that you have [docker](https://www.docker.com/) and [docker-compose](http
 Move into the root of the `meteor` directory.  
 Build the containers: `sudo docker-compose build`  
 Start (and daemonize) the containers: `sudo docker-compose up -d`  
-To test if core is running, from localhost: `curl http://localhost:9999/`  
+To test if core is running, from localhost: `curl http://172.69.1.1:9999/`  
 
 #### Clients
 Each client must be slightly adjusted, since there are several global variables that must be configred. The only mandatory configuration is the "server" variable, but it is recommended that all of the following are configured (names vary slightly by client):  
