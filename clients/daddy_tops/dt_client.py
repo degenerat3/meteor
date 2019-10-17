@@ -8,11 +8,22 @@ from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import WordCompleter
+from getpass import getpass
+from requests.auth import HTTPBasicAuth
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = os.environ.get("DT_USER", "Unknown")
 dtWords = ['action:', 'gaction:', 'groups', 'actions', 'show:', 'result:', 'hosts', "bots", 'modes', 'help', "exit"]
 dtComp = WordCompleter(dtWords)
+print("DaddyTops Login:")
+username = input("Username: ")
+password = getpass()
+
+reqauthtok = requests.get(server + "/api/token", auth=HTTPBasicAuth(username, password)).json()
+authtok = reqauthtok['token'] 
+ 
+
+
 
 def handleNew(split_inp):
     print(split_inp)
@@ -78,7 +89,7 @@ def newAction(args):
     opt = ""
     header = {'Content-type': 'application/json'}
     data = {"hostname": target, "mode": mode, "arguments": argum, "options": opt, "dtuser": user}
-    request = requests.post(server + "/add/command/single", headers=header, data=json.dumps(data))
+    request = requests.post(server + "/add/command/single", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
     if request.text == "success":
         print("SUCCESS! " + mode + " action queued for host: " + target)
     else:
@@ -109,7 +120,7 @@ def newGroupAction(args):
     opt = ""
     header = {'Content-type': 'application/json'}
     data = {"groupname": target, "mode": mode, "arguments": argum, "options": opt, "dtuser": user}
-    request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data))
+    request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
     if request.text == "success":
         print("SUCCESS! " + mode + " action queued for group: " + target)
     else:
@@ -145,7 +156,7 @@ def listObj(args):
         return
     if "result" not in obj:
         url = server + "/list/" + obj
-        request = requests.get(url)
+        request = requests.get(url, auth=HTTPBasicAuth(authtok, "garbage"))
         if request.text == "":
             print("None\n")
             return
@@ -160,7 +171,7 @@ def listObj(args):
             return
         header = {'Content-type': 'application/json'}
         data = {"actionid": aid}
-        request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data))
+        request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
         encRes = request.text
         res = base64.b64decode(encRes).decode("utf-8")
         print(res)

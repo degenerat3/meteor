@@ -2,3 +2,4 @@ pyyaml
 requests
 prompt_toolkit
 fuzzyfinder
+getpass
