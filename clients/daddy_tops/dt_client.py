@@ -14,7 +14,7 @@ from requests.auth import HTTPBasicAuth
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = os.environ.get("DT_USER", "Unknown")
-dtWords = ['action:', 'gaction:', 'groups', 'actions', 'show:', 'result:', 'hosts', "bots", 'modes', 'help', "exit"]
+dtWords = ["action:", "gaction:", "groups", "actions", "show:", "result:", "hosts", "bots", "modes", "help", "exit", "groupmembers"]
 dtComp = WordCompleter(dtWords)
 print(" =================")
 print("| DaddyTops Login |")
@@ -67,7 +67,7 @@ def help():
     print("SHOW ACTION MODES:       show: modes")
     print("SHOW ACTION RESULT:      show: result: <actionid>")
     print("SHOW TABLE INFO:         show: <table>")
-    print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'db'")
+    print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'groupmembers', 'db'")
     print()
     return
 
@@ -156,7 +156,7 @@ def listObj(args):
     except:
         print("Invalid syntax...")
         return
-    if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result", "modes"]:
+    if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result", "modes", "groupmembers"]:
         print("Unknown object: " + obj + "...")
         print("Options are (not case-sens): bots, hosts, actions, groups, db, result, modes")
         return
