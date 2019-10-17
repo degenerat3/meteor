@@ -163,7 +163,7 @@ def listactions():
 
 @app.route('/list/groupmembers', methods=['GET'])
 @auth.login_required
-def listactions():
+def listgroupmembers():
     data = requests.get(core + "/list/groupmembers")
     return data.text
 
