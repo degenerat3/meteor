@@ -28,7 +28,7 @@ services:
       - "8888:8888"
     volumes:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
-      - ./dtdb:/etc/dbfiles
+      - ./dtdb-data:/etc/dbfiles
     restart: always
     networks:
       meteornet: 
