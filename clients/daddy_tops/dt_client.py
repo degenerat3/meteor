@@ -38,9 +38,6 @@ def handleShow(split_inp):
     print(split_inp)
     return
 
-def clearterm():
-    print("\n" * get_terminal_size().lines, end='')
-
 def handleInput(args):
     if args.startswith("action:"):
         newAction(args)
@@ -54,6 +51,8 @@ def handleInput(args):
         exit()
     elif args.startswith("clear"):
         clearterm()
+    elif args == "":
+        return
     else:
         print("USAGE ERROR: use `help` for options")
     return
