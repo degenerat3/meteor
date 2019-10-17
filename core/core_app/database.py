@@ -18,11 +18,10 @@ class Host(Base):
     interface = Column(String)
     lastseen = Column(Integer)
 
-    def __init__(self, hostname, interface, groupid):
+    def __init__(self, hostname, interface):
         self.hostname = hostname
         self.interface = interface
         self.lastseen = 0
-        self.groupid = groupid
         session.add(self)
         try:
             session.commit()
@@ -31,7 +30,7 @@ class Host(Base):
             sys.stderr.write("Error creating Host...\n")
 
     def __repr__(self):
-        return "<Host(id='%d', hostname='%s', interface='%s', lastseen='%d', groupid='%d')>" % (self.id, self.hostname, self.interface, self.lastseen, self.groupid)
+        return "<Host(id='%d', hostname='%s', interface='%s', lastseen='%d')>" % (self.id, self.hostname, self.interface, self.lastseen)
 
     
 class Bot(Base):
