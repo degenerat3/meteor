@@ -38,8 +38,8 @@ echo "[+] Building binary"
 
 export goos=$targetos
 
-go build tmp1.go -o $outputbin
+go build tmp1.go
 
 echo "[+] Cleaning up..."
-cp tmp1 $outputbin
+mv tmp1 $outputbin
 rm tmp1.go
