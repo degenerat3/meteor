@@ -25,17 +25,15 @@ def registerBot(uuid, interval, delta, hostname):
     return [True, "None"]
 
 
-def registerHost(hostname, interface, groupname):
+def registerHost(hostname, interface):
     print("registering host")
     try:
-        q = session.query(Group).filter(Group.name == groupname).one()
-        groupid = q.id
-        h = Host(hostname, interface, groupid)
+        h = Host(hostname, interface)
     except:
-        logstr = "METEORAPP - Host failed to register - host:" + hostname + " group:" + groupname
+        logstr = "METEORAPP - Host failed to register - host:" + hostname
         logging.error(logstr)
-        return [False, "Unknown group"]
-    logstr = "METEORAPP - Host registered - host:" + hostname + " group:" + groupname
+        return [False, "Host registration error"]
+    logstr = "METEORAPP - Host registered - host:" + hostname
     logging.info(logstr)
     return [True, "None"]
 
@@ -51,6 +49,18 @@ def registerGroup(groupname):
     logstr = "METEORAPP - Group registered - group:" + groupname
     logging.info(logstr)
     return [True, "None"]
+
+
+def buildGroup(buildstr):
+    sp = buildstr.split("||")
+    for item in sp:
+        if item != "":
+            t = item.split(":")
+            host = t[0]
+            group = t[1]
+            hid = session.query(Host).filter(Host.hostname == host).one().id
+            gid = session.query(Group).filter(Group.name == group).one().id
+            HostGroupMap(hid, gid)
 
 
 def hostlookup(hostname):
@@ -75,9 +85,9 @@ def singlecommandadd(mode, arguments, options, hostid):
     a = Action(mode, arguments, options, False, False, hostid)
 
 def groupcommandadd(mode, arguments, options, groupid):
-    q = session.query(Host).filter(Host.groupid == groupid)
+    q = session.query(HostGroupMap).filter(HostGroupMap.groupid == groupid)
     for result in q:
-        hid = result.id
+        hid = result.hostid
         singlecommandadd(mode, arguments, options, hid)
     return [True, "None"]
 
@@ -142,6 +152,25 @@ def listGroupsUtil():
         data += str(instance) + "\n"
     return data
 
+def listGroupMembersUtil():
+    data = ""
+    groupstuff = {}
+    for instance in session.query(HostGroupMap).order_by(HostGroupMap.id):
+        hid = instance.hostid
+        gid = instance.groupid
+        hn = session.query(Host).filter(Host.id == hid).one().hostname
+        gn = session.query(Group).filter(Group.id == gid).one().name
+        if gn == "all":
+            continue
+        if gn in groupstuff:
+            groupstuff[gn].append(hn)
+        else:
+            groupstuff[gn] = []
+            groupstuff[gn].append(hn)
+    return str(groupstuff)
+        
+
+
 def listActionsUtil():
     data = ""
     for instance in session.query(Action).order_by(Action.id):
@@ -170,9 +199,11 @@ def dumpDatabase():
 def clearDbUtil():
     session.query(Response).delete()
     session.query(Action).delete()
+    session.query(HostGroupMap).delete()
     session.query(Bot).delete()
     session.query(Host).delete()
     session.query(Group).delete()
+    
     try:
         session.commit()
         logging.info("Database was cleared")

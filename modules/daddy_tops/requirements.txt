@@ -1,2 +1,8 @@
 requests
 flask
+flask-HTTPAuth
+Flask-SQLAlchemy
+itsdangerous
+passlib
+SQLAlchemy
+pyyaml

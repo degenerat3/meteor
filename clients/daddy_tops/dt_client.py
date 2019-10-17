@@ -8,19 +8,38 @@ from prompt_toolkit import prompt
 from prompt_toolkit.history import FileHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import WordCompleter
+from getpass import getpass
+from requests.auth import HTTPBasicAuth
+from shutil import get_terminal_size
+
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
-user = os.environ.get("DT_USER", "Unknown")
-dtWords = ['action:', 'gaction:', 'groups', 'actions', 'show:', 'result:', 'hosts', "bots", 'modes', 'help', "exit"]
+dtWords = ["action:", "gaction:", "groups", "actions", "show:", "result:", "hosts", "bots", "modes", "help", "exit", "groupmembers"]
 dtComp = WordCompleter(dtWords)
+print(" =================")
+print("| DaddyTops Login |")
+print(" =================")
+username = input("Username: ")
+password = getpass()
+user = username
+
+try:
+    reqauthtok = requests.get(server + "/api/token", auth=HTTPBasicAuth(username, password)).json()
+    authtok = reqauthtok['token']
+except:
+    print("INVALID CREDENTIALS")
+    exit()
+ 
 
 def handleNew(split_inp):
     print(split_inp)
     return
 
+
 def handleShow(split_inp):
     print(split_inp)
     return
+
 
 def handleInput(args):
     if args.startswith("action:"):
@@ -33,9 +52,12 @@ def handleInput(args):
         help()
     elif args.startswith("exit"):
         exit()
+    elif args == "":
+        return
     else:
         print("USAGE ERROR: use `help` for options")
     return
+
 
 def help():
     print("Daddy Tops Command Line Tool")
@@ -50,9 +72,10 @@ def help():
     print("SHOW ACTION MODES:       show: modes")
     print("SHOW ACTION RESULT:      show: result: <actionid>")
     print("SHOW TABLE INFO:         show: <table>")
-    print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'db'")
+    print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'groupmembers', 'db'")
     print()
     return
+
 
 def newAction(args):
     try:
@@ -78,12 +101,13 @@ def newAction(args):
     opt = ""
     header = {'Content-type': 'application/json'}
     data = {"hostname": target, "mode": mode, "arguments": argum, "options": opt, "dtuser": user}
-    request = requests.post(server + "/add/command/single", headers=header, data=json.dumps(data))
+    request = requests.post(server + "/add/command/single", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
     if request.text == "success":
-        print("SUCCESS! " + mode + " action queued for host: " + target)
+        print("SUCCESS! Action queued for host: " + target)
     else:
         print(request.text)
     return
+
 
 def newGroupAction(args):
     try:
@@ -109,12 +133,13 @@ def newGroupAction(args):
     opt = ""
     header = {'Content-type': 'application/json'}
     data = {"groupname": target, "mode": mode, "arguments": argum, "options": opt, "dtuser": user}
-    request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data))
+    request = requests.post(server + "/add/command/group", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
     if request.text == "success":
-        print("SUCCESS! " + mode + " action queued for group: " + target)
+        print("SUCCESS! Action queued for group: " + target)
     else:
         print(request.text)
     return
+
 
 def showModes():
     print("  AVAILABLE ACTION MODES:")
@@ -129,6 +154,7 @@ def showModes():
     print()
     return
 
+
 def listObj(args):
     if args == "show: modes":
         showModes()
@@ -139,13 +165,13 @@ def listObj(args):
     except:
         print("Invalid syntax...")
         return
-    if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result", "modes"]:
+    if obj.lower() not in ["bots", "hosts", "actions", "groups", "db", "database", "result", "modes", "groupmembers"]:
         print("Unknown object: " + obj + "...")
         print("Options are (not case-sens): bots, hosts, actions, groups, db, result, modes")
         return
     if "result" not in obj:
         url = server + "/list/" + obj
-        request = requests.get(url)
+        request = requests.get(url, auth=HTTPBasicAuth(authtok, "garbage"))
         if request.text == "":
             print("None\n")
             return
@@ -160,11 +186,12 @@ def listObj(args):
             return
         header = {'Content-type': 'application/json'}
         data = {"actionid": aid}
-        request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data))
+        request = requests.post(server + "/get/actionresult", headers=header, data=json.dumps(data), auth=HTTPBasicAuth(authtok, "garbage"))
         encRes = request.text
         res = base64.b64decode(encRes).decode("utf-8")
         print(res)
         return
+
 
 while True:
     user_input = prompt('DT> ', 

@@ -17,13 +17,11 @@ class Host(Base):
     hostname = Column(String, unique=True)
     interface = Column(String)
     lastseen = Column(Integer)
-    groupid = Column(Integer, ForeignKey('groups.id'))
 
-    def __init__(self, hostname, interface, groupid):
+    def __init__(self, hostname, interface):
         self.hostname = hostname
         self.interface = interface
         self.lastseen = 0
-        self.groupid = groupid
         session.add(self)
         try:
             session.commit()
@@ -32,7 +30,7 @@ class Host(Base):
             sys.stderr.write("Error creating Host...\n")
 
     def __repr__(self):
-        return "<Host(id='%d', hostname='%s', interface='%s', lastseen='%d', groupid='%d')>" % (self.id, self.hostname, self.interface, self.lastseen, self.groupid)
+        return "<Host(id='%d', hostname='%s', interface='%s', lastseen='%d')>" % (self.id, self.hostname, self.interface, self.lastseen)
 
     
 class Bot(Base):
@@ -79,6 +77,27 @@ class Group(Base):
 
     def __repr__(self):
         return "<Group(id='%d', name='%s')>" % (self.id, self.name)
+
+class HostGroupMap(Base):
+    __tablename__ = 'hostgroupmap'
+
+    id = Column(Integer, primary_key=True)
+    hostid = Column(Integer, ForeignKey('hosts.id'))
+    groupid = Column(Integer, ForeignKey('groups.id'))
+
+    def __init__(self, hostid, groupid):
+        self.hostid = hostid
+        self.groupid = groupid
+        session.add(self)
+        try:
+            session.commit()
+        except exc.IntegrityError as err:
+            session.rollback()
+            sys.stderr.write("Error creating HostGroupMap...\n")
+
+    def __repr__(self):
+        return "<HostGroupMap(id='%d', hostid='%d', groupid='%d')>" % (self.id, self.hostid, self.groupid)
+
 
 class Action(Base):
     __tablename__ = 'actions'

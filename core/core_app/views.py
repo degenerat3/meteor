@@ -31,10 +31,9 @@ def newhost():
     try:
         hostname = content['hostname']
         interface = content['interface']
-        groupname = content['groupname']
     except:
         return "Missing required fields"
-    reg_status = registerHost(hostname, interface, groupname)
+    reg_status = registerHost(hostname, interface)
     if reg_status[0]:
         return "Success"
     failure_str = "500: Register failure- " + reg_status[1]
@@ -53,6 +52,16 @@ def newgroup():
         return "Success"
     failure_str = "500: Register failure- " + reg_status[1]
     return failure_str
+
+
+@app.route('/register/buildgroups', methods=['POST'])
+def buildgroups():
+    content = request.json
+    try:
+        buildstr = content['buildstring']
+    except:
+        return "Missing required field"
+    buildGroup(buildstr)
 
 
 @app.route('/add/command/single', methods=['POST'])
@@ -137,6 +146,11 @@ def listgroups():
 @app.route('/list/actions', methods=['GET'])
 def listactions():
     data = listActionsUtil()
+    return data
+
+@app.route('/list/groupmembers', methods=['GET'])
+def listgroupmembers():
+    data = listGroupMembersUtil()
     return data
 
 @app.route('/list/db', methods=['GET'])
