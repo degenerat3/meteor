@@ -10,11 +10,12 @@ from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import WordCompleter
 from getpass import getpass
 from requests.auth import HTTPBasicAuth
+from shutil import get_terminal_size
 
 
 server = os.environ.get("DT_SERVER", "http://localhost:8888") 
 user = os.environ.get("DT_USER", "Unknown")
-dtWords = ["action:", "gaction:", "groups", "actions", "show:", "result:", "hosts", "bots", "modes", "help", "exit", "groupmembers"]
+dtWords = ["action:", "gaction:", "groups", "actions", "show:", "result:", "hosts", "bots", "modes", "help", "exit", "groupmembers", "clear"]
 dtComp = WordCompleter(dtWords)
 print(" =================")
 print("| DaddyTops Login |")
@@ -29,8 +30,6 @@ except:
     exit()
  
 
-
-
 def handleNew(split_inp):
     print(split_inp)
     return
@@ -38,6 +37,9 @@ def handleNew(split_inp):
 def handleShow(split_inp):
     print(split_inp)
     return
+
+def clearterm():
+    print("\n" * get_terminal_size().lines, end='')
 
 def handleInput(args):
     if args.startswith("action:"):
@@ -50,6 +52,8 @@ def handleInput(args):
         help()
     elif args.startswith("exit"):
         exit()
+    elif args.startswith("clear"):
+        clearterm()
     else:
         print("USAGE ERROR: use `help` for options")
     return
