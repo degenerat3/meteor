@@ -8,5 +8,5 @@ newpassword = input("new password: ")
 
 url = "http://localhost:8888/api/users"
 data = {'username': newuser, 'password': newpassword}
-r = requests.post(server, auth=HTTPBasicAuth('admin', adminpass), json=data)
+r = requests.post(url, auth=HTTPBasicAuth('admin', adminpass), json=data)
 print(r.text)
