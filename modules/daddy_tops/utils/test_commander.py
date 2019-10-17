@@ -1,7 +1,7 @@
 import requests
 import json
 
-server = "http://localhost:9999"
+server = "http://localhost:8888"
 
 header = {'Content-type': 'application/json'}
 data = {"groupname": "Webservers"}
