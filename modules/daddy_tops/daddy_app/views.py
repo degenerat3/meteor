@@ -83,7 +83,7 @@ def buildgroups():
     header = {'Content-type': 'application/json'}
     data = {"buildstring": buildstr}
     req = requests.post(core + "/register/buildgroups", headers=header, data = json.dumps(data))
-    reqturn req.text
+    return req.text
 
 
 @app.route('/add/command/single', methods=['POST'])
