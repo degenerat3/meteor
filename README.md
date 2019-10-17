@@ -39,7 +39,7 @@ To test if core is running, from localhost: `curl http://172.69.1.1:9999/`
 
 #### Clients
 Each client must be slightly adjusted, since there are several global variables that must be configred.  
-This whole build/compilation can be done automatically with the `clients/build.sh` script (run it, input prompted data, ezwin).  
+The compilation can be done automatically with the `clients/build.sh` script (run it, input prompted data, ezwin).  
 If you want to do it yourself:  
 The only mandatory configuration is the "server" variable, but it is recommended that all of the following are configured (names vary slightly by client):  
  - SERV     // the server to call back to (docker host)
