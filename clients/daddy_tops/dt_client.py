@@ -72,7 +72,7 @@ def help():
     print("SHOW ACTION MODES:       show: modes")
     print("SHOW ACTION RESULT:      show: result: <actionid>")
     print("SHOW TABLE INFO:         show: <table>")
-    print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'groupmembers', 'db'")
+    print("                           -table options: 'bots', 'hosts', 'actions', 'groups', 'groupmembers', 'db', 'modes'")
     print()
     return
 
