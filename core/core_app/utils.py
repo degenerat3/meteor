@@ -1,5 +1,7 @@
 import time
 import logging
+import os
+import requests
 from .database import *
 
 LOGGING_FILE = "/var/log/meteor/core/core.log"
