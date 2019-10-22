@@ -45,8 +45,11 @@ func connHandle(rw http.ResponseWriter, req *http.Request) {
 		Comms string `json:"comms"`
 	}
 	var msg Message
-	err := json.Unmarshal(bytmessage, &msg)
-	result := server.HandlePayload(msg, m)
+	if err = json.Unmarshal(bytmessage, &msg); err != nil {
+		fmt.Println("Error reading:", err.Error())
+	}
+
+	result := server.HandlePayload(msg.Comms, m)
 	rw.Write([]byte(result))
 }
 
