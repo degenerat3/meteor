@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/degenerat3/metcli/server"
 	"io/ioutil"
@@ -37,11 +38,15 @@ var m = server.GenMetserver(CORE, MAGIC, MAGICSTR, MAGICTERM, MAGICTERMSTR)
 //take the MAD payload and do stuff with it
 func connHandle(rw http.ResponseWriter, req *http.Request) {
 	bytmessage, err := ioutil.ReadAll(req.Body)
-	message := string(bytmessage)
 	if err != nil {
 		fmt.Println("Error reading:", err.Error())
 	}
-	result := server.HandlePayload(message, m)
+	type Message struct {
+		Comms string `json:"comms"`
+	}
+	var msg Message
+	err := json.Unmarshal(bytmessage, &msg)
+	result := server.HandlePayload(msg, m)
 	rw.Write([]byte(result))
 }
 
