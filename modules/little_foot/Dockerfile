@@ -1,5 +1,5 @@
 FROM golang:1.7.3
-WORKDIR /code
+WORKDIR /code/
 RUN go get github.com/degenerat3/metcli
 COPY lf_server.go .
 RUN GOOS=linux go build .

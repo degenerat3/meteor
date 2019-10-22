@@ -1,6 +1,6 @@
 FROM golang:1.7.3
-WORKDIR /code
-RUN go get github.com/degenerat3/metcli
+WORKDIR /code/
+RUN go get -d -v github.com/degenerat3/metcli
 COPY pet_server.go .
 RUN GOOS=linux go build .
 
