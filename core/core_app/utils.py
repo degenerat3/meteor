@@ -118,7 +118,7 @@ def getCommandUtil(uuid):
         cmds.append(cmd)
     session.commit()
     hstnm = h.hostname
-    #updatePwnboard(hstnm)      #uncomment this to update pwnboard
+    updatePwnboard(hstnm)      #uncomment this to update pwnboard
     logstr = "BOXACCESS " + hstnm + " via Meteor beacon"
     logging.info(logstr)
     return cmds
@@ -214,7 +214,7 @@ def clearDbUtil():
         return "Error\n"
 
 def updatePwnboard(ip):
-    host = os.environ.get("PWNBOARD_URL", "")
+    host = os.environ.get("PWNBOARD_URL", "http://pwnboard.win/generic")
     msg = "Meteor received a beacon"
     if not host:
         return
