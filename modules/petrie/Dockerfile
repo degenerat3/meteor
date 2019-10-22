@@ -2,7 +2,7 @@ FROM golang:1.7.3
 WORKDIR /code/
 RUN go get -d -v github.com/degenerat3/metcli
 COPY pet_server.go .
-RUN CGO_ENABLED=0 GOOS=linux go build -o /bin/pet_server .
+RUN CGO_ENABLED=0 GOOS=linux go build -o pet_server .
 
 FROM alpine:latest
 RUN apk add --update tzdata
