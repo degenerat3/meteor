@@ -57,7 +57,8 @@ func main() {
 //take the MAD payload and do stuff with it
 func connHandle(conn net.Conn) {
 	message, err := bufio.NewReader(conn).ReadString(MAGICTERMBYTE)
-	if string(message) == "ping\n" {
+	fmt.Printf(message)
+	if string(message) == "ping\xAB" {
 		conn.Write([]byte("pong\n"))
 		conn.Close()
 		return
