@@ -103,7 +103,10 @@ def addGroupAction(groupname, mode, arguments, options):
 
 def getCommandUtil(uuid):
     t = int(time.time())
-    b = session.query(Bot).filter(Bot.uuid == uuid).one()
+    try:
+        b = session.query(Bot).filter(Bot.uuid == uuid).one()
+    except:
+        return "Error: bot not registered"
     b.lastseen = t
     hid = b.hostid
     h = session.query(Host).filter(Host.id == hid).one()
