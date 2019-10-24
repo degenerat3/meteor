@@ -73,7 +73,7 @@ func main() {
 		if len(res) > 0 {
 			send(res, m)
 		}
-		if argslen < 2 {
+		if argslen > 1 {
 			os.Exit(0)
 		}
 		min := INTERVAL - DELTA
