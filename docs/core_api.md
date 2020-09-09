@@ -7,10 +7,10 @@ Desc: create new bot entry
 Method: `POST`
 Params: 
 ```
-uuid:      the client-generated unique identifier for the new bot [string]
-interval:  the interval (in seconds) between callbacks [string]
-delta:     the variation (in seconds) of each interval [string]
-hostname:  the host that the bot is running on (generally an IP address) [string]
+uuid:      the client-generated unique identifier for the new bot 
+interval:  the interval (in seconds) between callbacks 
+delta:     the variation (in seconds) of each interval 
+hostname:  the host that the bot is running on (generally an IP address) 
 ```
 
 ### `/register/host`
@@ -18,8 +18,8 @@ Desc: create new host entry
 Method: `POST`
 Params: 
 ```
-hostname:  the name of the host being registered [string]
-interface: the primary interface used by the host [string]
+hostname:  the name of the host being registered 
+interface: the primary interface used by the host 
 ```
 
 ### `/register/group`
@@ -27,8 +27,8 @@ Desc: create new group entry
 Method: `POST`
 Params: 
 ```
-groupname: the name of the group being registered [string]
-desc:      a description of the group [string]
+groupname: the name of the group being registered 
+desc:      a description of the group 
 ```
 
 ### `/register/hostgroup`
@@ -36,8 +36,8 @@ Desc: assign a group to a host
 Method: `POST`
 Params: 
 ```
-hostname:  the host that will be assigned
-groupname: the group that the host will be added to
+hostname:  the host that will be assigned 
+groupname: the group that the host will be added to 
 ```
 
 ## Actions
@@ -48,8 +48,8 @@ Method: `POST`
 Params: 
 ```
 mode:      the action mode 
-args:      required arg data for the mode type
-target:    the host to run the action against
+args:      required arg data for the mode type 
+target:    the host to run the action against 
 ```
 
 ### `/add/action/group`
@@ -76,7 +76,7 @@ Desc: the endpoint listeners will query when a bot "beacons." Checks if any acti
 Method: `POST`
 Params: 
 ```
-uuid:      the previously-registered unique identifier for the bot [string]
+uuid:      the previously-registered unique identifier for the bot 
 ```
 
 ## List  
