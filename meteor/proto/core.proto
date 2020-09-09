@@ -42,11 +42,15 @@ message AddRes {
     string data = 2;    // the action result data to store (usually output of the action)
 }
 
+message CheckIn { 
+    string uuid = 1;    // the previously-registered unique identifier for the bot
+}
+
 
 
 // API RESPONSE FORMATS
 
-message General {
+message GenResp {
     int32 status = 1;   // HTTP status code for the request
     string msg = 2;     // relevant response data (varies by API endpoint)
 }
