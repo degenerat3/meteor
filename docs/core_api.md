@@ -7,7 +7,10 @@ Desc: create new bot entry
 Method: `POST`
 Params: 
 ```
-TBD
+uuid:      the client-generated unique identifier for the new bot [string]
+interval:  the interval (in seconds) between callbacks [string]
+delta:     the variation (in seconds) of each interval [string]
+hostname:  the host that the bot is running on (generally an IP address) [string]
 ```
 
 ### `/register/host`
@@ -15,7 +18,8 @@ Desc: create new host entry
 Method: `POST`
 Params: 
 ```
-TBD
+hostname:  the name of the host being registered [string]
+interface: the primary interface used by the host [string]
 ```
 
 ### `/register/group`
@@ -23,7 +27,8 @@ Desc: create new group entry
 Method: `POST`
 Params: 
 ```
-TBD
+groupname: the name of the group being registered [string]
+desc:      a description of the group [string]
 ```
 
 ### `/register/hostgroup`
@@ -31,7 +36,8 @@ Desc: assign a group to a host
 Method: `POST`
 Params: 
 ```
-TBD
+hostname:  the host that will be assigned
+groupname: the group that the host will be added to
 ```
 
 ## Actions
@@ -41,7 +47,9 @@ Desc: queue a new action assigned to a specific host
 Method: `POST`
 Params: 
 ```
-TBD
+mode:      the action mode 
+args:      required arg data for the mode type
+target:    the host to run the action against
 ```
 
 ### `/add/action/group`
@@ -49,27 +57,29 @@ Desc: queue a new action assigned to a group
 Method: `POST`
 Params: 
 ```
-TBD
+mode:      the action mode 
+args:      required arg data for the mode type
+target:    the group to run the action against     
 ```
 
 ### `/add/result`
-	update an action with the included "result" (usually oputput of action)
-Desc: queue a new action assigned to a group
+Desc: update an action with the included "result" (usually oputput of action)
 Method: `POST`
 Params: 
 ```
-TBD
+aid:       the action id this result is associated with
+data:      the action result data to store (usually output of the action)
 ```
 
-### `/bot/checkin
+### `/bot/checkin`
 Desc: the endpoint listeners will query when a bot "beacons." Checks if any action is pending, returns proto for any pending actions or "None"
 Method: `POST`
 Params: 
 ```
-TBD
+uuid:      the previously-registered unique identifier for the bot [string]
 ```
 
-## List
+## List  
 
 ### `/list/bots`	
 Desc: print all bots and what host they're associated with
@@ -103,4 +113,4 @@ Method: `GET`
 
 ### `/`
 Desc: get status of the Core server, either "Core is running." or no response
-Metho: `Get`
+Method: `Get`
