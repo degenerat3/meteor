@@ -1,0 +1,52 @@
+// This file holds the required proto message formats for interacting with the core API endpoints
+
+syntax = "proto3";
+
+// API REQUEST FORMATS
+
+// For use with /register/bot
+message RegBot {
+    string uuid = 1;        // the client-generated unique identifier for the new bot 
+    int32 interval = 2;     // the interval (in seconds) between callbacks
+    int32 delta = 3;        //  the variation (in seconds) of each interval
+    string hostname = 4;    // the host that the bot is running on (generally an IP address)
+}
+
+// For use with /register/host
+message RegHost {
+    string hostname = 1;    // the name of the host being registered 
+    string interface = 2;   // the primary interface used by the host
+}
+
+// For use with /register/group
+message RegGroup {
+    string groupname = 1;   // the name of the group being registered
+    string desc = 2;        // a description of the group
+}
+
+// For use with /register/hostgroup
+message RegHG {
+    string hostname = 1;    // the host that will be assigned
+    string groupname = 2;   // the group that the host will be added to 
+}
+
+// For use with /add/action/*
+message AddAct {
+    string mode = 1;    // the action mode 
+    string args = 2;    // required arg data for the mode type
+    string target = 3;  // the group to run the action against
+}
+
+message AddRes {
+    int64 aid = 1;      // the action id this result is associated with
+    string data = 2;    // the action result data to store (usually output of the action)
+}
+
+
+
+// API RESPONSE FORMATS
+
+message General {
+    int32 status = 1;   // HTTP status code for the request
+    string msg = 2;     // relevant response data (varies by API endpoint)
+}
