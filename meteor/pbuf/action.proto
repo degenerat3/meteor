@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-message Action {
-    int64 action_id = 1;  // the ID of the action, 0 if check-in
-    string mode = 2; // type of data that will be in "args" or is being requested
-    string args = 3; // the data of the action (command line args, bot uuid, etc)
-  }

@@ -1,77 +1,72 @@
-# Core API 
+# Core API
+
+All of these requests/responses will make use of the MCS protobuf as defined in `meteor/pbuf/mcs.proto`.
 
 ### Registration Endpoints
 ---
 
 ### `/register/bot`
 Desc: create new bot entry  
-Method: `POST`  
-Request Proto: `RegBot`  
+Method: `POST`   
 Request Params:   
 ```
-uuid:      the client-generated unique identifier for the new bot 
-interval:  the interval (in seconds) between callbacks 
-delta:     the variation (in seconds) of each interval 
-hostname:  the host that the bot is running on (generally an IP address) 
-```
-Response Proto: `GenResp`  
+uuid:      the client-generated unique identifier for the new bot [string]
+interval:  the interval (in seconds) between callbacks [int32]
+delta:     the variation (in seconds) of each interval [int32]
+hostname:  the host that the bot is running on [string]
+```  
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
 
 ### `/register/host`
 Desc: create new host entry  
-Method: `POST`  
-Request Proto: `RegHost`  
+Method: `POST`   
 Request Params:   
 ```
-hostname:  the name of the host being registered 
-interface: the primary interface used by the host 
+hostname:  the name of the host being registered [string]
+interface: the primary interface used by the host [string]
 ```
-Response Proto: `GenResp`
 Response Params: 
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
 
 ### `/register/group`
 Desc: create new group entry  
-Method: `POST`  
-Request Proto: `RegGroup`  
+Method: `POST`    
 Request Params:   
 ```
-groupname: the name of the group being registered 
-```
-Response Proto: `GenResp`  
+groupname: the name of the group being registered [string]
+desc:      the description of the group [string]
+``` 
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
 
 ### `/register/hostgroup`
 Desc: assign a group to a host  
-Method: `POST`  
-Request Proto: `RegHG`  
+Method: `POST`    
 Request Params:   
 ```
-hostname:  the host that will be assigned 
-groupname: the group that the host will be added to 
-```
-Response Proto: `GenResp`  
+hostname:  the host that will be assigned [string]
+groupname: the group that the host will be added to [string]
+``` 
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
@@ -83,55 +78,49 @@ msg: error, if any
 ### `/add/action/single`	
 Desc: queue a new action assigned to a specific host  
 Method: `POST`  
-Request Proto: `AddAct`  
 Request Params:   
 ```
-mode:      the action mode 
-args:      required arg data for the mode type 
-target:    the host to run the action against 
+mode:      the action mode [string]
+args:      required arg data for the mode type [string]
+hostname:    the host to run the action against [string]
 ```
-Response Proto: `GenResp`  
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
 
 ### `/add/action/group`
 Desc: queue a new action assigned to a group  
-Method: `POST`  
-Request Proto: `AddAct`  
+Method: `POST`   
 Request Params:   
 ```
-mode:      the action mode 
-args:      required arg data for the mode type
-target:    the group to run the action against     
+mode:      the action mode [string]
+args:      required arg data for the mode type [string]
+groupname:    the group to run the action against [string]     
 ```
-Response Proto: `GenResp`  
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
 
 ### `/add/result`
 Desc: update an action with the included "result" (usually oputput of action)  
-Method: `POST`  
-Request Proto: `AddRes`  
+Method: `POST`   
 Request Params:   
 ```
-aid:       the action id this result is associated with
-data:      the action result data to store (usually output of the action)
+uuid:      the action id this result is associated with [string]
+result:      the action result data to store (usually output of the action) [string]
 ```
-Response Proto: `GenResp`  
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
@@ -139,16 +128,14 @@ msg: error, if any
 ### `/bot/checkin`
 Desc: the endpoint listeners will query when a bot "beacons." Checks if any action is pending, returns proto for any pending actions or "None"  
 Method: `POST`  
-Request Proto: `CheckIn`  
 Request Params:   
 ```
-uuid:      the previously-registered unique identifier for the bot 
+uuid:      the previously-registered unique identifier for the bot [string]
 ```
-Response Proto: `GenResp`  
 Response Params:   
 ```
-status: HTTP response
-msg: proto for all pending actions for the specified host, separated by "|". ex: 'abcdef=|ABCDEF='
+status: HTTP response [int32]
+actions: an array of actions to execute [Action]
 ```
 
 ---
@@ -164,11 +151,10 @@ Request Params:
 ```
 None
 ```
-Response Proto: `GenResp`  
 Response Params:   
 ```
-status: HTTP response
-msg: newline-separated '<UUID> : <lastseen>'
+status: HTTP response [int32]
+desc: newline-separated '<UUID> : <lastseen>' [string]
 ```
 
 ---
@@ -180,11 +166,10 @@ Request Params:
 ```
 None
 ```
-Response Proto: `GenResp`  
 Response Params:   
 ```
-status: HTTP response
-msg: newline-separated '<hostnme> : <group(s)> : <lastseen>'
+status: HTTP response [int32]
+desc: newline-separated '<hostnme> : <group(s)> : <lastseen>' [string]
 ```
 
 ---
@@ -196,11 +181,10 @@ Request Params:
 ```
 None
 ```
-Response Proto: `GenResp`  
 Response Params:   
 ```
-status: HTTP response
-msg: newline-separated '<name> : <desc>'
+status: HTTP response [int32]
+desc: newline-separated '<name> : <desc>' [string]
 ```
 
 ---
@@ -215,12 +199,11 @@ Method: `GET`
 Request Params:   
 ```
 None
-```
-Response Proto: `GenResp`  
+``` 
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
 
 ---
@@ -231,10 +214,9 @@ Method: `Get`
 Request Params:   
 ```
 None
-```
-Response Proto: `GenResp`  
+```  
 Response Params:   
 ```
-status: HTTP response
-msg: error, if any
+status: HTTP response [int32]
+desc: error, if any [string]
 ```
