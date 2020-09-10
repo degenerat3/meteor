@@ -2,6 +2,7 @@ package schema
 
 import (
 	"github.com/facebook/ent"
+	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
 )
 
@@ -22,5 +23,8 @@ func (Bot) Fields() []ent.Field {
 
 // Edges of the Bot.
 func (Bot) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("infecting", Host.Type).
+			Ref("bots"),
+	}
 }

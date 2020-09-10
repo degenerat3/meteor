@@ -2,6 +2,7 @@ package schema
 
 import (
 	"github.com/facebook/ent"
+	"github.com/facebook/ent/schema/edge"
 	"github.com/facebook/ent/schema/field"
 )
 
@@ -13,15 +14,19 @@ type Action struct {
 // Fields of the Action.
 func (Action) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("uuid"),
 		field.String("mode"),
 		field.String("args"),
 		field.Bool("queued"),
 		field.Bool("responded"),
-		field.String("response"),
+		field.String("result"),
 	}
 }
 
 // Edges of the Action.
 func (Action) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("targeting", Host.Type).
+			Ref("actions"),
+	}
 }
