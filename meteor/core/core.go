@@ -28,6 +28,9 @@ func main() {
 	http.HandleFunc("/add/action/single", addActSingle)
 	http.HandleFunc("/add/action/group", addActGroup)
 	http.HandleFunc("/add/result", addResult)
+	http.HandleFunc("/list/bots", listBots)
+	http.HandleFunc("/list/hosts", listHosts)
+	http.HandleFunc("/list/groups", listGroups)
 	log.Fatal(http.ListenAndServe(":9999", nil))
 	return
 }
