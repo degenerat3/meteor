@@ -21,6 +21,13 @@ func main() {
 
 	http.HandleFunc("/", status)
 	http.HandleFunc("/status", status)
+	http.HandleFunc("/register/bot", regBot)
+	http.HandleFunc("/register/host", regHost)
+	http.HandleFunc("/register/group", regGroup)
+	http.HandleFunc("/register/hostgroup", regHG)
+	http.HandleFunc("/add/action/single", addActSingle)
+	http.HandleFunc("/add/action/group", addActGroup)
+	http.HandleFunc("/add/result", addResult)
 	log.Fatal(http.ListenAndServe(":9999", nil))
 	return
 }
