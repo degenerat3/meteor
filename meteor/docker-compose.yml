@@ -12,14 +12,14 @@ services:
       meteornet:
         ipv4_address: 172.69.1.1
 
-  #db:
-  #  build:
-  #    context: database/
-  #  volumes:
-  #    - ./postgres-data:/var/lib/postgresql/data
-  #  networks:
-  #    meteornet:
-  #      ipv4_address: 172.69.1.2
+  db:
+    build:
+      context: database/
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      meteornet:
+        ipv4_address: 172.69.1.2
   
   daddytops:
     build:
