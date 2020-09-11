@@ -5,4 +5,4 @@ WORKDIR /go/src/github.com/degenerat3/meteor/meteor/listeners/daddy_tops
 RUN go get ./...
 RUN go build
 
-ENTRYPOINT [ "/app/daddy_tops" ]
+ENTRYPOINT [ "/go/src/github.com/degenerat3/meteor/meteor/listeners/daddy_tops" ]
