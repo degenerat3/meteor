@@ -53,3 +53,24 @@ func forwardReq(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(rdata)
 }
+
+func listForward(w http.ResponseWriter, r *http.Request) {
+	url := "http://172.69.1.1:9999" + string(r.URL.Path)
+	resp, err := http.Get(url)
+	if err != nil {
+		resp := &mcs.MCS{
+			Status: 500,
+		}
+		rdata, _ := proto.Marshal(resp)
+		w.Write(rdata)
+	}
+	rdata, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		resp := &mcs.MCS{
+			Status: 500,
+		}
+		rdata, _ := proto.Marshal(resp)
+		w.Write(rdata)
+	}
+	w.Write(rdata)
+}
