@@ -48,7 +48,7 @@ func testRegHost() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(stat.GetStatus()))
+	fmt.Printf("%d\n", stat.GetStatus())
 	fmt.Println(string(stat.GetDesc()))
 
 }
@@ -79,7 +79,7 @@ func testRegGroup() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(stat.GetStatus()))
+	fmt.Printf("%d\n", stat.GetStatus())
 	fmt.Println(string(stat.GetDesc()))
 }
 
@@ -109,7 +109,7 @@ func testRegHG() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(stat.GetStatus()))
+	fmt.Printf("%d\n", stat.GetStatus())
 	fmt.Println(string(stat.GetDesc()))
 }
 
@@ -141,6 +141,6 @@ func testRegBot() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(stat.GetStatus()))
+	fmt.Printf("%d\n", stat.GetStatus())
 	fmt.Println(string(stat.GetDesc()))
 }
