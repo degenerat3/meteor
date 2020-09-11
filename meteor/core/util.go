@@ -186,3 +186,40 @@ func addResultUtil(prot *mcs.MCS) int32 {
 	return 200
 
 }
+
+func listBotsUtil() string {
+	bots, _ := DBClient.Bot.
+		Query().
+		All(ctx)
+
+	botListStr := ""
+	for _, bot := range bots {
+		bstr := bot.String()
+		botListStr = botListStr + bstr + "\n"
+	}
+	return botListStr
+}
+
+func listHostsUtil() string {
+	hosts, _ := DBClient.Host.
+		Query().
+		All(ctx)
+	hostListStr := ""
+	for _, host := range hosts {
+		hstr := host.String()
+		hostListStr = hostListStr + hstr + "\n"
+	}
+	return hostListStr
+}
+
+func listGroupsUtil() string {
+	groups, _ := DBClient.Group.
+		Query().
+		All(ctx)
+	groupListStr := ""
+	for _, group := range groups {
+		gstr := group.String()
+		groupListStr = groupListStr + gstr + "\n"
+	}
+	return groupListStr
+}

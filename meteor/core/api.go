@@ -117,3 +117,34 @@ func addResult(w http.ResponseWriter, r *http.Request) {
 	newRes := &mcs.MCS{}
 	proto.Unmarshal(data, newRes)
 }
+
+func listBots(w http.ResponseWriter, r *http.Request) {
+	botsList := listBotsUtil()
+	resp := &mcs.MCS{
+		Status: 200,
+		Desc:   botsList,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+
+}
+
+func listHosts(w http.ResponseWriter, r *http.Request) {
+	hostsList := listHostsUtil()
+	resp := &mcs.MCS{
+		Status: 200,
+		Desc:   hostsList,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+}
+
+func listGroups(w http.ResponseWriter, r *http.Request) {
+	groupsList := listGroupsUtil()
+	resp := &mcs.MCS{
+		Status: 200,
+		Desc:   groupsList,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+}
