@@ -44,8 +44,8 @@ type ActionMutation struct {
 	responded        *bool
 	result           *string
 	clearedFields    map[string]struct{}
-	targeting        map[int]struct{}
-	removedtargeting map[int]struct{}
+	targeting        *int
+	clearedtargeting bool
 	done             bool
 	oldValue         func(context.Context) (*Action, error)
 }
@@ -351,38 +351,35 @@ func (m *ActionMutation) ResetResult() {
 	m.result = nil
 }
 
-// AddTargetingIDs adds the targeting edge to Host by ids.
-func (m *ActionMutation) AddTargetingIDs(ids ...int) {
-	if m.targeting == nil {
-		m.targeting = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.targeting[ids[i]] = struct{}{}
-	}
+// SetTargetingID sets the targeting edge to Host by id.
+func (m *ActionMutation) SetTargetingID(id int) {
+	m.targeting = &id
 }
 
-// RemoveTargetingIDs removes the targeting edge to Host by ids.
-func (m *ActionMutation) RemoveTargetingIDs(ids ...int) {
-	if m.removedtargeting == nil {
-		m.removedtargeting = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedtargeting[ids[i]] = struct{}{}
-	}
+// ClearTargeting clears the targeting edge to Host.
+func (m *ActionMutation) ClearTargeting() {
+	m.clearedtargeting = true
 }
 
-// RemovedTargeting returns the removed ids of targeting.
-func (m *ActionMutation) RemovedTargetingIDs() (ids []int) {
-	for id := range m.removedtargeting {
-		ids = append(ids, id)
+// TargetingCleared returns if the edge targeting was cleared.
+func (m *ActionMutation) TargetingCleared() bool {
+	return m.clearedtargeting
+}
+
+// TargetingID returns the targeting id in the mutation.
+func (m *ActionMutation) TargetingID() (id int, exists bool) {
+	if m.targeting != nil {
+		return *m.targeting, true
 	}
 	return
 }
 
 // TargetingIDs returns the targeting ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// TargetingID instead. It exists only for internal usage by the builders.
 func (m *ActionMutation) TargetingIDs() (ids []int) {
-	for id := range m.targeting {
-		ids = append(ids, id)
+	if id := m.targeting; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -390,7 +387,7 @@ func (m *ActionMutation) TargetingIDs() (ids []int) {
 // ResetTargeting reset all changes of the "targeting" edge.
 func (m *ActionMutation) ResetTargeting() {
 	m.targeting = nil
-	m.removedtargeting = nil
+	m.clearedtargeting = false
 }
 
 // Op returns the operation name.
@@ -605,11 +602,9 @@ func (m *ActionMutation) AddedEdges() []string {
 func (m *ActionMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case action.EdgeTargeting:
-		ids := make([]ent.Value, 0, len(m.targeting))
-		for id := range m.targeting {
-			ids = append(ids, id)
+		if id := m.targeting; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -618,9 +613,6 @@ func (m *ActionMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *ActionMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedtargeting != nil {
-		edges = append(edges, action.EdgeTargeting)
-	}
 	return edges
 }
 
@@ -628,12 +620,6 @@ func (m *ActionMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *ActionMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case action.EdgeTargeting:
-		ids := make([]ent.Value, 0, len(m.removedtargeting))
-		for id := range m.removedtargeting {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -642,6 +628,9 @@ func (m *ActionMutation) RemovedIDs(name string) []ent.Value {
 // mutation.
 func (m *ActionMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
+	if m.clearedtargeting {
+		edges = append(edges, action.EdgeTargeting)
+	}
 	return edges
 }
 
@@ -649,6 +638,8 @@ func (m *ActionMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *ActionMutation) EdgeCleared(name string) bool {
 	switch name {
+	case action.EdgeTargeting:
+		return m.clearedtargeting
 	}
 	return false
 }
@@ -657,6 +648,9 @@ func (m *ActionMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *ActionMutation) ClearEdge(name string) error {
 	switch name {
+	case action.EdgeTargeting:
+		m.ClearTargeting()
+		return nil
 	}
 	return fmt.Errorf("unknown Action unique edge %s", name)
 }
@@ -688,8 +682,8 @@ type BotMutation struct {
 	lastSeen         *int
 	addlastSeen      *int
 	clearedFields    map[string]struct{}
-	infecting        map[int]struct{}
-	removedinfecting map[int]struct{}
+	infecting        *int
+	clearedinfecting bool
 	done             bool
 	oldValue         func(context.Context) (*Bot, error)
 }
@@ -981,38 +975,35 @@ func (m *BotMutation) ResetLastSeen() {
 	m.addlastSeen = nil
 }
 
-// AddInfectingIDs adds the infecting edge to Host by ids.
-func (m *BotMutation) AddInfectingIDs(ids ...int) {
-	if m.infecting == nil {
-		m.infecting = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.infecting[ids[i]] = struct{}{}
-	}
+// SetInfectingID sets the infecting edge to Host by id.
+func (m *BotMutation) SetInfectingID(id int) {
+	m.infecting = &id
 }
 
-// RemoveInfectingIDs removes the infecting edge to Host by ids.
-func (m *BotMutation) RemoveInfectingIDs(ids ...int) {
-	if m.removedinfecting == nil {
-		m.removedinfecting = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.removedinfecting[ids[i]] = struct{}{}
-	}
+// ClearInfecting clears the infecting edge to Host.
+func (m *BotMutation) ClearInfecting() {
+	m.clearedinfecting = true
 }
 
-// RemovedInfecting returns the removed ids of infecting.
-func (m *BotMutation) RemovedInfectingIDs() (ids []int) {
-	for id := range m.removedinfecting {
-		ids = append(ids, id)
+// InfectingCleared returns if the edge infecting was cleared.
+func (m *BotMutation) InfectingCleared() bool {
+	return m.clearedinfecting
+}
+
+// InfectingID returns the infecting id in the mutation.
+func (m *BotMutation) InfectingID() (id int, exists bool) {
+	if m.infecting != nil {
+		return *m.infecting, true
 	}
 	return
 }
 
 // InfectingIDs returns the infecting ids in the mutation.
+// Note that ids always returns len(ids) <= 1 for unique edges, and you should use
+// InfectingID instead. It exists only for internal usage by the builders.
 func (m *BotMutation) InfectingIDs() (ids []int) {
-	for id := range m.infecting {
-		ids = append(ids, id)
+	if id := m.infecting; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -1020,7 +1011,7 @@ func (m *BotMutation) InfectingIDs() (ids []int) {
 // ResetInfecting reset all changes of the "infecting" edge.
 func (m *BotMutation) ResetInfecting() {
 	m.infecting = nil
-	m.removedinfecting = nil
+	m.clearedinfecting = false
 }
 
 // Op returns the operation name.
@@ -1240,11 +1231,9 @@ func (m *BotMutation) AddedEdges() []string {
 func (m *BotMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case bot.EdgeInfecting:
-		ids := make([]ent.Value, 0, len(m.infecting))
-		for id := range m.infecting {
-			ids = append(ids, id)
+		if id := m.infecting; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -1253,9 +1242,6 @@ func (m *BotMutation) AddedIDs(name string) []ent.Value {
 // mutation.
 func (m *BotMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedinfecting != nil {
-		edges = append(edges, bot.EdgeInfecting)
-	}
 	return edges
 }
 
@@ -1263,12 +1249,6 @@ func (m *BotMutation) RemovedEdges() []string {
 // the given edge name.
 func (m *BotMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case bot.EdgeInfecting:
-		ids := make([]ent.Value, 0, len(m.removedinfecting))
-		for id := range m.removedinfecting {
-			ids = append(ids, id)
-		}
-		return ids
 	}
 	return nil
 }
@@ -1277,6 +1257,9 @@ func (m *BotMutation) RemovedIDs(name string) []ent.Value {
 // mutation.
 func (m *BotMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
+	if m.clearedinfecting {
+		edges = append(edges, bot.EdgeInfecting)
+	}
 	return edges
 }
 
@@ -1284,6 +1267,8 @@ func (m *BotMutation) ClearedEdges() []string {
 // cleared in this mutation.
 func (m *BotMutation) EdgeCleared(name string) bool {
 	switch name {
+	case bot.EdgeInfecting:
+		return m.clearedinfecting
 	}
 	return false
 }
@@ -1292,6 +1277,9 @@ func (m *BotMutation) EdgeCleared(name string) bool {
 // error if the edge name is not defined in the schema.
 func (m *BotMutation) ClearEdge(name string) error {
 	switch name {
+	case bot.EdgeInfecting:
+		m.ClearInfecting()
+		return nil
 	}
 	return fmt.Errorf("unknown Bot unique edge %s", name)
 }

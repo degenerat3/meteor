@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -27,6 +26,7 @@ type ActionQuery struct {
 	predicates []predicate.Action
 	// eager-loading edges.
 	withTargeting *HostQuery
+	withFKs       bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -66,7 +66,7 @@ func (aq *ActionQuery) QueryTargeting() *HostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(action.Table, action.FieldID, aq.sqlQuery()),
 			sqlgraph.To(host.Table, host.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, action.TargetingTable, action.TargetingPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, action.TargetingTable, action.TargetingColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -329,15 +329,25 @@ func (aq *ActionQuery) prepareQuery(ctx context.Context) error {
 func (aq *ActionQuery) sqlAll(ctx context.Context) ([]*Action, error) {
 	var (
 		nodes       = []*Action{}
+		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
 		loadedTypes = [1]bool{
 			aq.withTargeting != nil,
 		}
 	)
+	if aq.withTargeting != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, action.ForeignKeys...)
+	}
 	_spec.ScanValues = func() []interface{} {
 		node := &Action{config: aq.config}
 		nodes = append(nodes, node)
 		values := node.scanValues()
+		if withFKs {
+			values = append(values, node.fkValues()...)
+		}
 		return values
 	}
 	_spec.Assign = func(values ...interface{}) error {
@@ -356,64 +366,26 @@ func (aq *ActionQuery) sqlAll(ctx context.Context) ([]*Action, error) {
 	}
 
 	if query := aq.withTargeting; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Action, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
+		ids := make([]int, 0, len(nodes))
+		nodeids := make(map[int][]*Action)
+		for i := range nodes {
+			if fk := nodes[i].host_actions; fk != nil {
+				ids = append(ids, *fk)
+				nodeids[*fk] = append(nodeids[*fk], nodes[i])
+			}
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Action)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: true,
-				Table:   action.TargetingTable,
-				Columns: action.TargetingPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(action.TargetingPrimaryKey[1], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, aq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "targeting": %v`, err)
-		}
-		query.Where(host.IDIn(edgeids...))
+		query.Where(host.IDIn(ids...))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			nodes, ok := nodeids[n.ID]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "targeting" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "host_actions" returned %v`, n.ID)
 			}
 			for i := range nodes {
-				nodes[i].Edges.Targeting = append(nodes[i].Edges.Targeting, n)
+				nodes[i].Edges.Targeting = n
 			}
 		}
 	}

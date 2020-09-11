@@ -52,9 +52,25 @@ func (au *ActionUpdate) SetQueued(b bool) *ActionUpdate {
 	return au
 }
 
+// SetNillableQueued sets the queued field if the given value is not nil.
+func (au *ActionUpdate) SetNillableQueued(b *bool) *ActionUpdate {
+	if b != nil {
+		au.SetQueued(*b)
+	}
+	return au
+}
+
 // SetResponded sets the responded field.
 func (au *ActionUpdate) SetResponded(b bool) *ActionUpdate {
 	au.mutation.SetResponded(b)
+	return au
+}
+
+// SetNillableResponded sets the responded field if the given value is not nil.
+func (au *ActionUpdate) SetNillableResponded(b *bool) *ActionUpdate {
+	if b != nil {
+		au.SetResponded(*b)
+	}
 	return au
 }
 
@@ -64,19 +80,23 @@ func (au *ActionUpdate) SetResult(s string) *ActionUpdate {
 	return au
 }
 
-// AddTargetingIDs adds the targeting edge to Host by ids.
-func (au *ActionUpdate) AddTargetingIDs(ids ...int) *ActionUpdate {
-	au.mutation.AddTargetingIDs(ids...)
+// SetTargetingID sets the targeting edge to Host by id.
+func (au *ActionUpdate) SetTargetingID(id int) *ActionUpdate {
+	au.mutation.SetTargetingID(id)
 	return au
 }
 
-// AddTargeting adds the targeting edges to Host.
-func (au *ActionUpdate) AddTargeting(h ...*Host) *ActionUpdate {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
+// SetNillableTargetingID sets the targeting edge to Host by id if the given value is not nil.
+func (au *ActionUpdate) SetNillableTargetingID(id *int) *ActionUpdate {
+	if id != nil {
+		au = au.SetTargetingID(*id)
 	}
-	return au.AddTargetingIDs(ids...)
+	return au
+}
+
+// SetTargeting sets the targeting edge to Host.
+func (au *ActionUpdate) SetTargeting(h *Host) *ActionUpdate {
+	return au.SetTargetingID(h.ID)
 }
 
 // Mutation returns the ActionMutation object of the builder.
@@ -84,19 +104,10 @@ func (au *ActionUpdate) Mutation() *ActionMutation {
 	return au.mutation
 }
 
-// RemoveTargetingIDs removes the targeting edge to Host by ids.
-func (au *ActionUpdate) RemoveTargetingIDs(ids ...int) *ActionUpdate {
-	au.mutation.RemoveTargetingIDs(ids...)
+// ClearTargeting clears the targeting edge to Host.
+func (au *ActionUpdate) ClearTargeting() *ActionUpdate {
+	au.mutation.ClearTargeting()
 	return au
-}
-
-// RemoveTargeting removes targeting edges to Host.
-func (au *ActionUpdate) RemoveTargeting(h ...*Host) *ActionUpdate {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
-	}
-	return au.RemoveTargetingIDs(ids...)
 }
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
@@ -211,12 +222,12 @@ func (au *ActionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: action.FieldResult,
 		})
 	}
-	if nodes := au.mutation.RemovedTargetingIDs(); len(nodes) > 0 {
+	if au.mutation.TargetingCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   action.TargetingTable,
-			Columns: action.TargetingPrimaryKey,
+			Columns: []string{action.TargetingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -225,17 +236,14 @@ func (au *ActionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				},
 			},
 		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := au.mutation.TargetingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   action.TargetingTable,
-			Columns: action.TargetingPrimaryKey,
+			Columns: []string{action.TargetingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -291,9 +299,25 @@ func (auo *ActionUpdateOne) SetQueued(b bool) *ActionUpdateOne {
 	return auo
 }
 
+// SetNillableQueued sets the queued field if the given value is not nil.
+func (auo *ActionUpdateOne) SetNillableQueued(b *bool) *ActionUpdateOne {
+	if b != nil {
+		auo.SetQueued(*b)
+	}
+	return auo
+}
+
 // SetResponded sets the responded field.
 func (auo *ActionUpdateOne) SetResponded(b bool) *ActionUpdateOne {
 	auo.mutation.SetResponded(b)
+	return auo
+}
+
+// SetNillableResponded sets the responded field if the given value is not nil.
+func (auo *ActionUpdateOne) SetNillableResponded(b *bool) *ActionUpdateOne {
+	if b != nil {
+		auo.SetResponded(*b)
+	}
 	return auo
 }
 
@@ -303,19 +327,23 @@ func (auo *ActionUpdateOne) SetResult(s string) *ActionUpdateOne {
 	return auo
 }
 
-// AddTargetingIDs adds the targeting edge to Host by ids.
-func (auo *ActionUpdateOne) AddTargetingIDs(ids ...int) *ActionUpdateOne {
-	auo.mutation.AddTargetingIDs(ids...)
+// SetTargetingID sets the targeting edge to Host by id.
+func (auo *ActionUpdateOne) SetTargetingID(id int) *ActionUpdateOne {
+	auo.mutation.SetTargetingID(id)
 	return auo
 }
 
-// AddTargeting adds the targeting edges to Host.
-func (auo *ActionUpdateOne) AddTargeting(h ...*Host) *ActionUpdateOne {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
+// SetNillableTargetingID sets the targeting edge to Host by id if the given value is not nil.
+func (auo *ActionUpdateOne) SetNillableTargetingID(id *int) *ActionUpdateOne {
+	if id != nil {
+		auo = auo.SetTargetingID(*id)
 	}
-	return auo.AddTargetingIDs(ids...)
+	return auo
+}
+
+// SetTargeting sets the targeting edge to Host.
+func (auo *ActionUpdateOne) SetTargeting(h *Host) *ActionUpdateOne {
+	return auo.SetTargetingID(h.ID)
 }
 
 // Mutation returns the ActionMutation object of the builder.
@@ -323,19 +351,10 @@ func (auo *ActionUpdateOne) Mutation() *ActionMutation {
 	return auo.mutation
 }
 
-// RemoveTargetingIDs removes the targeting edge to Host by ids.
-func (auo *ActionUpdateOne) RemoveTargetingIDs(ids ...int) *ActionUpdateOne {
-	auo.mutation.RemoveTargetingIDs(ids...)
+// ClearTargeting clears the targeting edge to Host.
+func (auo *ActionUpdateOne) ClearTargeting() *ActionUpdateOne {
+	auo.mutation.ClearTargeting()
 	return auo
-}
-
-// RemoveTargeting removes targeting edges to Host.
-func (auo *ActionUpdateOne) RemoveTargeting(h ...*Host) *ActionUpdateOne {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
-	}
-	return auo.RemoveTargetingIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -448,12 +467,12 @@ func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (a *Action, err error) 
 			Column: action.FieldResult,
 		})
 	}
-	if nodes := auo.mutation.RemovedTargetingIDs(); len(nodes) > 0 {
+	if auo.mutation.TargetingCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   action.TargetingTable,
-			Columns: action.TargetingPrimaryKey,
+			Columns: []string{action.TargetingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -462,17 +481,14 @@ func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (a *Action, err error) 
 				},
 			},
 		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := auo.mutation.TargetingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   action.TargetingTable,
-			Columns: action.TargetingPrimaryKey,
+			Columns: []string{action.TargetingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

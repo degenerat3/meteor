@@ -67,25 +67,37 @@ func (bu *BotUpdate) SetLastSeen(i int) *BotUpdate {
 	return bu
 }
 
+// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+func (bu *BotUpdate) SetNillableLastSeen(i *int) *BotUpdate {
+	if i != nil {
+		bu.SetLastSeen(*i)
+	}
+	return bu
+}
+
 // AddLastSeen adds i to lastSeen.
 func (bu *BotUpdate) AddLastSeen(i int) *BotUpdate {
 	bu.mutation.AddLastSeen(i)
 	return bu
 }
 
-// AddInfectingIDs adds the infecting edge to Host by ids.
-func (bu *BotUpdate) AddInfectingIDs(ids ...int) *BotUpdate {
-	bu.mutation.AddInfectingIDs(ids...)
+// SetInfectingID sets the infecting edge to Host by id.
+func (bu *BotUpdate) SetInfectingID(id int) *BotUpdate {
+	bu.mutation.SetInfectingID(id)
 	return bu
 }
 
-// AddInfecting adds the infecting edges to Host.
-func (bu *BotUpdate) AddInfecting(h ...*Host) *BotUpdate {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
+// SetNillableInfectingID sets the infecting edge to Host by id if the given value is not nil.
+func (bu *BotUpdate) SetNillableInfectingID(id *int) *BotUpdate {
+	if id != nil {
+		bu = bu.SetInfectingID(*id)
 	}
-	return bu.AddInfectingIDs(ids...)
+	return bu
+}
+
+// SetInfecting sets the infecting edge to Host.
+func (bu *BotUpdate) SetInfecting(h *Host) *BotUpdate {
+	return bu.SetInfectingID(h.ID)
 }
 
 // Mutation returns the BotMutation object of the builder.
@@ -93,19 +105,10 @@ func (bu *BotUpdate) Mutation() *BotMutation {
 	return bu.mutation
 }
 
-// RemoveInfectingIDs removes the infecting edge to Host by ids.
-func (bu *BotUpdate) RemoveInfectingIDs(ids ...int) *BotUpdate {
-	bu.mutation.RemoveInfectingIDs(ids...)
+// ClearInfecting clears the infecting edge to Host.
+func (bu *BotUpdate) ClearInfecting() *BotUpdate {
+	bu.mutation.ClearInfecting()
 	return bu
-}
-
-// RemoveInfecting removes infecting edges to Host.
-func (bu *BotUpdate) RemoveInfecting(h ...*Host) *BotUpdate {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
-	}
-	return bu.RemoveInfectingIDs(ids...)
 }
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
@@ -242,12 +245,12 @@ func (bu *BotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: bot.FieldLastSeen,
 		})
 	}
-	if nodes := bu.mutation.RemovedInfectingIDs(); len(nodes) > 0 {
+	if bu.mutation.InfectingCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   bot.InfectingTable,
-			Columns: bot.InfectingPrimaryKey,
+			Columns: []string{bot.InfectingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -256,17 +259,14 @@ func (bu *BotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				},
 			},
 		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := bu.mutation.InfectingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   bot.InfectingTable,
-			Columns: bot.InfectingPrimaryKey,
+			Columns: []string{bot.InfectingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -337,25 +337,37 @@ func (buo *BotUpdateOne) SetLastSeen(i int) *BotUpdateOne {
 	return buo
 }
 
+// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+func (buo *BotUpdateOne) SetNillableLastSeen(i *int) *BotUpdateOne {
+	if i != nil {
+		buo.SetLastSeen(*i)
+	}
+	return buo
+}
+
 // AddLastSeen adds i to lastSeen.
 func (buo *BotUpdateOne) AddLastSeen(i int) *BotUpdateOne {
 	buo.mutation.AddLastSeen(i)
 	return buo
 }
 
-// AddInfectingIDs adds the infecting edge to Host by ids.
-func (buo *BotUpdateOne) AddInfectingIDs(ids ...int) *BotUpdateOne {
-	buo.mutation.AddInfectingIDs(ids...)
+// SetInfectingID sets the infecting edge to Host by id.
+func (buo *BotUpdateOne) SetInfectingID(id int) *BotUpdateOne {
+	buo.mutation.SetInfectingID(id)
 	return buo
 }
 
-// AddInfecting adds the infecting edges to Host.
-func (buo *BotUpdateOne) AddInfecting(h ...*Host) *BotUpdateOne {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
+// SetNillableInfectingID sets the infecting edge to Host by id if the given value is not nil.
+func (buo *BotUpdateOne) SetNillableInfectingID(id *int) *BotUpdateOne {
+	if id != nil {
+		buo = buo.SetInfectingID(*id)
 	}
-	return buo.AddInfectingIDs(ids...)
+	return buo
+}
+
+// SetInfecting sets the infecting edge to Host.
+func (buo *BotUpdateOne) SetInfecting(h *Host) *BotUpdateOne {
+	return buo.SetInfectingID(h.ID)
 }
 
 // Mutation returns the BotMutation object of the builder.
@@ -363,19 +375,10 @@ func (buo *BotUpdateOne) Mutation() *BotMutation {
 	return buo.mutation
 }
 
-// RemoveInfectingIDs removes the infecting edge to Host by ids.
-func (buo *BotUpdateOne) RemoveInfectingIDs(ids ...int) *BotUpdateOne {
-	buo.mutation.RemoveInfectingIDs(ids...)
+// ClearInfecting clears the infecting edge to Host.
+func (buo *BotUpdateOne) ClearInfecting() *BotUpdateOne {
+	buo.mutation.ClearInfecting()
 	return buo
-}
-
-// RemoveInfecting removes infecting edges to Host.
-func (buo *BotUpdateOne) RemoveInfecting(h ...*Host) *BotUpdateOne {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
-	}
-	return buo.RemoveInfectingIDs(ids...)
 }
 
 // Save executes the query and returns the updated entity.
@@ -510,12 +513,12 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (b *Bot, err error) {
 			Column: bot.FieldLastSeen,
 		})
 	}
-	if nodes := buo.mutation.RemovedInfectingIDs(); len(nodes) > 0 {
+	if buo.mutation.InfectingCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   bot.InfectingTable,
-			Columns: bot.InfectingPrimaryKey,
+			Columns: []string{bot.InfectingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -524,17 +527,14 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (b *Bot, err error) {
 				},
 			},
 		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := buo.mutation.InfectingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   bot.InfectingTable,
-			Columns: bot.InfectingPrimaryKey,
+			Columns: []string{bot.InfectingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

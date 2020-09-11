@@ -44,19 +44,31 @@ func (bc *BotCreate) SetLastSeen(i int) *BotCreate {
 	return bc
 }
 
-// AddInfectingIDs adds the infecting edge to Host by ids.
-func (bc *BotCreate) AddInfectingIDs(ids ...int) *BotCreate {
-	bc.mutation.AddInfectingIDs(ids...)
+// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+func (bc *BotCreate) SetNillableLastSeen(i *int) *BotCreate {
+	if i != nil {
+		bc.SetLastSeen(*i)
+	}
 	return bc
 }
 
-// AddInfecting adds the infecting edges to Host.
-func (bc *BotCreate) AddInfecting(h ...*Host) *BotCreate {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
+// SetInfectingID sets the infecting edge to Host by id.
+func (bc *BotCreate) SetInfectingID(id int) *BotCreate {
+	bc.mutation.SetInfectingID(id)
+	return bc
+}
+
+// SetNillableInfectingID sets the infecting edge to Host by id if the given value is not nil.
+func (bc *BotCreate) SetNillableInfectingID(id *int) *BotCreate {
+	if id != nil {
+		bc = bc.SetInfectingID(*id)
 	}
-	return bc.AddInfectingIDs(ids...)
+	return bc
+}
+
+// SetInfecting sets the infecting edge to Host.
+func (bc *BotCreate) SetInfecting(h *Host) *BotCreate {
+	return bc.SetInfectingID(h.ID)
 }
 
 // Mutation returns the BotMutation object of the builder.
@@ -126,7 +138,8 @@ func (bc *BotCreate) preSave() error {
 		}
 	}
 	if _, ok := bc.mutation.LastSeen(); !ok {
-		return &ValidationError{Name: "lastSeen", err: errors.New("ent: missing required field \"lastSeen\"")}
+		v := bot.DefaultLastSeen
+		bc.mutation.SetLastSeen(v)
 	}
 	if v, ok := bc.mutation.LastSeen(); ok {
 		if err := bot.LastSeenValidator(v); err != nil {
@@ -194,10 +207,10 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 	}
 	if nodes := bc.mutation.InfectingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   bot.InfectingTable,
-			Columns: bot.InfectingPrimaryKey,
+			Columns: []string{bot.InfectingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

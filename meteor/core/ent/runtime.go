@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"github.com/degenerat3/meteor/meteor/core/ent/action"
 	"github.com/degenerat3/meteor/meteor/core/ent/bot"
 	"github.com/degenerat3/meteor/meteor/core/ent/host"
 	"github.com/degenerat3/meteor/meteor/core/ent/schema"
@@ -12,6 +13,16 @@ import (
 // code (default values, validators or hooks) and stitches it
 // to their package variables.
 func init() {
+	actionFields := schema.Action{}.Fields()
+	_ = actionFields
+	// actionDescQueued is the schema descriptor for queued field.
+	actionDescQueued := actionFields[3].Descriptor()
+	// action.DefaultQueued holds the default value on creation for the queued field.
+	action.DefaultQueued = actionDescQueued.Default.(bool)
+	// actionDescResponded is the schema descriptor for responded field.
+	actionDescResponded := actionFields[4].Descriptor()
+	// action.DefaultResponded holds the default value on creation for the responded field.
+	action.DefaultResponded = actionDescResponded.Default.(bool)
 	botFields := schema.Bot{}.Fields()
 	_ = botFields
 	// botDescInterval is the schema descriptor for interval field.
@@ -24,12 +35,16 @@ func init() {
 	bot.DeltaValidator = botDescDelta.Validators[0].(func(int) error)
 	// botDescLastSeen is the schema descriptor for lastSeen field.
 	botDescLastSeen := botFields[3].Descriptor()
+	// bot.DefaultLastSeen holds the default value on creation for the lastSeen field.
+	bot.DefaultLastSeen = botDescLastSeen.Default.(int)
 	// bot.LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
 	bot.LastSeenValidator = botDescLastSeen.Validators[0].(func(int) error)
 	hostFields := schema.Host{}.Fields()
 	_ = hostFields
 	// hostDescLastSeen is the schema descriptor for lastSeen field.
 	hostDescLastSeen := hostFields[2].Descriptor()
+	// host.DefaultLastSeen holds the default value on creation for the lastSeen field.
+	host.DefaultLastSeen = hostDescLastSeen.Default.(int)
 	// host.LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
 	host.LastSeenValidator = hostDescLastSeen.Validators[0].(func(int) error)
 }

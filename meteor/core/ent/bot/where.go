@@ -464,7 +464,7 @@ func HasInfecting() predicate.Bot {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(InfectingTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, InfectingTable, InfectingPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, InfectingTable, InfectingColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -476,7 +476,7 @@ func HasInfectingWith(preds ...predicate.Host) predicate.Bot {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(InfectingInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, InfectingTable, InfectingPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, InfectingTable, InfectingColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

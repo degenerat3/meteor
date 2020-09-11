@@ -14,10 +14,10 @@ type Bot struct {
 // Fields of the Bot.
 func (Bot) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("uuid"),
+		field.String("uuid").Unique(),
 		field.Int("interval").Positive(),
 		field.Int("delta").Positive(),
-		field.Int("lastSeen").Positive(),
+		field.Int("lastSeen").Positive().Default(0),
 	}
 }
 
@@ -25,6 +25,6 @@ func (Bot) Fields() []ent.Field {
 func (Bot) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("infecting", Host.Type).
-			Ref("bots"),
+			Ref("bots").Unique(),
 	}
 }

@@ -611,7 +611,7 @@ func HasTargeting() predicate.Action {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TargetingTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, TargetingTable, TargetingPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, TargetingTable, TargetingColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -623,7 +623,7 @@ func HasTargetingWith(preds ...predicate.Host) predicate.Action {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(TargetingInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, TargetingTable, TargetingPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, TargetingTable, TargetingColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

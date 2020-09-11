@@ -416,7 +416,7 @@ func HasBots() predicate.Host {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(BotsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, BotsTable, BotsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, BotsTable, BotsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -428,7 +428,7 @@ func HasBotsWith(preds ...predicate.Bot) predicate.Host {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(BotsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, BotsTable, BotsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, BotsTable, BotsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
@@ -444,7 +444,7 @@ func HasActions() predicate.Host {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ActionsTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ActionsTable, ActionsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, ActionsTable, ActionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -456,7 +456,7 @@ func HasActionsWith(preds ...predicate.Action) predicate.Host {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(ActionsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ActionsTable, ActionsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, ActionsTable, ActionsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

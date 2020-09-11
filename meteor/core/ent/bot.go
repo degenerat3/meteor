@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/degenerat3/meteor/meteor/core/ent/bot"
+	"github.com/degenerat3/meteor/meteor/core/ent/host"
 	"github.com/facebook/ent/dialect/sql"
 )
 
@@ -25,22 +26,28 @@ type Bot struct {
 	LastSeen int `json:"lastSeen,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BotQuery when eager-loading is set.
-	Edges BotEdges `json:"edges"`
+	Edges     BotEdges `json:"edges"`
+	host_bots *int
 }
 
 // BotEdges holds the relations/edges for other nodes in the graph.
 type BotEdges struct {
 	// Infecting holds the value of the infecting edge.
-	Infecting []*Host
+	Infecting *Host
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // InfectingOrErr returns the Infecting value or an error if the edge
-// was not loaded in eager-loading.
-func (e BotEdges) InfectingOrErr() ([]*Host, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e BotEdges) InfectingOrErr() (*Host, error) {
 	if e.loadedTypes[0] {
+		if e.Infecting == nil {
+			// The edge infecting was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: host.Label}
+		}
 		return e.Infecting, nil
 	}
 	return nil, &NotLoadedError{edge: "infecting"}
@@ -54,6 +61,13 @@ func (*Bot) scanValues() []interface{} {
 		&sql.NullInt64{},  // interval
 		&sql.NullInt64{},  // delta
 		&sql.NullInt64{},  // lastSeen
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*Bot) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // host_bots
 	}
 }
 
@@ -88,6 +102,15 @@ func (b *Bot) assignValues(values ...interface{}) error {
 		return fmt.Errorf("unexpected type %T for field lastSeen", values[3])
 	} else if value.Valid {
 		b.LastSeen = int(value.Int64)
+	}
+	values = values[4:]
+	if len(values) == len(bot.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field host_bots", value)
+		} else if value.Valid {
+			b.host_bots = new(int)
+			*b.host_bots = int(value.Int64)
+		}
 	}
 	return nil
 }

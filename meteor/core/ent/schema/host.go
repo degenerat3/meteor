@@ -14,9 +14,9 @@ type Host struct {
 // Fields of the Host.
 func (Host) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("hostname"),
+		field.String("hostname").Unique(),
 		field.String("interface"),
-		field.Int("lastSeen").Positive(),
+		field.Int("lastSeen").Positive().Default(0),
 	}
 }
 

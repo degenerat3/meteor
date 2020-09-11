@@ -40,6 +40,14 @@ func (hc *HostCreate) SetLastSeen(i int) *HostCreate {
 	return hc
 }
 
+// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+func (hc *HostCreate) SetNillableLastSeen(i *int) *HostCreate {
+	if i != nil {
+		hc.SetLastSeen(*i)
+	}
+	return hc
+}
+
 // AddBotIDs adds the bots edge to Bot by ids.
 func (hc *HostCreate) AddBotIDs(ids ...int) *HostCreate {
 	hc.mutation.AddBotIDs(ids...)
@@ -139,7 +147,8 @@ func (hc *HostCreate) preSave() error {
 		return &ValidationError{Name: "interface", err: errors.New("ent: missing required field \"interface\"")}
 	}
 	if _, ok := hc.mutation.LastSeen(); !ok {
-		return &ValidationError{Name: "lastSeen", err: errors.New("ent: missing required field \"lastSeen\"")}
+		v := host.DefaultLastSeen
+		hc.mutation.SetLastSeen(v)
 	}
 	if v, ok := hc.mutation.LastSeen(); ok {
 		if err := host.LastSeenValidator(v); err != nil {
@@ -199,10 +208,10 @@ func (hc *HostCreate) createSpec() (*Host, *sqlgraph.CreateSpec) {
 	}
 	if nodes := hc.mutation.BotsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.BotsTable,
-			Columns: host.BotsPrimaryKey,
+			Columns: []string{host.BotsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -218,10 +227,10 @@ func (hc *HostCreate) createSpec() (*Host, *sqlgraph.CreateSpec) {
 	}
 	if nodes := hc.mutation.ActionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.ActionsTable,
-			Columns: host.ActionsPrimaryKey,
+			Columns: []string{host.ActionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

@@ -70,7 +70,7 @@ func (hq *HostQuery) QueryBots() *BotQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(host.Table, host.FieldID, hq.sqlQuery()),
 			sqlgraph.To(bot.Table, bot.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, host.BotsTable, host.BotsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, host.BotsTable, host.BotsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(hq.driver.Dialect(), step)
 		return fromU, nil
@@ -88,7 +88,7 @@ func (hq *HostQuery) QueryActions() *ActionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(host.Table, host.FieldID, hq.sqlQuery()),
 			sqlgraph.To(action.Table, action.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, host.ActionsTable, host.ActionsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, host.ActionsTable, host.ActionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(hq.driver.Dialect(), step)
 		return fromU, nil
@@ -421,127 +421,57 @@ func (hq *HostQuery) sqlAll(ctx context.Context) ([]*Host, error) {
 
 	if query := hq.withBots; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Host, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
+		nodeids := make(map[int]*Host)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Host)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   host.BotsTable,
-				Columns: host.BotsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(host.BotsPrimaryKey[0], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, hq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "bots": %v`, err)
-		}
-		query.Where(bot.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.Bot(func(s *sql.Selector) {
+			s.Where(sql.InValues(host.BotsColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.host_bots
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "host_bots" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "bots" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "host_bots" returned %v for node %v`, *fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Bots = append(nodes[i].Edges.Bots, n)
-			}
+			node.Edges.Bots = append(node.Edges.Bots, n)
 		}
 	}
 
 	if query := hq.withActions; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Host, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
+		nodeids := make(map[int]*Host)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
 		}
-		var (
-			edgeids []int
-			edges   = make(map[int][]*Host)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   host.ActionsTable,
-				Columns: host.ActionsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(host.ActionsPrimaryKey[0], fks...))
-			},
-
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{&sql.NullInt64{}, &sql.NullInt64{}}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*sql.NullInt64)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := int(eout.Int64)
-				inValue := int(ein.Int64)
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				edgeids = append(edgeids, inValue)
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, hq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "actions": %v`, err)
-		}
-		query.Where(action.IDIn(edgeids...))
+		query.withFKs = true
+		query.Where(predicate.Action(func(s *sql.Selector) {
+			s.Where(sql.InValues(host.ActionsColumn, fks...))
+		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
+			fk := n.host_actions
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "host_actions" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected "actions" node returned %v`, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "host_actions" returned %v for node %v`, *fk, n.ID)
 			}
-			for i := range nodes {
-				nodes[i].Edges.Actions = append(nodes[i].Edges.Actions, n)
-			}
+			node.Edges.Actions = append(node.Edges.Actions, n)
 		}
 	}
 

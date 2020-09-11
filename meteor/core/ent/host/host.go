@@ -23,16 +23,20 @@ const (
 
 	// Table holds the table name of the host in the database.
 	Table = "hosts"
-	// BotsTable is the table the holds the bots relation/edge. The primary key declared below.
-	BotsTable = "host_bots"
+	// BotsTable is the table the holds the bots relation/edge.
+	BotsTable = "bots"
 	// BotsInverseTable is the table name for the Bot entity.
 	// It exists in this package in order to avoid circular dependency with the "bot" package.
 	BotsInverseTable = "bots"
-	// ActionsTable is the table the holds the actions relation/edge. The primary key declared below.
-	ActionsTable = "host_actions"
+	// BotsColumn is the table column denoting the bots relation/edge.
+	BotsColumn = "host_bots"
+	// ActionsTable is the table the holds the actions relation/edge.
+	ActionsTable = "actions"
 	// ActionsInverseTable is the table name for the Action entity.
 	// It exists in this package in order to avoid circular dependency with the "action" package.
 	ActionsInverseTable = "actions"
+	// ActionsColumn is the table column denoting the actions relation/edge.
+	ActionsColumn = "host_actions"
 	// MemberTable is the table the holds the member relation/edge. The primary key declared below.
 	MemberTable = "group_members"
 	// MemberInverseTable is the table name for the Group entity.
@@ -49,18 +53,14 @@ var Columns = []string{
 }
 
 var (
-	// BotsPrimaryKey and BotsColumn2 are the table columns denoting the
-	// primary key for the bots relation (M2M).
-	BotsPrimaryKey = []string{"host_id", "bot_id"}
-	// ActionsPrimaryKey and ActionsColumn2 are the table columns denoting the
-	// primary key for the actions relation (M2M).
-	ActionsPrimaryKey = []string{"host_id", "action_id"}
 	// MemberPrimaryKey and MemberColumn2 are the table columns denoting the
 	// primary key for the member relation (M2M).
 	MemberPrimaryKey = []string{"group_id", "host_id"}
 )
 
 var (
+	// DefaultLastSeen holds the default value on creation for the lastSeen field.
+	DefaultLastSeen int
 	// LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
 	LastSeenValidator func(int) error
 )

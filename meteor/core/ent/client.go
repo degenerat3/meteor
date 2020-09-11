@@ -229,7 +229,7 @@ func (c *ActionClient) QueryTargeting(a *Action) *HostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(action.Table, action.FieldID, id),
 			sqlgraph.To(host.Table, host.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, action.TargetingTable, action.TargetingPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, action.TargetingTable, action.TargetingColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -333,7 +333,7 @@ func (c *BotClient) QueryInfecting(b *Bot) *HostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(bot.Table, bot.FieldID, id),
 			sqlgraph.To(host.Table, host.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, bot.InfectingTable, bot.InfectingPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, bot.InfectingTable, bot.InfectingColumn),
 		)
 		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
 		return fromV, nil
@@ -541,7 +541,7 @@ func (c *HostClient) QueryBots(h *Host) *BotQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(host.Table, host.FieldID, id),
 			sqlgraph.To(bot.Table, bot.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, host.BotsTable, host.BotsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, host.BotsTable, host.BotsColumn),
 		)
 		fromV = sqlgraph.Neighbors(h.driver.Dialect(), step)
 		return fromV, nil
@@ -557,7 +557,7 @@ func (c *HostClient) QueryActions(h *Host) *ActionQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(host.Table, host.FieldID, id),
 			sqlgraph.To(action.Table, action.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, host.ActionsTable, host.ActionsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, host.ActionsTable, host.ActionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(h.driver.Dialect(), step)
 		return fromV, nil

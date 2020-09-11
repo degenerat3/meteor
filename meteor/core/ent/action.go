@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/degenerat3/meteor/meteor/core/ent/action"
+	"github.com/degenerat3/meteor/meteor/core/ent/host"
 	"github.com/facebook/ent/dialect/sql"
 )
 
@@ -29,22 +30,28 @@ type Action struct {
 	Result string `json:"result,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ActionQuery when eager-loading is set.
-	Edges ActionEdges `json:"edges"`
+	Edges        ActionEdges `json:"edges"`
+	host_actions *int
 }
 
 // ActionEdges holds the relations/edges for other nodes in the graph.
 type ActionEdges struct {
 	// Targeting holds the value of the targeting edge.
-	Targeting []*Host
+	Targeting *Host
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // TargetingOrErr returns the Targeting value or an error if the edge
-// was not loaded in eager-loading.
-func (e ActionEdges) TargetingOrErr() ([]*Host, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ActionEdges) TargetingOrErr() (*Host, error) {
 	if e.loadedTypes[0] {
+		if e.Targeting == nil {
+			// The edge targeting was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: host.Label}
+		}
 		return e.Targeting, nil
 	}
 	return nil, &NotLoadedError{edge: "targeting"}
@@ -60,6 +67,13 @@ func (*Action) scanValues() []interface{} {
 		&sql.NullBool{},   // queued
 		&sql.NullBool{},   // responded
 		&sql.NullString{}, // result
+	}
+}
+
+// fkValues returns the types for scanning foreign-keys values from sql.Rows.
+func (*Action) fkValues() []interface{} {
+	return []interface{}{
+		&sql.NullInt64{}, // host_actions
 	}
 }
 
@@ -104,6 +118,15 @@ func (a *Action) assignValues(values ...interface{}) error {
 		return fmt.Errorf("unexpected type %T for field result", values[5])
 	} else if value.Valid {
 		a.Result = value.String
+	}
+	values = values[6:]
+	if len(values) == len(action.ForeignKeys) {
+		if value, ok := values[0].(*sql.NullInt64); !ok {
+			return fmt.Errorf("unexpected type %T for edge-field host_actions", value)
+		} else if value.Valid {
+			a.host_actions = new(int)
+			*a.host_actions = int(value.Int64)
+		}
 	}
 	return nil
 }

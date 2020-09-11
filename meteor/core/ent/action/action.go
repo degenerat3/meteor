@@ -25,11 +25,13 @@ const (
 
 	// Table holds the table name of the action in the database.
 	Table = "actions"
-	// TargetingTable is the table the holds the targeting relation/edge. The primary key declared below.
-	TargetingTable = "host_actions"
+	// TargetingTable is the table the holds the targeting relation/edge.
+	TargetingTable = "actions"
 	// TargetingInverseTable is the table name for the Host entity.
 	// It exists in this package in order to avoid circular dependency with the "host" package.
 	TargetingInverseTable = "hosts"
+	// TargetingColumn is the table column denoting the targeting relation/edge.
+	TargetingColumn = "host_actions"
 )
 
 // Columns holds all SQL columns for action fields.
@@ -43,8 +45,14 @@ var Columns = []string{
 	FieldResult,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the Action type.
+var ForeignKeys = []string{
+	"host_actions",
+}
+
 var (
-	// TargetingPrimaryKey and TargetingColumn2 are the table columns denoting the
-	// primary key for the targeting relation (M2M).
-	TargetingPrimaryKey = []string{"host_id", "action_id"}
+	// DefaultQueued holds the default value on creation for the queued field.
+	DefaultQueued bool
+	// DefaultResponded holds the default value on creation for the responded field.
+	DefaultResponded bool
 )

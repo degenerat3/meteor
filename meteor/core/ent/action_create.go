@@ -44,9 +44,25 @@ func (ac *ActionCreate) SetQueued(b bool) *ActionCreate {
 	return ac
 }
 
+// SetNillableQueued sets the queued field if the given value is not nil.
+func (ac *ActionCreate) SetNillableQueued(b *bool) *ActionCreate {
+	if b != nil {
+		ac.SetQueued(*b)
+	}
+	return ac
+}
+
 // SetResponded sets the responded field.
 func (ac *ActionCreate) SetResponded(b bool) *ActionCreate {
 	ac.mutation.SetResponded(b)
+	return ac
+}
+
+// SetNillableResponded sets the responded field if the given value is not nil.
+func (ac *ActionCreate) SetNillableResponded(b *bool) *ActionCreate {
+	if b != nil {
+		ac.SetResponded(*b)
+	}
 	return ac
 }
 
@@ -56,19 +72,23 @@ func (ac *ActionCreate) SetResult(s string) *ActionCreate {
 	return ac
 }
 
-// AddTargetingIDs adds the targeting edge to Host by ids.
-func (ac *ActionCreate) AddTargetingIDs(ids ...int) *ActionCreate {
-	ac.mutation.AddTargetingIDs(ids...)
+// SetTargetingID sets the targeting edge to Host by id.
+func (ac *ActionCreate) SetTargetingID(id int) *ActionCreate {
+	ac.mutation.SetTargetingID(id)
 	return ac
 }
 
-// AddTargeting adds the targeting edges to Host.
-func (ac *ActionCreate) AddTargeting(h ...*Host) *ActionCreate {
-	ids := make([]int, len(h))
-	for i := range h {
-		ids[i] = h[i].ID
+// SetNillableTargetingID sets the targeting edge to Host by id if the given value is not nil.
+func (ac *ActionCreate) SetNillableTargetingID(id *int) *ActionCreate {
+	if id != nil {
+		ac = ac.SetTargetingID(*id)
 	}
-	return ac.AddTargetingIDs(ids...)
+	return ac
+}
+
+// SetTargeting sets the targeting edge to Host.
+func (ac *ActionCreate) SetTargeting(h *Host) *ActionCreate {
+	return ac.SetTargetingID(h.ID)
 }
 
 // Mutation returns the ActionMutation object of the builder.
@@ -128,10 +148,12 @@ func (ac *ActionCreate) preSave() error {
 		return &ValidationError{Name: "args", err: errors.New("ent: missing required field \"args\"")}
 	}
 	if _, ok := ac.mutation.Queued(); !ok {
-		return &ValidationError{Name: "queued", err: errors.New("ent: missing required field \"queued\"")}
+		v := action.DefaultQueued
+		ac.mutation.SetQueued(v)
 	}
 	if _, ok := ac.mutation.Responded(); !ok {
-		return &ValidationError{Name: "responded", err: errors.New("ent: missing required field \"responded\"")}
+		v := action.DefaultResponded
+		ac.mutation.SetResponded(v)
 	}
 	if _, ok := ac.mutation.Result(); !ok {
 		return &ValidationError{Name: "result", err: errors.New("ent: missing required field \"result\"")}
@@ -213,10 +235,10 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ac.mutation.TargetingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   action.TargetingTable,
-			Columns: action.TargetingPrimaryKey,
+			Columns: []string{action.TargetingColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

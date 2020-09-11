@@ -49,6 +49,14 @@ func (hu *HostUpdate) SetLastSeen(i int) *HostUpdate {
 	return hu
 }
 
+// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+func (hu *HostUpdate) SetNillableLastSeen(i *int) *HostUpdate {
+	if i != nil {
+		hu.SetLastSeen(*i)
+	}
+	return hu
+}
+
 // AddLastSeen adds i to lastSeen.
 func (hu *HostUpdate) AddLastSeen(i int) *HostUpdate {
 	hu.mutation.AddLastSeen(i)
@@ -255,10 +263,10 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := hu.mutation.RemovedBotsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.BotsTable,
-			Columns: host.BotsPrimaryKey,
+			Columns: []string{host.BotsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -274,10 +282,10 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := hu.mutation.BotsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.BotsTable,
-			Columns: host.BotsPrimaryKey,
+			Columns: []string{host.BotsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -293,10 +301,10 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := hu.mutation.RemovedActionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.ActionsTable,
-			Columns: host.ActionsPrimaryKey,
+			Columns: []string{host.ActionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -312,10 +320,10 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := hu.mutation.ActionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.ActionsTable,
-			Columns: host.ActionsPrimaryKey,
+			Columns: []string{host.ActionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -401,6 +409,14 @@ func (huo *HostUpdateOne) SetInterface(s string) *HostUpdateOne {
 func (huo *HostUpdateOne) SetLastSeen(i int) *HostUpdateOne {
 	huo.mutation.ResetLastSeen()
 	huo.mutation.SetLastSeen(i)
+	return huo
+}
+
+// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+func (huo *HostUpdateOne) SetNillableLastSeen(i *int) *HostUpdateOne {
+	if i != nil {
+		huo.SetLastSeen(*i)
+	}
 	return huo
 }
 
@@ -608,10 +624,10 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 	}
 	if nodes := huo.mutation.RemovedBotsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.BotsTable,
-			Columns: host.BotsPrimaryKey,
+			Columns: []string{host.BotsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -627,10 +643,10 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 	}
 	if nodes := huo.mutation.BotsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.BotsTable,
-			Columns: host.BotsPrimaryKey,
+			Columns: []string{host.BotsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -646,10 +662,10 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 	}
 	if nodes := huo.mutation.RemovedActionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.ActionsTable,
-			Columns: host.ActionsPrimaryKey,
+			Columns: []string{host.ActionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
@@ -665,10 +681,10 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 	}
 	if nodes := huo.mutation.ActionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   host.ActionsTable,
-			Columns: host.ActionsPrimaryKey,
+			Columns: []string{host.ActionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{

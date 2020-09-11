@@ -11,39 +11,57 @@ var (
 	// ActionsColumns holds the columns for the "actions" table.
 	ActionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "uuid", Type: field.TypeString},
+		{Name: "uuid", Type: field.TypeString, Unique: true},
 		{Name: "mode", Type: field.TypeString},
 		{Name: "args", Type: field.TypeString},
 		{Name: "queued", Type: field.TypeBool},
 		{Name: "responded", Type: field.TypeBool},
 		{Name: "result", Type: field.TypeString},
+		{Name: "host_actions", Type: field.TypeInt, Nullable: true},
 	}
 	// ActionsTable holds the schema information for the "actions" table.
 	ActionsTable = &schema.Table{
-		Name:        "actions",
-		Columns:     ActionsColumns,
-		PrimaryKey:  []*schema.Column{ActionsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
+		Name:       "actions",
+		Columns:    ActionsColumns,
+		PrimaryKey: []*schema.Column{ActionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "actions_hosts_actions",
+				Columns: []*schema.Column{ActionsColumns[7]},
+
+				RefColumns: []*schema.Column{HostsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// BotsColumns holds the columns for the "bots" table.
 	BotsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "uuid", Type: field.TypeString},
+		{Name: "uuid", Type: field.TypeString, Unique: true},
 		{Name: "interval", Type: field.TypeInt},
 		{Name: "delta", Type: field.TypeInt},
 		{Name: "last_seen", Type: field.TypeInt},
+		{Name: "host_bots", Type: field.TypeInt, Nullable: true},
 	}
 	// BotsTable holds the schema information for the "bots" table.
 	BotsTable = &schema.Table{
-		Name:        "bots",
-		Columns:     BotsColumns,
-		PrimaryKey:  []*schema.Column{BotsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{},
+		Name:       "bots",
+		Columns:    BotsColumns,
+		PrimaryKey: []*schema.Column{BotsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "bots_hosts_bots",
+				Columns: []*schema.Column{BotsColumns[5]},
+
+				RefColumns: []*schema.Column{HostsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// GroupsColumns holds the columns for the "groups" table.
 	GroupsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "desc", Type: field.TypeString},
 	}
 	// GroupsTable holds the schema information for the "groups" table.
@@ -56,7 +74,7 @@ var (
 	// HostsColumns holds the columns for the "hosts" table.
 	HostsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "hostname", Type: field.TypeString},
+		{Name: "hostname", Type: field.TypeString, Unique: true},
 		{Name: "interface", Type: field.TypeString},
 		{Name: "last_seen", Type: field.TypeInt},
 	}
@@ -94,60 +112,6 @@ var (
 			},
 		},
 	}
-	// HostBotsColumns holds the columns for the "host_bots" table.
-	HostBotsColumns = []*schema.Column{
-		{Name: "host_id", Type: field.TypeInt},
-		{Name: "bot_id", Type: field.TypeInt},
-	}
-	// HostBotsTable holds the schema information for the "host_bots" table.
-	HostBotsTable = &schema.Table{
-		Name:       "host_bots",
-		Columns:    HostBotsColumns,
-		PrimaryKey: []*schema.Column{HostBotsColumns[0], HostBotsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:  "host_bots_host_id",
-				Columns: []*schema.Column{HostBotsColumns[0]},
-
-				RefColumns: []*schema.Column{HostsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:  "host_bots_bot_id",
-				Columns: []*schema.Column{HostBotsColumns[1]},
-
-				RefColumns: []*schema.Column{BotsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// HostActionsColumns holds the columns for the "host_actions" table.
-	HostActionsColumns = []*schema.Column{
-		{Name: "host_id", Type: field.TypeInt},
-		{Name: "action_id", Type: field.TypeInt},
-	}
-	// HostActionsTable holds the schema information for the "host_actions" table.
-	HostActionsTable = &schema.Table{
-		Name:       "host_actions",
-		Columns:    HostActionsColumns,
-		PrimaryKey: []*schema.Column{HostActionsColumns[0], HostActionsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:  "host_actions_host_id",
-				Columns: []*schema.Column{HostActionsColumns[0]},
-
-				RefColumns: []*schema.Column{HostsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:  "host_actions_action_id",
-				Columns: []*schema.Column{HostActionsColumns[1]},
-
-				RefColumns: []*schema.Column{ActionsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ActionsTable,
@@ -155,16 +119,12 @@ var (
 		GroupsTable,
 		HostsTable,
 		GroupMembersTable,
-		HostBotsTable,
-		HostActionsTable,
 	}
 )
 
 func init() {
+	ActionsTable.ForeignKeys[0].RefTable = HostsTable
+	BotsTable.ForeignKeys[0].RefTable = HostsTable
 	GroupMembersTable.ForeignKeys[0].RefTable = GroupsTable
 	GroupMembersTable.ForeignKeys[1].RefTable = HostsTable
-	HostBotsTable.ForeignKeys[0].RefTable = HostsTable
-	HostBotsTable.ForeignKeys[1].RefTable = BotsTable
-	HostActionsTable.ForeignKeys[0].RefTable = HostsTable
-	HostActionsTable.ForeignKeys[1].RefTable = ActionsTable
 }

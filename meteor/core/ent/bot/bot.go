@@ -21,11 +21,13 @@ const (
 
 	// Table holds the table name of the bot in the database.
 	Table = "bots"
-	// InfectingTable is the table the holds the infecting relation/edge. The primary key declared below.
-	InfectingTable = "host_bots"
+	// InfectingTable is the table the holds the infecting relation/edge.
+	InfectingTable = "bots"
 	// InfectingInverseTable is the table name for the Host entity.
 	// It exists in this package in order to avoid circular dependency with the "host" package.
 	InfectingInverseTable = "hosts"
+	// InfectingColumn is the table column denoting the infecting relation/edge.
+	InfectingColumn = "host_bots"
 )
 
 // Columns holds all SQL columns for bot fields.
@@ -37,17 +39,18 @@ var Columns = []string{
 	FieldLastSeen,
 }
 
-var (
-	// InfectingPrimaryKey and InfectingColumn2 are the table columns denoting the
-	// primary key for the infecting relation (M2M).
-	InfectingPrimaryKey = []string{"host_id", "bot_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the Bot type.
+var ForeignKeys = []string{
+	"host_bots",
+}
 
 var (
 	// IntervalValidator is a validator for the "interval" field. It is called by the builders before save.
 	IntervalValidator func(int) error
 	// DeltaValidator is a validator for the "delta" field. It is called by the builders before save.
 	DeltaValidator func(int) error
+	// DefaultLastSeen holds the default value on creation for the lastSeen field.
+	DefaultLastSeen int
 	// LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
 	LastSeenValidator func(int) error
 )

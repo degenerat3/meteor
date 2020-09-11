@@ -14,11 +14,11 @@ type Action struct {
 // Fields of the Action.
 func (Action) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("uuid"),
+		field.String("uuid").Unique(),
 		field.String("mode"),
 		field.String("args"),
-		field.Bool("queued"),
-		field.Bool("responded"),
+		field.Bool("queued").Default(false),
+		field.Bool("responded").Default(false),
 		field.String("result"),
 	}
 }
@@ -27,6 +27,6 @@ func (Action) Fields() []ent.Field {
 func (Action) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("targeting", Host.Type).
-			Ref("actions"),
+			Ref("actions").Unique(),
 	}
 }
