@@ -1,8 +1,8 @@
 FROM golang
 
-COPY . /app
+COPY . /go/src/github.com/degenerat3/meteor/meteor/listeners/daddy_tops
 WORKDIR /app
 RUN go get ./...
 RUN go build
 
-ENTRYPOINT [ "/app/app" ]
+ENTRYPOINT [ "/app/daddy_tops" ]
