@@ -1,7 +1,7 @@
 FROM golang
 
 COPY . /go/src/github.com/degenerat3/meteor/meteor/core
-WORKDIR /app
+WORKDIR /go/src/github.com/degenerat3/meteor/meteor/core
 RUN go get ./...
 RUN go build
 
