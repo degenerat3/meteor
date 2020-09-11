@@ -1,8 +1,7 @@
 FROM golang
 
 COPY . /go/src/github.com/degenerat3/meteor/meteor/core
-WORKDIR /go/src/github.com/degenerat3/meteor/meteor/core
-RUN go get ./...
-RUN go build
+RUN go get github.com/degenerat3/meteor/meteor/core/...
+RUN go install github.com/degenerat3/meteor/meteor/core
 
-ENTRYPOINT [ "/go/src/github.com/degenerat3/meteor/meteor/core" ]
+ENTRYPOINT [ "/go/bin/core" ]
