@@ -18,7 +18,6 @@ hostname:  the host that the bot is running on [string]
 Response Params:   
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
@@ -34,7 +33,6 @@ interface: the primary interface used by the host [string]
 Response Params: 
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
@@ -50,7 +48,6 @@ desc:      the description of the group [string]
 Response Params:   
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
@@ -66,7 +63,6 @@ groupname: the group that the host will be added to [string]
 Response Params:   
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
@@ -87,7 +83,6 @@ hostname:    the host to run the action against [string]
 Response Params:   
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
@@ -104,7 +99,6 @@ groupname:    the group to run the action against [string]
 Response Params:   
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
@@ -120,7 +114,6 @@ result:      the action result data to store (usually output of the action) [str
 Response Params:   
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
@@ -203,7 +196,6 @@ None
 Response Params:   
 ```
 status: HTTP response [int32]
-desc: error, if any [string]
 ```
 
 ---
