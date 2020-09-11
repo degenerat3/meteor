@@ -35,6 +35,7 @@ func forwardReq(w http.ResponseWriter, r *http.Request) {
 		w.Write(rdata)
 	}
 	url := "http://172.69.1.1:9999" + string(r.URL.Path)
+	fmt.Println(url)
 	resp, err := http.Post(url, "", bytes.NewBuffer(data))
 	if err != nil {
 		resp := &mcs.MCS{
@@ -56,6 +57,7 @@ func forwardReq(w http.ResponseWriter, r *http.Request) {
 
 func listForward(w http.ResponseWriter, r *http.Request) {
 	url := "http://172.69.1.1:9999" + string(r.URL.Path)
+	fmt.Println(url)
 	resp, err := http.Get(url)
 	if err != nil {
 		resp := &mcs.MCS{
