@@ -4,8 +4,8 @@ services:
   core:
     build:
       context: core/
-    #depends_on:
-    #  - "db"
+    depends_on:
+      - "db"
     volumes:
       - /var/log/meteor/core:/var/log/meteor/core
     networks:
