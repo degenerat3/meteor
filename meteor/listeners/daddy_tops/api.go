@@ -8,7 +8,7 @@ import (
 )
 
 func status(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get("172.69.1.1/status")
+	resp, err := http.Get("http://172.69.1.1/status")
 	if err != nil {
 		log.Fatal(err)
 	}
