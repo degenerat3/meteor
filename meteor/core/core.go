@@ -14,7 +14,7 @@ var ctx = context.Background()
 
 func main() {
 	var err error
-	DBClient, err = ent.Open("postgres", "host=172.69.1.2 port=5432 user=met dbname=meteor password=dbpassword")
+	DBClient, err = ent.Open("postgres", "host=172.69.1.2 port=5432 user=met dbname=meteor password=dbpassword sslmode=disable")
 	if err := DBClient.Schema.Create(ctx); err != nil {
 		log.Fatalf("failed creating schema resources: %v", err)
 	}
