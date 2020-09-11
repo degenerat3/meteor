@@ -1,6 +1,5 @@
 FROM golang
 
-COPY . /go/src/github.com/degenerat3/meteor/meteor/core
 #Install git
 RUN apt-get update; apt-get install -y git
 RUN mkdir -p /go/src/github.com/degenerat3/
