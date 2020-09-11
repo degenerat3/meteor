@@ -209,6 +209,7 @@ func listHostsUtil() string {
 		hstr := host.String()
 		hostListStr = hostListStr + hstr + "\n"
 	}
+	fmt.Printf("List Host Util Str: %s\n", hostListStr)
 	return hostListStr
 }
 

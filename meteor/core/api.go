@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	_ "github.com/lib/pq"
@@ -130,6 +131,7 @@ func listBots(w http.ResponseWriter, r *http.Request) {
 }
 
 func listHosts(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("In listHosts...")
 	hostsList := listHostsUtil()
 	resp := &mcs.MCS{
 		Status: 200,
