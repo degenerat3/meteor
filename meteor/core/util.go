@@ -32,6 +32,7 @@ func regBotUtil(prot *mcs.MCS) int32 {
 		SetInterval(int(intv)).
 		SetDelta(int(dlt)).
 		SetInfecting(hostObj).
+		SetLastSeen(0).
 		Save(ctx)
 
 	if err != nil {
@@ -52,6 +53,7 @@ func regHostUtil(prot *mcs.MCS) int32 {
 					Create().          // Host create builder.
 					SetHostname(hn).   // Set hostname value.
 					SetInterface(ifc). // set interface val
+					SetLastSeen(0).    // set last seen
 					Save(ctx)          // Create and return.
 
 	if err != nil {
