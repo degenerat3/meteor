@@ -16,7 +16,7 @@ func (Host) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("hostname").Unique(),
 		field.String("interface"),
-		field.Int("lastSeen").Positive().Default(0),
+		field.Int("lastSeen").Default(0),
 	}
 }
 

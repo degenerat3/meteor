@@ -15,9 +15,9 @@ type Bot struct {
 func (Bot) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("uuid").Unique(),
-		field.Int("interval").Positive(),
-		field.Int("delta").Positive(),
-		field.Int("lastSeen").Positive().Default(0),
+		field.Int("interval"),
+		field.Int("delta"),
+		field.Int("lastSeen").Default(0),
 	}
 }
 
