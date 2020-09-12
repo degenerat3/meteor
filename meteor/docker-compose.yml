@@ -8,6 +8,11 @@ services:
       - "db"
     volumes:
       - /var/log/meteor/core:/var/log/meteor/core
+    environment:
+      - WAIT_HOSTS=db:5432
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=30
+      - WAIT_HOST_CONNECT_TIMEOUT=30
     networks:
       meteornet:
         ipv4_address: 172.69.1.1
