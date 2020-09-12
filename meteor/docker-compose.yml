@@ -8,7 +8,7 @@ services:
       - "db"
     volumes:
       - /var/log/meteor/core:/var/log/meteor/core
-    command: sh -c "/wait && /sayhello"
+    command: sh -c "/wait && /go/bin/core"
     environment:
       - WAIT_HOSTS=db:5432
       - WAIT_HOSTS_TIMEOUT=300
