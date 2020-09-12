@@ -8,8 +8,6 @@ services:
       - "db"
     volumes:
       - /var/log/meteor/core:/var/log/meteor/core
-    environment:
-      WAIT_HOSTS: db:5432
     networks:
       meteornet:
         ipv4_address: 172.69.1.1
