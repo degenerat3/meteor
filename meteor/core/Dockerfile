@@ -13,4 +13,4 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERS
 RUN chmod +x /wait
 
 
-ENTRYPOINT [ "/go/bin/core" ]
+CMD [ "/go/bin/core" ]
