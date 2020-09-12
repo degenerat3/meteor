@@ -61,6 +61,4 @@ var (
 var (
 	// DefaultLastSeen holds the default value on creation for the lastSeen field.
 	DefaultLastSeen int
-	// LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
-	LastSeenValidator func(int) error
 )

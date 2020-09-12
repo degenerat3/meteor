@@ -160,11 +160,6 @@ func (hu *HostUpdate) RemoveMember(g ...*Group) *HostUpdate {
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
 func (hu *HostUpdate) Save(ctx context.Context) (int, error) {
-	if v, ok := hu.mutation.LastSeen(); ok {
-		if err := host.LastSeenValidator(v); err != nil {
-			return 0, &ValidationError{Name: "lastSeen", err: fmt.Errorf("ent: validator failed for field \"lastSeen\": %w", err)}
-		}
-	}
 
 	var (
 		err      error
@@ -523,11 +518,6 @@ func (huo *HostUpdateOne) RemoveMember(g ...*Group) *HostUpdateOne {
 
 // Save executes the query and returns the updated entity.
 func (huo *HostUpdateOne) Save(ctx context.Context) (*Host, error) {
-	if v, ok := huo.mutation.LastSeen(); ok {
-		if err := host.LastSeenValidator(v); err != nil {
-			return nil, &ValidationError{Name: "lastSeen", err: fmt.Errorf("ent: validator failed for field \"lastSeen\": %w", err)}
-		}
-	}
 
 	var (
 		err  error

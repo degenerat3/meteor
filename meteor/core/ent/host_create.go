@@ -150,11 +150,6 @@ func (hc *HostCreate) preSave() error {
 		v := host.DefaultLastSeen
 		hc.mutation.SetLastSeen(v)
 	}
-	if v, ok := hc.mutation.LastSeen(); ok {
-		if err := host.LastSeenValidator(v); err != nil {
-			return &ValidationError{Name: "lastSeen", err: fmt.Errorf("ent: validator failed for field \"lastSeen\": %w", err)}
-		}
-	}
 	return nil
 }
 

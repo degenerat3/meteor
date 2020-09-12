@@ -113,21 +113,6 @@ func (bu *BotUpdate) ClearInfecting() *BotUpdate {
 
 // Save executes the query and returns the number of rows/vertices matched by this operation.
 func (bu *BotUpdate) Save(ctx context.Context) (int, error) {
-	if v, ok := bu.mutation.Interval(); ok {
-		if err := bot.IntervalValidator(v); err != nil {
-			return 0, &ValidationError{Name: "interval", err: fmt.Errorf("ent: validator failed for field \"interval\": %w", err)}
-		}
-	}
-	if v, ok := bu.mutation.Delta(); ok {
-		if err := bot.DeltaValidator(v); err != nil {
-			return 0, &ValidationError{Name: "delta", err: fmt.Errorf("ent: validator failed for field \"delta\": %w", err)}
-		}
-	}
-	if v, ok := bu.mutation.LastSeen(); ok {
-		if err := bot.LastSeenValidator(v); err != nil {
-			return 0, &ValidationError{Name: "lastSeen", err: fmt.Errorf("ent: validator failed for field \"lastSeen\": %w", err)}
-		}
-	}
 
 	var (
 		err      error
@@ -383,21 +368,6 @@ func (buo *BotUpdateOne) ClearInfecting() *BotUpdateOne {
 
 // Save executes the query and returns the updated entity.
 func (buo *BotUpdateOne) Save(ctx context.Context) (*Bot, error) {
-	if v, ok := buo.mutation.Interval(); ok {
-		if err := bot.IntervalValidator(v); err != nil {
-			return nil, &ValidationError{Name: "interval", err: fmt.Errorf("ent: validator failed for field \"interval\": %w", err)}
-		}
-	}
-	if v, ok := buo.mutation.Delta(); ok {
-		if err := bot.DeltaValidator(v); err != nil {
-			return nil, &ValidationError{Name: "delta", err: fmt.Errorf("ent: validator failed for field \"delta\": %w", err)}
-		}
-	}
-	if v, ok := buo.mutation.LastSeen(); ok {
-		if err := bot.LastSeenValidator(v); err != nil {
-			return nil, &ValidationError{Name: "lastSeen", err: fmt.Errorf("ent: validator failed for field \"lastSeen\": %w", err)}
-		}
-	}
 
 	var (
 		err  error

@@ -27,9 +27,12 @@ func testRegHost() {
 		Hostname:  "blackbox",
 		Interface: "eth0",
 	}
-	hdata, _ := proto.Marshal(hostReg)
+	hdata, err := proto.Marshal(hostReg)
+	if err != nil {
+		panic(err)
+	}
 	url := "http://" + SERVER + "/register/host"
-	_, err := http.Post(url, "", bytes.NewBuffer(hdata))
+	_, err = http.Post(url, "", bytes.NewBuffer(hdata))
 	if err != nil {
 		panic(err)
 	}

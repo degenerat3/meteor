@@ -25,26 +25,14 @@ func init() {
 	action.DefaultResponded = actionDescResponded.Default.(bool)
 	botFields := schema.Bot{}.Fields()
 	_ = botFields
-	// botDescInterval is the schema descriptor for interval field.
-	botDescInterval := botFields[1].Descriptor()
-	// bot.IntervalValidator is a validator for the "interval" field. It is called by the builders before save.
-	bot.IntervalValidator = botDescInterval.Validators[0].(func(int) error)
-	// botDescDelta is the schema descriptor for delta field.
-	botDescDelta := botFields[2].Descriptor()
-	// bot.DeltaValidator is a validator for the "delta" field. It is called by the builders before save.
-	bot.DeltaValidator = botDescDelta.Validators[0].(func(int) error)
 	// botDescLastSeen is the schema descriptor for lastSeen field.
 	botDescLastSeen := botFields[3].Descriptor()
 	// bot.DefaultLastSeen holds the default value on creation for the lastSeen field.
 	bot.DefaultLastSeen = botDescLastSeen.Default.(int)
-	// bot.LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
-	bot.LastSeenValidator = botDescLastSeen.Validators[0].(func(int) error)
 	hostFields := schema.Host{}.Fields()
 	_ = hostFields
 	// hostDescLastSeen is the schema descriptor for lastSeen field.
 	hostDescLastSeen := hostFields[2].Descriptor()
 	// host.DefaultLastSeen holds the default value on creation for the lastSeen field.
 	host.DefaultLastSeen = hostDescLastSeen.Default.(int)
-	// host.LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
-	host.LastSeenValidator = hostDescLastSeen.Validators[0].(func(int) error)
 }

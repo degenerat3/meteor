@@ -45,12 +45,6 @@ var ForeignKeys = []string{
 }
 
 var (
-	// IntervalValidator is a validator for the "interval" field. It is called by the builders before save.
-	IntervalValidator func(int) error
-	// DeltaValidator is a validator for the "delta" field. It is called by the builders before save.
-	DeltaValidator func(int) error
 	// DefaultLastSeen holds the default value on creation for the lastSeen field.
 	DefaultLastSeen int
-	// LastSeenValidator is a validator for the "lastSeen" field. It is called by the builders before save.
-	LastSeenValidator func(int) error
 )

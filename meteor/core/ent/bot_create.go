@@ -124,27 +124,12 @@ func (bc *BotCreate) preSave() error {
 	if _, ok := bc.mutation.Interval(); !ok {
 		return &ValidationError{Name: "interval", err: errors.New("ent: missing required field \"interval\"")}
 	}
-	if v, ok := bc.mutation.Interval(); ok {
-		if err := bot.IntervalValidator(v); err != nil {
-			return &ValidationError{Name: "interval", err: fmt.Errorf("ent: validator failed for field \"interval\": %w", err)}
-		}
-	}
 	if _, ok := bc.mutation.Delta(); !ok {
 		return &ValidationError{Name: "delta", err: errors.New("ent: missing required field \"delta\"")}
-	}
-	if v, ok := bc.mutation.Delta(); ok {
-		if err := bot.DeltaValidator(v); err != nil {
-			return &ValidationError{Name: "delta", err: fmt.Errorf("ent: validator failed for field \"delta\": %w", err)}
-		}
 	}
 	if _, ok := bc.mutation.LastSeen(); !ok {
 		v := bot.DefaultLastSeen
 		bc.mutation.SetLastSeen(v)
-	}
-	if v, ok := bc.mutation.LastSeen(); ok {
-		if err := bot.LastSeenValidator(v); err != nil {
-			return &ValidationError{Name: "lastSeen", err: fmt.Errorf("ent: validator failed for field \"lastSeen\": %w", err)}
-		}
 	}
 	return nil
 }
