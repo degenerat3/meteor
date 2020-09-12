@@ -50,16 +50,16 @@ func regHostUtil(prot *mcs.MCS) int32 {
 	if hn == "" || ifc == "" {
 		return 400 // missing param
 	}
-	_, err := DBClient.Host. // Host Client.
-					Create().          // Host create builder.
-					SetHostname(hn).   // Set hostname value.
-					SetInterface(ifc). // set interface val
-					SetLastSeen(0).    // set last seen
-					Save(ctx)          // Create and return.
+	DBClient.Host. // Host Client.
+			Create().          // Host create builder.
+			SetHostname(hn).   // Set hostname value.
+			SetInterface(ifc). // set interface val
+			SetLastSeen(0).    // set last seen
+			SaveX(ctx)         // Create and return.
 
-	if err != nil {
-		return 500 // error registering host
-	}
+	//if err != nil {
+	//	return 500 // error registering host
+	//}
 	return 200
 }
 
