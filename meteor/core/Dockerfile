@@ -7,4 +7,8 @@ RUN cd /go/src/github.com/degenerat3; git clone https://github.com/degenerat3/me
 RUN go get github.com/degenerat3/meteor/meteor/...
 RUN go install github.com/degenerat3/meteor/meteor/core
 
-ENTRYPOINT [ "/go/bin/core" ]
+## Add the wait script to the image
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.7.3/wait /wait
+RUN chmod +x /wait
+
+ENTRYPOINT [ "/wait", "/go/bin/core" ]
