@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/degenerat3/meteor/meteor/core/ent/action"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	//"github.com/degenerat3/meteor/meteor/core/ent/bot"
@@ -46,7 +45,6 @@ func regBotUtil(prot *mcs.MCS) int32 {
 func regHostUtil(prot *mcs.MCS) int32 {
 	hn := prot.GetHostname()
 	ifc := prot.GetInterface()
-	fmt.Printf("hn: %s, ifc: %s\n", hn, ifc)
 	if hn == "" || ifc == "" {
 		return 400 // missing param
 	}
@@ -213,7 +211,6 @@ func listHostsUtil() string {
 		hstr := host.String()
 		hostListStr = hostListStr + hstr + "\n"
 	}
-	fmt.Printf("List Host Util Str: %s\n", hostListStr)
 	return hostListStr
 }
 
