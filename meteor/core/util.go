@@ -46,6 +46,7 @@ func regBotUtil(prot *mcs.MCS) int32 {
 func regHostUtil(prot *mcs.MCS) int32 {
 	hn := prot.GetHostname()
 	ifc := prot.GetInterface()
+	fmt.Printf("hn: %s, ifc: %s\n", hn, ifc)
 	if hn == "" || ifc == "" {
 		return 400 // missing param
 	}
