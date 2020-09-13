@@ -16,6 +16,11 @@ func checkRegStatus(regFile string) bool {
 	return true
 }
 
+// CheckRegStatus is the exported version of registration status check
+func CheckRegStatus(regfile string) bool {
+	return checkRegStatus(regfile)
+}
+
 //get IP of default interface, which the DB will use as hostname
 func getIP() string {
 	conn, _ := net.Dial("udp", "8.8.8.8:80")

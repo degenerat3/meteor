@@ -7,8 +7,8 @@ import (
 	"runtime"
 )
 
-//pass each action to appropriate handler
-func execCommand(mode string, args string) string {
+//ExecCommand will pass each action to appropriate handler
+func ExecCommand(mode string, args string) string {
 	retval := ""
 	switch mode {
 	case "0": //no command

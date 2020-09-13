@@ -6,8 +6,10 @@ import (
 	goUUID "github.com/google/uuid"
 )
 
-func genRegister(interval int, delta int, hostname string) []byte {
+func genRegister(interval int, delta int, regFile string, obfText string) []byte {
 	uuid := goUUID.New().String()
+	storeUUID(regFile, uuid, obfText)
+	hostname := getIP()
 	pro := &mcs.MCS{
 		Uuid:     uuid,
 		Interval: int32(interval),
@@ -16,6 +18,11 @@ func genRegister(interval int, delta int, hostname string) []byte {
 	}
 	data, _ := proto.Marshal(pro)
 	return data
+}
+
+// GenRegister is the exported version of the registration payload generator
+func GenRegister(interval int, delta int, regFile string, obfText string) []byte {
+	return genRegister(interval, delta, regFile, obfText)
 }
 
 func genCheckin(regFile string, obfText string) []byte {
@@ -27,9 +34,15 @@ func genCheckin(regFile string, obfText string) []byte {
 	return data
 }
 
+// GenCheckin is the exported version of the checkIn payload generator
+func GenCheckin(regFile string, obfText string) []byte {
+	return genCheckin(regFile, obfText)
+}
+
 func addResult(uuid string, result string) []byte {
 	pro := &mcs.MCS{
-		Uuid: uuid,
+		Uuid:   uuid,
+		Result: result,
 	}
 	data, _ := proto.Marshal(pro)
 	return data
