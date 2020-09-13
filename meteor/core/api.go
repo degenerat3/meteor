@@ -116,6 +116,28 @@ func addResult(w http.ResponseWriter, r *http.Request) {
 	}
 	newRes := &mcs.MCS{}
 	proto.Unmarshal(data, newRes)
+	stat := addResultUtil(newRes)
+	resp := &mcs.MCS{
+		Status: stat,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+}
+
+func botCheckin(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	newCheck := &mcs.MCS{}
+	proto.Unmarshal(data, newCheck)
+	stat, pendingActions := botCheckinUtil(newCheck)
+	resp := &mcs.MCS{
+		Status:  stat,
+		Actions: pendingActions,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
 }
 
 func listBots(w http.ResponseWriter, r *http.Request) {

