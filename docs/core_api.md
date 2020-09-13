@@ -1,6 +1,8 @@
 # Core API
+Details on the to communicate with the Meteor Core API.  
 
-All of these requests/responses will make use of the MCS protobuf as defined in `meteor/pbuf/mcs.proto`.
+All of these requests/responses will make use of the MCS protobuf as defined in `meteor/pbuf/mcs.proto`.  
+
 
 ### Registration Endpoints
 ---
