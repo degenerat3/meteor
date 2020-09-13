@@ -66,6 +66,8 @@ func main() {
 			}
 			acnData, _ := proto.Marshal(acnResp)
 			conn.Write(acnData)
+			acnAck := make([]byte, 512)
+			conn.Read(acnAck)	// read the "Add response" status, even tho we don't check it rn
 		}
 		endCheck()
 	}
