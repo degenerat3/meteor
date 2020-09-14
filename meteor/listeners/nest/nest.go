@@ -78,7 +78,7 @@ func buildClient(br BuildReq) (int, string) {
 	}
 	replaceAttributes(br, newID)
 	newEnv := "export GOOS=" + br.TargetOS
-	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients" + newID + "; go build -o outBin; cp outbin /hostedfiles/" + newID + ";"
+	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/" + newID + "; go build -o outBin; cp outbin /hostedfiles/" + newID + ";"
 	c = exec.Command("/bin/sh", "-c", compileCom)
 	err = c.Run()
 	if err != nil {
