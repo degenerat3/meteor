@@ -23,7 +23,7 @@ func CheckRegStatus(regfile string) bool {
 
 //get IP of default interface, which the DB will use as hostname
 func getIP() string {
-	conn, _ := net.Dial("udp", "8.8.8.8:80")
+	conn, _ := net.Dial("udp4", "8.8.8.8:80")
 	defer conn.Close()
 	ad := conn.LocalAddr().(*net.UDPAddr)
 	ipStr := ad.IP.String()
