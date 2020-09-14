@@ -74,15 +74,15 @@ func buildClient(br BuildReq) (int, string) {
 	c := exec.Command("/bin/sh", "-c", cpCom)
 	err := c.Run()
 	if err != nil {
-		return 500, "500 - error copying files" + err.Error()
+		return 500, "500 - error copying files"
 	}
 	replaceAttributes(br, newID)
 	newEnv := "export GOOS=" + br.TargetOS
-	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/" + newID + "; go build -o outBin; cp outbin /hostedfiles/" + newID + ";"
+	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/" + newID + "; go build -o outBin; cp outBin /hostedfiles/" + newID + ";"
 	c = exec.Command("/bin/sh", "-c", compileCom)
 	err = c.Run()
 	if err != nil {
-		return 500, "500 - error compiling new files" + err.Error()
+		return 500, "500 - error compiling new files"
 	}
 	cleanUpCom := "rm -rf /go/src/github.com/degenerat3/meteor/meteor/clients/" + newID
 	c = exec.Command("/bin/sh", "-c", cleanUpCom)
