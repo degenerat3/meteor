@@ -16,7 +16,7 @@ services:
       - WAIT_HOST_CONNECT_TIMEOUT=30
     networks:
       meteornet:
-        ipv4_address: 172.69.1.1
+        ipv4_address: 172.16.77.1
 
   db:
     build:
@@ -27,7 +27,7 @@ services:
       POSTGRES_HOST_AUTH_METHOD: "trust"
     networks:
       meteornet:
-        ipv4_address: 172.69.1.2
+        ipv4_address: 172.16.77.2
   
   daddytops:
     build:
@@ -39,7 +39,34 @@ services:
     restart: always
     networks:
       meteornet: 
-        ipv4_address: 172.69.1.3
+        ipv4_address: 172.16.77.3
+
+  nest:
+    build:
+      context: listeners/nest/
+    ports:
+      - "45678:45678"
+    volumes:
+      - /var/log/meteor/nest:/var/log/meteor/nest
+    restart: always
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.4
+
+  petrie:
+    build:
+      context: listeners/petrie/
+    ports:
+      - "10666:10666"
+    volumes:
+      - /var/log/meteor/petrie:/var/log/meteor/petrie
+    environment:
+      - PETRIE_PORT=10666
+      - CORE_SERVER=172.16.77.1
+    restart: always
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.5
 
 
 networks:
@@ -47,4 +74,4 @@ networks:
     ipam:
       driver: default
       config:
-        - subnet: 172.69.0.0/16
+        - subnet: 172.16.77.0/8
