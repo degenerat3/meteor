@@ -11,7 +11,7 @@ import (
 )
 
 func status(w http.ResponseWriter, r *http.Request) {
-	resp, err := http.Get("http://172.69.1.1:9999/status")
+	resp, err := http.Get("http://172.16.77.1:9999/status")
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -34,7 +34,7 @@ func forwardReq(w http.ResponseWriter, r *http.Request) {
 		rdata, _ := proto.Marshal(resp)
 		w.Write(rdata)
 	}
-	url := "http://172.69.1.1:9999" + string(r.URL.Path)
+	url := "http://172.16.77.1:9999" + string(r.URL.Path)
 	resp, err := http.Post(url, "", bytes.NewBuffer(data))
 	if err != nil {
 		resp := &mcs.MCS{
@@ -55,7 +55,7 @@ func forwardReq(w http.ResponseWriter, r *http.Request) {
 }
 
 func listForward(w http.ResponseWriter, r *http.Request) {
-	url := "http://172.69.1.1:9999" + string(r.URL.Path)
+	url := "http://172.16.77.1:9999" + string(r.URL.Path)
 	resp, err := http.Get(url)
 	if err != nil {
 		resp := &mcs.MCS{
