@@ -36,8 +36,8 @@ services:
       - "8888:8888"
     volumes:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
-      environment:
-        - CORE_SERVER=172.16.77.2
+    environment:
+      - CORE_SERVER=172.16.77.2
     restart: always
     networks:
       meteornet: 
