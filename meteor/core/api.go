@@ -5,7 +5,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	_ "github.com/lib/pq"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -21,7 +20,7 @@ func status(w http.ResponseWriter, r *http.Request) {
 func regBot(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newBot := &mcs.MCS{}
 	proto.Unmarshal(data, newBot)
@@ -36,7 +35,7 @@ func regBot(w http.ResponseWriter, r *http.Request) {
 func regHost(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newHost := &mcs.MCS{}
 	proto.Unmarshal(data, newHost)
@@ -52,7 +51,7 @@ func regHost(w http.ResponseWriter, r *http.Request) {
 func regGroup(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newGroup := &mcs.MCS{}
 	proto.Unmarshal(data, newGroup)
@@ -67,7 +66,7 @@ func regGroup(w http.ResponseWriter, r *http.Request) {
 func regHG(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newHG := &mcs.MCS{}
 	proto.Unmarshal(data, newHG)
@@ -82,7 +81,7 @@ func regHG(w http.ResponseWriter, r *http.Request) {
 func addActSingle(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newAct := &mcs.MCS{}
 	proto.Unmarshal(data, newAct)
@@ -97,7 +96,7 @@ func addActSingle(w http.ResponseWriter, r *http.Request) {
 func addActGroup(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newAct := &mcs.MCS{}
 	proto.Unmarshal(data, newAct)
@@ -112,7 +111,7 @@ func addActGroup(w http.ResponseWriter, r *http.Request) {
 func addResult(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newRes := &mcs.MCS{}
 	proto.Unmarshal(data, newRes)
@@ -127,7 +126,7 @@ func addResult(w http.ResponseWriter, r *http.Request) {
 func botCheckin(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		log.Fatal(err)
+		errLog.Println(err.Error())
 	}
 	newCheck := &mcs.MCS{}
 	proto.Unmarshal(data, newCheck)

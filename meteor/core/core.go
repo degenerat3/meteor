@@ -6,20 +6,35 @@ import (
 	_ "github.com/lib/pq"
 	"log"
 	"net/http"
+	"os"
 )
 
 // DBClient is the connection to the psql db
-var DBClient *ent.Client
-var ctx = context.Background()
+var (
+	DBClient *ent.Client
+	ctx      = context.Background()
+
+	// LOGPATH is the output path (including fname) for the listener logs
+	LOGPATH = os.Getenv("LOGPATH")
+
+	// write info logs to this
+	infoLog *log.Logger
+
+	// write warning logs to this
+	warnLog *log.Logger
+
+	// write all errors to this
+	errLog *log.Logger
+)
 
 func main() {
-	var err error
-	DBClient, err = ent.Open("postgres", "host=172.16.77.3 port=5432 user=met dbname=meteor password=dbpassword sslmode=disable")
-	if err := DBClient.Schema.Create(ctx); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
-	}
+	infoLog, warnLog, errLog = InitLogger(LOGPATH)
+	DBClient, err := ent.Open("postgres", "host=172.16.77.3 port=5432 user=met dbname=meteor password=dbpassword sslmode=disable")
 	if err != nil {
-		log.Fatal(err)
+		errLog.Printf("Error connecting to DB: %v\n", err.Error())
+	}
+	if err := DBClient.Schema.Create(ctx); err != nil {
+		errLog.Printf("failed creating schema resources: %s\n", err.Error())
 	}
 
 	http.HandleFunc("/", status)
@@ -34,6 +49,6 @@ func main() {
 	http.HandleFunc("/list/bots", listBots)
 	http.HandleFunc("/list/hosts", listHosts)
 	http.HandleFunc("/list/groups", listGroups)
-	log.Fatal(http.ListenAndServe(":9999", nil))
+	infoLog.Println(http.ListenAndServe(":9999", nil))
 	return
 }
