@@ -38,7 +38,7 @@ func regBotUtil(prot *mcs.MCS) int32 {
 		errLog.Printf("Error registering bot '%s': %s", uuid, err.Error())
 		return 500 // error registering bot
 	}
-
+	infoLog.Printf("Registered bot: %s\n", uuid)
 	return 200
 
 }
@@ -60,6 +60,7 @@ func regHostUtil(prot *mcs.MCS) int32 {
 		errLog.Printf("Error registering host '%s': %s", hn, err.Error())
 		return 500 // error registering host
 	}
+	infoLog.Printf("Registered host: %s\n", hn)
 	return 200
 }
 
@@ -80,6 +81,7 @@ func regGroupUtil(prot *mcs.MCS) int32 {
 		errLog.Printf("Error registering group '%s': %s", gn, err.Error())
 		return 500 // error registering group
 	}
+	infoLog.Printf("Registered group: %s\n", gn)
 	return 200
 }
 
@@ -106,6 +108,7 @@ func regHGUtil(prot *mcs.MCS) int32 {
 		errLog.Printf("Error adding host '%s' to group '%s': %s", hn, gn, err.Error())
 		return 500 // error updating group
 	}
+	infoLog.Printf("Added host '%s' to group '%s'\n", hn, gn)
 	return 200
 
 }
@@ -136,7 +139,7 @@ func addActSingleUtil(prot *mcs.MCS) int32 {
 		errLog.Printf("Error adding action '%s' with mode '%s', args '%s': %s", uuid, mode, args, err.Error())
 		return 500 // error adding action
 	}
-
+	infoLog.Printf("Added action '%s' targeting host '%s'\n", args, hn)
 	return 200
 }
 
@@ -175,6 +178,7 @@ func addActGroupUtil(prot *mcs.MCS) int32 {
 			return 500 // error adding action
 		}
 	}
+	infoLog.Printf("Added action '%s' targeting group '%s'\n", args, gn)
 	return 200
 }
 
@@ -197,6 +201,7 @@ func addResultUtil(prot *mcs.MCS) int32 {
 		errLog.Printf("Error adding result '%s': %s", uuid, err.Error())
 		return 500 // error adding result
 	}
+	infoLog.Printf("Added result for action '%s'\n", uuid)
 	return 200
 
 }
