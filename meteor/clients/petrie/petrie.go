@@ -27,7 +27,7 @@ var REGFILE = "$$REGFILE$$"
 var OBFTEXT = "$$OBFTEXT$$"
 
 // DEBUG specifies if execution of the client will write output
-var DEBUG = true
+var DEBUG = false
 
 func main() {
 	if len(os.Args) != 2 && len(os.Args) != 3 {

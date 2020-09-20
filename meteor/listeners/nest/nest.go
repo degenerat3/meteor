@@ -24,6 +24,7 @@ type BuildReq struct {
 	Interval   string
 	Delta      string
 	TargetOS   string
+	Debug      string
 }
 
 func main() {
@@ -118,11 +119,14 @@ func stringInSlice(a string, list []string) bool {
 func replaceAttributes(br BuildReq, newID string) {
 	path := "/go/src/github.com/degenerat3/meteor/meteor/clients/" + newID + "/" + br.ClientName + ".go"
 	read, _ := ioutil.ReadFile(path)
-	newContents := strings.Replace(string(read), "$$SERVER$$", br.Server, -1)
-	newContents = strings.Replace(string(newContents), "$$REGFILE$$", br.RegFile, -1)
-	newContents = strings.Replace(string(newContents), "$$OBFTEXT$$", br.ObfText, -1)
-	newContents = strings.Replace(string(newContents), "1234123499", br.Interval, -1)
-	newContents = strings.Replace(string(newContents), "4321432199", br.Delta, -1)
+	newContents := strings.Replace(string(read), "$$SERVER$$", br.Server, 1)
+	newContents = strings.Replace(string(newContents), "$$REGFILE$$", br.RegFile, 1)
+	newContents = strings.Replace(string(newContents), "$$OBFTEXT$$", br.ObfText, 1)
+	newContents = strings.Replace(string(newContents), "1234123499", br.Interval, 1)
+	newContents = strings.Replace(string(newContents), "4321432199", br.Delta, 1)
+	if br.Debug == "true" || br.Debug == "True" {
+		newContents = strings.Replace(string(newContents), "var DEBUG = false", "var DEBUG = true", 1)
+	}
 	ioutil.WriteFile(path, []byte(newContents), 0)
 	return
 
