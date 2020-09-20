@@ -65,7 +65,7 @@ services:
       - /var/log/meteor/petrie:/var/log/meteor/petrie
     environment:
       - PETRIE_PORT=10666
-      - CORE_SERVER=172.16.77.2
+      - CORE_SERVER=172.16.77.2:9999
       - LOGPATH=/var/log/meteor/petrie/petrie.log
     restart: always
     networks:
