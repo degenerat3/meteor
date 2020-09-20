@@ -29,7 +29,8 @@ var (
 
 func main() {
 	infoLog, warnLog, errLog = InitLogger(LOGPATH)
-	DBClient, err := ent.Open("postgres", "host=172.16.77.3 port=5432 user=met dbname=meteor password=dbpassword sslmode=disable")
+	var err error
+	DBClient, err = ent.Open("postgres", "host=172.16.77.3 port=5432 user=met dbname=meteor password=dbpassword sslmode=disable")
 	if err != nil {
 		errLog.Printf("Error connecting to DB: %v\n", err.Error())
 	}
