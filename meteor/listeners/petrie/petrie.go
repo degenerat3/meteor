@@ -58,6 +58,7 @@ func connHandle(conn net.Conn) {
 	comms := &mcs.MCS{}
 	err := proto.Unmarshal(data, comms)
 	if err != nil {
+		errLog.Println("Error unmarshalling client data")
 		return
 	}
 	md := comms.GetMode()
