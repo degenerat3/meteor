@@ -115,13 +115,7 @@ func main() {
 		}
 		endCheck()
 		conn.Close()
-		min := INTERVAL - DELTA
-		max := INTERVAL + DELTA
-		sleeptime := rand.Intn(max-min) + min
-		if DEBUG {
-			fmt.Printf("Sleeping for %d seconds...\n", sleeptime)
-		}
-		time.Sleep(time.Duration(sleeptime) * time.Second)
+
 	}
 }
 
@@ -132,4 +126,11 @@ func endCheck() {
 	if len(os.Args) == 3 {
 		os.Exit(0)
 	}
+	min := INTERVAL - DELTA
+	max := INTERVAL + DELTA
+	sleeptime := rand.Intn(max-min) + min
+	if DEBUG {
+		fmt.Printf("Sleeping for %d seconds...\n", sleeptime)
+	}
+	time.Sleep(time.Duration(sleeptime) * time.Second)
 }
