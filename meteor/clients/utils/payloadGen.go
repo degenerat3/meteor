@@ -19,7 +19,7 @@ func genRegister(interval int, delta int, regFile string, obfText string) string
 		Mode:     "register",
 	}
 	data, _ := proto.Marshal(pro)
-	encoded := base64.StdEncoding.EncodeToString([]byte(data))
+	encoded := encodePayload(data)
 	return encoded
 }
 
@@ -35,7 +35,7 @@ func genCheckin(regFile string, obfText string) string {
 		Mode: "checkin",
 	}
 	data, _ := proto.Marshal(pro)
-	encoded := base64.StdEncoding.EncodeToString([]byte(data))
+	encoded := encodePayload(data)
 	return encoded
 }
 
@@ -51,6 +51,17 @@ func addResult(uuid string, result string) string {
 		Mode:   "addResult",
 	}
 	data, _ := proto.Marshal(pro)
-	encoded := base64.StdEncoding.EncodeToString([]byte(data))
+	encoded := encodePayload(data)
 	return encoded
+}
+
+func encodePayload(proto []byte) string {
+	encoded := base64.StdEncoding.EncodeToString([]byte(proto))
+	encoded = encoded + "\n"
+	return encoded
+}
+
+// EncodePayload is the exported version of the marshal'd protobuf to base64 encoder
+func EncodePayload(proto []byte) string {
+	return encodePayload(proto)
 }

