@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	lUtils "github.com/degenerat3/meteor/meteor/listeners/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
@@ -55,8 +56,12 @@ func connHandle(conn net.Conn) {
 	infoLog.Println("Connection recieved, reading data...")
 	data := make([]byte, 4096)
 	conn.Read(data)
+	decoded, err := base64.StdEncoding.DecodeString(string(data))
+	if err != nil {
+		errLog.Println("Error decoding b64: " + err.Error())
+	}
 	comms := &mcs.MCS{}
-	err := proto.Unmarshal(data, comms)
+	err = proto.Unmarshal(decoded, comms)
 	if err != nil {
 		errLog.Println("Error unmarshalling client data: " + err.Error())
 		return
