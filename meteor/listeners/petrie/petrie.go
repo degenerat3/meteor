@@ -81,6 +81,7 @@ func connHandle(conn net.Conn) {
 		warnLog.Println("Recieved an unknown mode")
 		conn.Write([]byte(""))
 	}
-	conn.Write(retData)
+	encoded := base64.StdEncoding.EncodeToString(retData)
+	conn.Write([]byte(encoded))
 	return
 }

