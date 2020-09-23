@@ -52,6 +52,7 @@ func main() {
 }
 
 func connHandle(conn net.Conn) {
+	infoLog.Println("Connection recieved, reading data...")
 	data := make([]byte, 4096)
 	conn.Read(data)
 	comms := &mcs.MCS{}
