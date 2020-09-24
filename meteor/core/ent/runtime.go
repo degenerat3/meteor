@@ -23,6 +23,10 @@ func init() {
 	actionDescResponded := actionFields[4].Descriptor()
 	// action.DefaultResponded holds the default value on creation for the responded field.
 	action.DefaultResponded = actionDescResponded.Default.(bool)
+	// actionDescResult is the schema descriptor for result field.
+	actionDescResult := actionFields[5].Descriptor()
+	// action.DefaultResult holds the default value on creation for the result field.
+	action.DefaultResult = actionDescResult.Default.(string)
 	botFields := schema.Bot{}.Fields()
 	_ = botFields
 	// botDescLastSeen is the schema descriptor for lastSeen field.

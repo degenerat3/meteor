@@ -80,6 +80,14 @@ func (au *ActionUpdate) SetResult(s string) *ActionUpdate {
 	return au
 }
 
+// SetNillableResult sets the result field if the given value is not nil.
+func (au *ActionUpdate) SetNillableResult(s *string) *ActionUpdate {
+	if s != nil {
+		au.SetResult(*s)
+	}
+	return au
+}
+
 // SetTargetingID sets the targeting edge to Host by id.
 func (au *ActionUpdate) SetTargetingID(id int) *ActionUpdate {
 	au.mutation.SetTargetingID(id)
@@ -324,6 +332,14 @@ func (auo *ActionUpdateOne) SetNillableResponded(b *bool) *ActionUpdateOne {
 // SetResult sets the result field.
 func (auo *ActionUpdateOne) SetResult(s string) *ActionUpdateOne {
 	auo.mutation.SetResult(s)
+	return auo
+}
+
+// SetNillableResult sets the result field if the given value is not nil.
+func (auo *ActionUpdateOne) SetNillableResult(s *string) *ActionUpdateOne {
+	if s != nil {
+		auo.SetResult(*s)
+	}
 	return auo
 }
 

@@ -55,4 +55,6 @@ var (
 	DefaultQueued bool
 	// DefaultResponded holds the default value on creation for the responded field.
 	DefaultResponded bool
+	// DefaultResult holds the default value on creation for the result field.
+	DefaultResult string
 )

@@ -72,6 +72,14 @@ func (ac *ActionCreate) SetResult(s string) *ActionCreate {
 	return ac
 }
 
+// SetNillableResult sets the result field if the given value is not nil.
+func (ac *ActionCreate) SetNillableResult(s *string) *ActionCreate {
+	if s != nil {
+		ac.SetResult(*s)
+	}
+	return ac
+}
+
 // SetTargetingID sets the targeting edge to Host by id.
 func (ac *ActionCreate) SetTargetingID(id int) *ActionCreate {
 	ac.mutation.SetTargetingID(id)
@@ -156,7 +164,8 @@ func (ac *ActionCreate) preSave() error {
 		ac.mutation.SetResponded(v)
 	}
 	if _, ok := ac.mutation.Result(); !ok {
-		return &ValidationError{Name: "result", err: errors.New("ent: missing required field \"result\"")}
+		v := action.DefaultResult
+		ac.mutation.SetResult(v)
 	}
 	return nil
 }

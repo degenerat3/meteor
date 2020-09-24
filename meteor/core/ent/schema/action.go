@@ -19,7 +19,7 @@ func (Action) Fields() []ent.Field {
 		field.String("args"),
 		field.Bool("queued").Default(false),
 		field.Bool("responded").Default(false),
-		field.String("result"),
+		field.String("result").Default("N/A"),
 	}
 }
 

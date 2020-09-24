@@ -16,7 +16,7 @@ var (
 		{Name: "args", Type: field.TypeString},
 		{Name: "queued", Type: field.TypeBool},
 		{Name: "responded", Type: field.TypeBool},
-		{Name: "result", Type: field.TypeString},
+		{Name: "result", Type: field.TypeString, Default: "N/A"},
 		{Name: "host_actions", Type: field.TypeInt, Nullable: true},
 	}
 	// ActionsTable holds the schema information for the "actions" table.
