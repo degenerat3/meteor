@@ -44,6 +44,7 @@ func main() {
 	http.HandleFunc("/register/host", regHost)
 	http.HandleFunc("/register/group", regGroup)
 	http.HandleFunc("/register/hostgroup", regHG)
+	http.HandleFunc("/bot/checkin", botCheckin)
 	http.HandleFunc("/add/action/single", addActSingle)
 	http.HandleFunc("/add/action/group", addActGroup)
 	http.HandleFunc("/add/result", addResult)
