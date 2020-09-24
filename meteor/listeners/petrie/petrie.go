@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/base64"
 	"fmt"
 	lUtils "github.com/degenerat3/meteor/meteor/listeners/utils"
@@ -9,6 +10,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"strings"
 )
 
 var (
@@ -55,9 +57,9 @@ func main() {
 
 func connHandle(conn net.Conn) {
 	infoLog.Println("Connection recieved, reading data...")
-	data := make([]byte, 4096)
-	conn.Read(data)
-	decoded, err := base64.StdEncoding.DecodeString(string(data))
+	data, _ := bufio.NewReader(conn).ReadString('\n')
+	data = strings.TrimSuffix(data, "\n")
+	decoded, err := base64.StdEncoding.DecodeString(data)
 	if err != nil {
 		errLog.Println("Error decoding b64: " + err.Error())
 	}

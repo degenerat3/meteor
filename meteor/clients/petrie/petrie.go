@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -68,6 +69,7 @@ func main() {
 			fmt.Printf("Reading data from conn...\n")
 		}
 		data, _ := bufio.NewReader(conn).ReadString('\n')
+		data = strings.TrimSuffix(data, "\n")
 		if DEBUG {
 			fmt.Printf("Got response: %s\n", data)
 		}
