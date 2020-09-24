@@ -51,6 +51,8 @@ func main() {
 	http.HandleFunc("/list/bots", listBots)
 	http.HandleFunc("/list/hosts", listHosts)
 	http.HandleFunc("/list/groups", listGroups)
+	http.HandleFunc("/list/actions", listActions)
+	http.HandleFunc("/list/result", listResult)
 	infoLog.Println(http.ListenAndServe(":9999", nil))
 	return
 }

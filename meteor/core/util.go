@@ -7,6 +7,7 @@ import (
 	"github.com/degenerat3/meteor/meteor/core/ent/host"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	goUUID "github.com/google/uuid"
+	"strconv"
 )
 
 func regBotUtil(prot *mcs.MCS) int32 {
@@ -284,4 +285,31 @@ func listGroupsUtil() string {
 		groupListStr = groupListStr + gstr + "\n"
 	}
 	return groupListStr
+}
+
+func listActionsUtil() string {
+	actions, _ := DBClient.Action.
+		Query().
+		All(ctx)
+	actListStr := ""
+	for _, act := range actions {
+		targ, _ := act.QueryTargeting().Only(ctx)
+		astr := act.UUID + ", " + targ.Hostname + ", " + act.Mode + ", " + act.Args + ", Queued: " + strconv.FormatBool(act.Queued) + ", Responded: " + strconv.FormatBool(act.Responded)
+		actListStr = actListStr + astr + "\n"
+	}
+	return actListStr
+}
+
+func listResultUtil(uuid string) string {
+	action, err := DBClient.Action.
+		Query().
+		Where(action.UUID(uuid)).
+		Only(ctx)
+	if err != nil {
+		return "Unknown UUID\n"
+	}
+	if action.Responded != true {
+		return "Action not yet returned\n"
+	}
+	return action.Result
 }

@@ -169,3 +169,29 @@ func listGroups(w http.ResponseWriter, r *http.Request) {
 	rdata, _ := proto.Marshal(resp)
 	w.Write(rdata)
 }
+
+func listActions(w http.ResponseWriter, r *http.Request) {
+	actsList := listActionsUtil()
+	resp := &mcs.MCS{
+		Status: 200,
+		Desc:   actsList,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+}
+
+func listResult(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		errLog.Println(err.Error())
+	}
+	resProt := &mcs.MCS{}
+	proto.Unmarshal(data, resProt)
+	res := listResultUtil(resProt.GetUuid())
+	resp := &mcs.MCS{
+		Status: 200,
+		Desc:   res,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+}
