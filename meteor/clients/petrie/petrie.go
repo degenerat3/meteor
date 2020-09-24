@@ -94,7 +94,7 @@ func main() {
 		if DEBUG {
 			fmt.Printf("Recd mode: %s\n", mode)
 		}
-		if mode == "0" {
+		if mode == "None" {
 			endCheck()
 			continue
 		}
