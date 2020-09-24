@@ -53,7 +53,7 @@ func handleBuildReq(w http.ResponseWriter, r *http.Request) {
 	}
 	stat, binLoc := buildClient(br)
 	if stat == 200 {
-		binLoc = "File located at <server>/files/" + binLoc
+		binLoc = "File located at [serverRoot]/files/" + binLoc
 	}
 	bod, _ := json.Marshal(map[string]string{
 		"msg": binLoc,
