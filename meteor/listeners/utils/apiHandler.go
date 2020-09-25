@@ -49,7 +49,7 @@ func HandleReg(uuid string, interval int32, delta int32, hostname string, core s
 
 // HandleAddRes will build the correct proto for a "addResult"
 func HandleAddRes(uuid string, result string, core string) []byte {
-	url := "http://" + core + "/register/bot"
+	url := "http://" + core + "/add/result"
 	chk := &mcs.MCS{
 		Uuid:   uuid,
 		Result: result,
