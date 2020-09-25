@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/base64"
 	"os"
 	"os/exec"
 	"runtime"
@@ -42,7 +43,8 @@ func ExecCommand(mode string, args string) string {
 	if retval == "" {
 		retval = "<No Output>"
 	}
-	return retval
+	encoded := base64.StdEncoding.EncodeToString([]byte(retval))
+	return encoded
 }
 
 //most commonly used, pass in args to a shell
