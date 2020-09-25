@@ -107,21 +107,14 @@ func main() {
 			mod := acn.GetMode()
 			args := acn.GetArgs()
 			acnOut := cUtils.ExecCommand(mod, args)
-			acnResp := &mcs.MCS{
-				Uuid:   uid,
-				Result: acnOut,
-			}
-			acnData, err := proto.Marshal(acnResp)
-			if err != nil {
-				if DEBUG {
-					fmt.Printf("Error marshalling data: %s\n", err.Error())
-				}
-			}
+			acnData := cUtils.GenAddResult(uid, acnOut)
 			if DEBUG {
 				fmt.Printf("Writing response data...\n")
 			}
-			encAcnData := cUtils.EncodePayload(acnData)
-			fmt.Fprintf(conn, "%s\n", encAcnData)
+			fmt.Fprintf(conn, "%s\n", acnData)
+			if DEBUG {
+				fmt.Printf("Reading response ack...\n")
+			}
 			data, _ = bufio.NewReader(conn).ReadString('\n')
 			data = strings.TrimSuffix(data, "\n") // read the ack, even though we don't do anything with it rn
 		}

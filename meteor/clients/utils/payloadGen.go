@@ -44,7 +44,7 @@ func GenCheckin(regFile string, obfText string) string {
 	return genCheckin(regFile, obfText)
 }
 
-func addResult(uuid string, result string) string {
+func genAddResult(uuid string, result string) string {
 	pro := &mcs.MCS{
 		Uuid:   uuid,
 		Result: result,
@@ -53,6 +53,11 @@ func addResult(uuid string, result string) string {
 	data, _ := proto.Marshal(pro)
 	encoded := encodePayload(data)
 	return encoded
+}
+
+// GenAddResult is the exported version of the result add payload generator
+func GenAddResult(uuid string, result string) string {
+	return genAddResult(uuid, result)
 }
 
 func encodePayload(proto []byte) string {
