@@ -69,6 +69,7 @@ func main() {
 			fmt.Printf("Reading data from conn...\n")
 		}
 		data, _ := bufio.NewReader(conn).ReadString('\n')
+		conn.Close()
 		data = strings.TrimSuffix(data, "\n")
 		if DEBUG {
 			fmt.Printf("Got response: %s\n", data)
@@ -108,6 +109,7 @@ func main() {
 			args := acn.GetArgs()
 			acnOut := cUtils.ExecCommand(mod, args)
 			acnData := cUtils.GenAddResult(uid, acnOut)
+			conn, err = net.Dial("tcp", SERVER)
 			if DEBUG {
 				fmt.Printf("Writing response data...\n")
 			}
@@ -117,6 +119,7 @@ func main() {
 			}
 			data, _ = bufio.NewReader(conn).ReadString('\n')
 			data = strings.TrimSuffix(data, "\n") // read the ack, even though we don't do anything with it rn
+			conn.Close()
 		}
 		endCheck()
 		conn.Close()
