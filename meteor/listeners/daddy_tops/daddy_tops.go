@@ -19,6 +19,7 @@ func main() {
 	http.HandleFunc("/add/action/single", forwardReq)
 	http.HandleFunc("/add/action/group", forwardReq)
 	http.HandleFunc("/add/result", forwardReq)
+	http.HandleFunc("/list/result", forwardReq)
 	http.HandleFunc("/list/bots", listForward)
 	http.HandleFunc("/list/hosts", listForward)
 	http.HandleFunc("/list/groups", listForward)
