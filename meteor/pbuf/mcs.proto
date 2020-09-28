@@ -16,7 +16,7 @@ message MCS {
     int32 interval = 10;    // callback interval
     int32 delta = 11;       // jitter for interval
     repeated Action actions = 12;   // array of Actions
-
+    AuthDat authDat = 13;    // User authentication data
 }
 
 // Actions to be run by the bot
@@ -25,3 +25,10 @@ message Action {
     string mode = 2; // type of data that will be in "args" or is being requested
     string args = 3; // the data of the action (command line args, bot uuid, etc)
   }
+
+// User authentication data
+message AuthDat {
+    string username = 1;    // username
+    string password = 2;    // password
+    string token = 3;       // login session token
+}

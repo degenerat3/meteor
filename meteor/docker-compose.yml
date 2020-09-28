@@ -39,6 +39,7 @@ services:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
     environment:
       - CORE_SERVER=172.16.77.2
+      - ADMIN_PW=admin123!
     restart: always
     networks:
       meteornet: 
