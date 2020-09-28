@@ -28,6 +28,7 @@ type hooks struct {
 	Bot    []ent.Hook
 	Group  []ent.Hook
 	Host   []ent.Hook
+	User   []ent.Hook
 }
 
 // Options applies the options on the config object.

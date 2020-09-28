@@ -17,3 +17,6 @@ type Group func(*sql.Selector)
 
 // Host is the predicate function for host builders.
 type Host func(*sql.Selector)
+
+// User is the predicate function for user builders.
+type User func(*sql.Selector)

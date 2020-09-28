@@ -85,6 +85,19 @@ var (
 		PrimaryKey:  []*schema.Column{HostsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// UsersColumns holds the columns for the "users" table.
+	UsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "username", Type: field.TypeString, Unique: true},
+		{Name: "password", Type: field.TypeString},
+	}
+	// UsersTable holds the schema information for the "users" table.
+	UsersTable = &schema.Table{
+		Name:        "users",
+		Columns:     UsersColumns,
+		PrimaryKey:  []*schema.Column{UsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
 	// GroupMembersColumns holds the columns for the "group_members" table.
 	GroupMembersColumns = []*schema.Column{
 		{Name: "group_id", Type: field.TypeInt},
@@ -118,6 +131,7 @@ var (
 		BotsTable,
 		GroupsTable,
 		HostsTable,
+		UsersTable,
 		GroupMembersTable,
 	}
 )
