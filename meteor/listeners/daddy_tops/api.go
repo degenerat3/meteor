@@ -106,8 +106,7 @@ func userLogin(w http.ResponseWriter, r *http.Request) {
 	pw := authData.GetPassword()
 	hasher := sha1.New()
 	hasher.Write([]byte(pw))
-	encpw := string(hasher.Sum(nil))
-
+	encpw := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 	knownPassArr, err := DBClient.User.Query().Where(user.Username(un)).Select(user.FieldPassword).Strings(ctx)
 	knownPass := knownPassArr[0]
 	if err != nil {
@@ -142,7 +141,7 @@ func forwardReq(w http.ResponseWriter, r *http.Request) {
 	proto.Unmarshal(data, prot)
 	validity := checkAuth(prot)
 	if validity == false {
-		resp := genUnAuth()
+		resp := genInvalidTok()
 		w.Write(resp)
 		return
 	}

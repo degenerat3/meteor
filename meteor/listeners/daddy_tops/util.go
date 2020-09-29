@@ -31,6 +31,15 @@ func genUnAuth() []byte {
 	return rdata
 }
 
+func genInvalidTok() []byte {
+	resp := &mcs.MCS{
+		Status: 401,
+		Desc:   "Invalid token\n",
+	}
+	rdata, _ := proto.Marshal(resp)
+	return rdata
+}
+
 func newSession() string {
 	token := genRando()
 	exp := time.Now().Unix() + 600
