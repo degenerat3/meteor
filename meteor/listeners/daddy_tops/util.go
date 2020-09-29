@@ -15,7 +15,7 @@ func initAdmin() {
 	hasher := sha1.New()
 	hasher.Write([]byte(adminpw))
 	encpw := string(hasher.Sum(nil))
-	_, err := DBClient.User.Create().SetUsername("admin").SetPassword(encpw).Save(ctx)
+	_, err := DBClient.User.Create().SetUsername(string("admin")).SetPassword(encpw).Save(ctx)
 	if err != nil {
 		panic(err)
 	}
