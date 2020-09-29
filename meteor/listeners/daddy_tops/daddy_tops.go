@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/degenerat3/meteor/meteor/core/ent"
+	_ "github.com/lib/pq"
 	"log"
 	"net/http"
 	"os"
