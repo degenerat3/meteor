@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
 	"github.com/degenerat3/meteor/meteor/core/ent/user"
 	"github.com/degenerat3/meteor/meteor/pbuf"
@@ -45,7 +46,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	adminPw := adminDat.GetToken()
 	hasher := sha1.New()
 	hasher.Write([]byte(adminPw))
-	encpw := string(hasher.Sum(nil))
+	encpw := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 	knownPassArr, err := DBClient.User.Query().Where(user.Username("admin")).Select(user.FieldPassword).Strings(ctx)
 	knownPass := knownPassArr[0]
 	if encpw != knownPass {
@@ -57,7 +58,7 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 	newPass := adminDat.GetPassword()
 	hasher = sha1.New()
 	hasher.Write([]byte(newPass))
-	encpw = string(hasher.Sum(nil))
+	encpw = base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 	_, err = DBClient.User.Create().SetUsername(newUser).SetPassword(encpw).Save(ctx)
 	if err != nil {
 		resp := &mcs.MCS{

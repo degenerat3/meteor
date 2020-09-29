@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/sha1"
+	"encoding/base64"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"math/rand"
@@ -14,7 +15,7 @@ func initAdmin() {
 	adminpw := os.Getenv("ADMIN_PW")
 	hasher := sha1.New()
 	hasher.Write([]byte(adminpw))
-	encpw := string(hasher.Sum(nil))
+	encpw := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
 	_, err := DBClient.User.Create().SetUsername(string("admin")).SetPassword(encpw).Save(ctx)
 	if err != nil {
 		panic(err)

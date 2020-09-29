@@ -35,6 +35,8 @@ services:
       context: listeners/daddy_tops/
     ports:
       - "8888:8888"
+    depends_on:
+      - "core"
     volumes:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
     command: sh -c "/wait && /go/bin/daddy_tops"
