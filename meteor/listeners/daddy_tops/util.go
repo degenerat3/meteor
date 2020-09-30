@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/base64"
+	"github.com/degenerat3/meteor/meteor/core/ent/user"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"math/rand"
@@ -16,16 +17,19 @@ func initAdmin() {
 	hasher := sha1.New()
 	hasher.Write([]byte(adminpw))
 	encpw := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
-	_, err := DBClient.User.Create().SetUsername(string("admin")).SetPassword(encpw).Save(ctx)
+	_, err := DBClient.User.Query().Where(user.Username("admin")).Only(ctx)
 	if err != nil {
-		panic(err)
+		_, err := DBClient.User.Create().SetUsername(string("admin")).SetPassword(encpw).Save(ctx)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
 func genUnAuth() []byte {
 	resp := &mcs.MCS{
 		Status: 401,
-		Desc:   "Invalid user or password\n",
+		Desc:   "Invalid user or password",
 	}
 	rdata, _ := proto.Marshal(resp)
 	return rdata

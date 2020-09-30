@@ -107,8 +107,7 @@ func userLogin(w http.ResponseWriter, r *http.Request) {
 	hasher := sha1.New()
 	hasher.Write([]byte(pw))
 	encpw := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
-	knownPassArr, err := DBClient.User.Query().Where(user.Username(un)).Select(user.FieldPassword).Strings(ctx)
-	knownPass := knownPassArr[0]
+	knownPass, err := DBClient.User.Query().Where(user.Username(un)).Select(user.FieldPassword).String(ctx)
 	if err != nil {
 		val := genUnAuth()
 		w.Write(val)
