@@ -46,11 +46,17 @@ func buildDT() {
 	newEnv := "mkdir /hostedfiles/dt; export GOOS=windows"
 	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
 	c := exec.Command("/bin/sh", "-c", compileCom)
-	c.Run()
+	err := c.Run()
+	if err != nil {
+		panic(err)
+	}
 	newEnv = "export GOOS=linux"
 	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.bin; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
 	c = exec.Command("/bin/sh", "-c", compileCom)
-	c.Run()
+	err = c.Run()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func handleBuildReq(w http.ResponseWriter, r *http.Request) {
