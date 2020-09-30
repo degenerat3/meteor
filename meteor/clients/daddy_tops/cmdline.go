@@ -78,15 +78,16 @@ func registerUser() {
 	fmt.Print("Enter Current Admin Password: ")
 	adminpwb, _ := terminal.ReadPassword(int(syscall.Stdin))
 	adminpw := string(adminpwb)
-	fmt.Print("New Username: ")
+	fmt.Print("\nNew Username: ")
 	un, _ := reader.ReadString('\n')
 	un = strings.TrimSuffix(un, "\n")
 	un = strings.TrimSuffix(un, "\r")
 	DTUSER = un
 	fmt.Print("New Password: ")
 	bytePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
-	fmt.Print("Confirm Password: ")
+	fmt.Print("\nConfirm Password: ")
 	bytePassword2, _ := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Println()
 	pw := string(bytePassword)
 	pw2 := string(bytePassword2)
 	if pw != pw2 {

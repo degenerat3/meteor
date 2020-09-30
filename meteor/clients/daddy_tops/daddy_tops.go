@@ -39,7 +39,7 @@ func main() {
 		if os.Args[1] == "--register-hosts" {
 			if len(os.Args) < 3 {
 				fmt.Println("Missing arg: config.yml")
-				os.Exit(1)
+				os.Exit(0)
 			} else {
 				registerHosts(os.Args[2])
 				return
@@ -47,16 +47,17 @@ func main() {
 		} else if os.Args[1] == "--server" {
 			if len(os.Args) < 3 {
 				fmt.Println("Missing arg: server")
-				os.Exit(1)
+				os.Exit(0)
 			} else {
 				setServer(os.Args[2])
 			}
-		} else if os.Args[1] == " --register-user" {
+		} else if os.Args[1] == "--register-user" {
 			registerUser()
 		} else {
-			fmt.Println("Unknow argument")
-			os.Exit(1)
+			fmt.Println("Unknown argument")
+			os.Exit(0)
 		}
+		os.Exit(0)
 	}
 	fmt.Println(" ===============================")
 	fmt.Println("| DADDY TOPS - METEOR COMMANDER |")
