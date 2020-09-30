@@ -28,6 +28,7 @@ type BuildReq struct {
 }
 
 func main() {
+	buildDT()
 	http.HandleFunc("/", status)
 	http.HandleFunc("/status", status)
 	http.HandleFunc("/buildreq", handleBuildReq)
