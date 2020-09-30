@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"github.com/degenerat3/meteor/meteor/pbuf"
@@ -9,14 +10,63 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 )
 
-var SERVER string
+// DTSERVER is the Daddy_Tops listener address that comms will be sent to
+var DTSERVER = getDTServ()
+
+// DTUSER is the username associated with this session
+var DTUSER string
+
+var authToken string
+
+func getDTServ() string {
+	s := os.Getenv("DT_SERVER")
+	if s == "" {
+		fmt.Println("'DT_SERVER' env is undefined, please specify the upstream Daddy Tops server.")
+		reader := bufio.NewReader(os.Stdin)
+		fmt.Print("Enter DT Server (ex 127.0.0.1:8888): ")
+		s, _ = reader.ReadString('\n')
+		s = strings.TrimSuffix(s, "\n")
+		s = strings.TrimSuffix(s, "\r")
+	}
+	return s
+}
 
 func main() {
-	SERVER = os.Args[1]
-	//testRegUser()
-	testLogin()
+	if len(os.Args) > 1 {
+		if os.Args[1] == "--register-hosts" {
+			if len(os.Args) < 3 {
+				fmt.Println("Missing arg: config.yml")
+				os.Exit(1)
+			} else {
+				registerHosts(os.Args[2])
+				return
+			}
+		} else if os.Args[1] == "--server" {
+			if len(os.Args) < 3 {
+				fmt.Println("Missing arg: server")
+				os.Exit(1)
+			} else {
+				setServer(os.Args[2])
+			}
+		} else if os.Args[1] == " --register-user" {
+			registerUser()
+		} else {
+			fmt.Println("Unknow argument")
+			os.Exit(1)
+		}
+	}
+	fmt.Println(" ===============================")
+	fmt.Println("| DADDY TOPS - METEOR COMMANDER |")
+	fmt.Println(" ===============================")
+	login()
+	if authToken == "Invalid user or password" {
+		fmt.Println(authToken)
+		os.Exit(0)
+	}
+	prm()
 
 }
 
@@ -34,7 +84,7 @@ func testRegUser() {
 	if err != nil {
 		panic(err)
 	}
-	url := "http://" + SERVER + "/register/user"
+	url := "http://" + DTSERVER + "/register/user"
 	_, err = http.Post(url, "", bytes.NewBuffer(hdata))
 	if err != nil {
 		panic(err)
@@ -44,7 +94,7 @@ func testRegUser() {
 func testLogin() {
 	authdat := &mcs.AuthDat{
 		Username: "jim",
-		Password: "letmein",
+		Password: "letmeinaaa",
 	}
 	hostReg1 := &mcs.MCS{
 		AuthDat: authdat,
@@ -53,7 +103,7 @@ func testLogin() {
 	if err != nil {
 		panic(err)
 	}
-	url := "http://" + SERVER + "/login"
+	url := "http://" + DTSERVER + "/login"
 	resp, err := http.Post(url, "", bytes.NewBuffer(hdata1))
 	if err != nil {
 		panic(err)
@@ -76,7 +126,7 @@ func testLogin() {
 	}
 
 	hostReg := &mcs.MCS{
-		Hostname:  "192.168.206.197",
+		Hostname:  "2.168.206.197",
 		Interface: "eth0",
 		AuthDat:   authdat2,
 	}
@@ -84,12 +134,12 @@ func testLogin() {
 	if err != nil {
 		panic(err)
 	}
-	url = "http://" + SERVER + "/register/host"
+	url = "http://" + DTSERVER + "/register/host"
 	_, err = http.Post(url, "", bytes.NewBuffer(hdata))
 	if err != nil {
 		panic(err)
 	}
-	url = "http://" + SERVER + "/list/hosts"
+	url = "http://" + DTSERVER + "/list/hosts"
 	resp, err = http.Get(url)
 	if err != nil {
 		panic(err)
@@ -118,12 +168,12 @@ func testRegHost() {
 	if err != nil {
 		panic(err)
 	}
-	url := "http://" + SERVER + "/register/host"
+	url := "http://" + DTSERVER + "/register/host"
 	_, err = http.Post(url, "", bytes.NewBuffer(hdata))
 	if err != nil {
 		panic(err)
 	}
-	url = "http://" + SERVER + "/list/hosts"
+	url = "http://" + DTSERVER + "/list/hosts"
 	resp, err := http.Get(url)
 	if err != nil {
 		panic(err)
