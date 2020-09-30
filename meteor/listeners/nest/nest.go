@@ -41,6 +41,17 @@ func status(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Nest is running...\n"))
 }
 
+func buildDT() {
+	newEnv := "mkdir /hostedfiles/dt; export GOOS=windows"
+	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
+	c := exec.Command("/bin/sh", "-c", compileCom)
+	c.Run()
+	newEnv = "export GOOS=linux"
+	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.exe; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
+	c = exec.Command("/bin/sh", "-c", compileCom)
+	c.Run()
+}
+
 func handleBuildReq(w http.ResponseWriter, r *http.Request) {
 	var br BuildReq
 	err := json.NewDecoder(r.Body).Decode(&br)
