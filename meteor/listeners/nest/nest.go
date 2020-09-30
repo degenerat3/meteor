@@ -29,7 +29,7 @@ type BuildReq struct {
 }
 
 func main() {
-	//buildDT()
+	buildDT()
 	http.HandleFunc("/", status)
 	http.HandleFunc("/status", status)
 	http.HandleFunc("/buildreq", handleBuildReq)
@@ -44,15 +44,10 @@ func status(w http.ResponseWriter, r *http.Request) {
 }
 
 func buildDT() {
-	c := exec.Command("/bin/sh", "-c", "go get github.com/degenerat3/meteor/meteor/clients/daddy_tops/...")
-	err := c.Run()
-	if err != nil {
-		panic(err)
-	}
 	newEnv := "export GOOS=windows"
-	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outBin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
-	c = exec.Command("/bin/sh", "-c", compileCom)
-	err = c.Run()
+	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go get ./...; go build -o outBin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
+	c := exec.Command("/bin/sh", "-c", compileCom)
+	err := c.Run()
 	if err != nil {
 		fmt.Println(err.Error())
 		panic(err)
