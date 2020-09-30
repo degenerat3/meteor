@@ -43,15 +43,15 @@ func status(w http.ResponseWriter, r *http.Request) {
 }
 
 func buildDT() {
-	newEnv := "mkdir /hostedfiles/dt; export GOOS=windows"
-	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
+	newEnv := "export GOOS=windows"
+	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outBin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
 	c := exec.Command("/bin/sh", "-c", compileCom)
 	err := c.Run()
 	if err != nil {
 		panic(err)
 	}
 	newEnv = "export GOOS=linux"
-	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.bin; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
+	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outBin.bin; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
 	c = exec.Command("/bin/sh", "-c", compileCom)
 	err = c.Run()
 	if err != nil {
