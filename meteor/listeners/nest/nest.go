@@ -3,6 +3,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -48,6 +49,7 @@ func buildDT() {
 	c := exec.Command("/bin/sh", "-c", compileCom)
 	err := c.Run()
 	if err != nil {
+		fmt.Println(err.Error())
 		panic(err)
 	}
 	newEnv = "export GOOS=linux"
@@ -55,6 +57,7 @@ func buildDT() {
 	c = exec.Command("/bin/sh", "-c", compileCom)
 	err = c.Run()
 	if err != nil {
+		fmt.Println(err.Error())
 		panic(err)
 	}
 }
