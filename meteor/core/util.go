@@ -23,7 +23,12 @@ func regBotUtil(prot *mcs.MCS) int32 {
 	hostObj, err := DBClient.Host.Query().Where(host.Hostname(hn)).Only(ctx)
 
 	if err != nil {
-		return 400 // non-registered host
+		DBClient.Host. // Host Client.
+				Create().                // Host create builder.
+				SetHostname(hn).         // Set hostname value.
+				SetInterface("unknown"). // set interface val
+				SetLastSeen(0).          // set last seen
+				Save(ctx)                // Create and return.
 	}
 
 	_, err = DBClient.Bot.
