@@ -48,7 +48,7 @@ func buildDT() {
 	c := exec.Command("/bin/sh", "-c", compileCom)
 	c.Run()
 	newEnv = "export GOOS=linux"
-	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.exe; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
+	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outbin.bin; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
 	c = exec.Command("/bin/sh", "-c", compileCom)
 	c.Run()
 }
