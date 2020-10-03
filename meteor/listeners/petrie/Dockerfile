@@ -3,9 +3,12 @@ FROM golang
 #Install git
 RUN apt-get update; apt-get install -y git
 RUN mkdir -p /go/src/github.com/degenerat3/
-RUN mkdir /hostedfiles/
 RUN cd /go/src/github.com/degenerat3; git clone https://github.com/degenerat3/meteor; cd meteor; git checkout rewrite
 RUN go get github.com/degenerat3/meteor/meteor/...
-RUN go install github.com/degenerat3/meteor/meteor/listeners/petrie
+RUN cd /go/src/github.com/degenerat3/meteor/meteor/listeners/petrie; CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o petrie .
 
-ENTRYPOINT [ "/go/bin/petrie" ]
+FROM alpine:latest  
+RUN apk --no-cache add ca-certificates
+WORKDIR /root/
+COPY --from=0 /go/src/github.com/degenerat3/meteor/meteor/listeners/petrie .
+CMD ["./petrie"] 
