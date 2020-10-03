@@ -368,7 +368,7 @@ func listGroupUtil(prot *mcs.MCS) string {
 		return "Error querying group"
 	}
 	for _, hst := range mems {
-		hstr := "	- " + hst.Hostname
+		hstr := "	- " + hst.Hostname + "\n"
 		grpStr = grpStr + hstr
 	}
 	return grpStr + "\n"
