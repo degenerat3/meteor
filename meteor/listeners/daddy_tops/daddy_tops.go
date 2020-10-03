@@ -46,6 +46,8 @@ func main() {
 	http.HandleFunc("/list/hosts", listForward)
 	http.HandleFunc("/list/groups", listForward)
 	http.HandleFunc("/list/actions", listForward)
+	http.HandleFunc("/list/host", forwardReq)
+	http.HandleFunc("/list/group", forwardReq)
 	log.Fatal(http.ListenAndServe(":8888", nil))
 	return
 }
