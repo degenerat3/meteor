@@ -85,9 +85,10 @@ func addActSingle(w http.ResponseWriter, r *http.Request) {
 	}
 	newAct := &mcs.MCS{}
 	proto.Unmarshal(data, newAct)
-	stat := addActSingleUtil(newAct)
+	stat, uid := addActSingleUtil(newAct)
 	resp := &mcs.MCS{
 		Status: stat,
+		Uuid:   uid,
 	}
 	rdata, _ := proto.Marshal(resp)
 	w.Write(rdata)

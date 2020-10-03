@@ -119,16 +119,16 @@ func regHGUtil(prot *mcs.MCS) int32 {
 
 }
 
-func addActSingleUtil(prot *mcs.MCS) int32 {
+func addActSingleUtil(prot *mcs.MCS) (int32, string) {
 	mode := prot.GetMode()
 	args := prot.GetArgs()
 	hn := prot.GetHostname()
 	if mode == "" || args == "" || hn == "" {
-		return 400 // missing param
+		return 400, "" // missing param
 	}
 	hostObj, err := DBClient.Host.Query().Where(host.Hostname(hn)).Only(ctx)
 	if err != nil {
-		return 400 // non-registered host
+		return 400, "" // non-registered host
 	}
 
 	uuid := goUUID.New().String()
@@ -143,10 +143,10 @@ func addActSingleUtil(prot *mcs.MCS) int32 {
 
 	if err != nil {
 		errLog.Printf("Error adding action '%s' with mode '%s', args '%s': %s", uuid, mode, args, err.Error())
-		return 500 // error adding action
+		return 500, "" // error adding action
 	}
 	infoLog.Printf("Added action '%s' targeting host '%s'\n", args, hn)
-	return 200
+	return 200, uuid
 }
 
 func addActGroupUtil(prot *mcs.MCS) int32 {
