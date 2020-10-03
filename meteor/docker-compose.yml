@@ -8,7 +8,7 @@ services:
       - "db"
     volumes:
       - /var/log/meteor/core:/var/log/meteor/core
-    command: sh -c "/wait && /go/bin/core"
+    command: sh -c "/wait && /root/core"
     environment:
       - WAIT_HOSTS=db:5432
       - WAIT_HOSTS_TIMEOUT=300
@@ -39,7 +39,7 @@ services:
       - "core"
     volumes:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
-    command: sh -c "/wait && /go/bin/daddy_tops"
+    command: sh -c "/wait && /root/daddy_tops_server"
     environment:
       - WAIT_HOSTS=db:5432
       - WAIT_HOSTS_TIMEOUT=300
