@@ -232,7 +232,8 @@ func handleResultKW(splitargs []string) string {
 		return "Error: missing argument"
 	}
 	resReg := &mcs.MCS{
-		Uuid: splitargs[0],
+		Uuid:    splitargs[0],
+		AuthDat: generateAuthData(),
 	}
 	bdata, _ := proto.Marshal(resReg)
 	url := "http://" + DTSERVER + "/list/result"

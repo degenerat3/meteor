@@ -6,6 +6,7 @@ import (
 
 func prm() {
 	shell := ishell.New()
+	shell.SetHomeHistoryPath(".dt_history")
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "action",
@@ -19,6 +20,14 @@ func prm() {
 		Name: "gaction",
 		Func: func(c *ishell.Context) {
 			retval := handleGroupActionKW(c.Args)
+			c.Println(retval)
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "result",
+		Func: func(c *ishell.Context) {
+			retval := handleResultKW(c.Args)
 			c.Println(retval)
 		},
 	})
