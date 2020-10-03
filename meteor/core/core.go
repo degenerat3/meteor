@@ -53,6 +53,8 @@ func main() {
 	http.HandleFunc("/list/groups", listGroups)
 	http.HandleFunc("/list/actions", listActions)
 	http.HandleFunc("/list/result", listResult)
+	http.HandleFunc("/list/host", listHost)
+	http.HandleFunc("/list/group", listGroup)
 	infoLog.Println(http.ListenAndServe(":9999", nil))
 	return
 }

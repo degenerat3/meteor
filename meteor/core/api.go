@@ -196,3 +196,19 @@ func listResult(w http.ResponseWriter, r *http.Request) {
 	rdata, _ := proto.Marshal(resp)
 	w.Write(rdata)
 }
+
+func listHost(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		errLog.Println(err.Error())
+	}
+	resProt := &mcs.MCS{}
+	proto.Unmarshal(data, resProt)
+	res := listHostUtil(resProt)
+	resp := &mcs.MCS{
+		Status: 200,
+		Desc:   res,
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+}
