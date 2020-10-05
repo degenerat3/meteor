@@ -32,3 +32,19 @@ message AuthDat {
     string password = 2;    // password
     string token = 3;       // login session token
 }
+
+/*Proto for Cera Transfer Protocol */
+message CTP {
+    int32 session_id = 1;     // unique int will be generated for each session
+    bytes payload = 2;        // the actual data being sent will go here
+    bytes checksum = 3;       // last 8 digits of payload SHA1 will go here
+  
+    enum Flag {               
+        SESSION_INIT = 0;     // used by client to propose session ID
+        ACK = 1;              // generic acknowledge, multiple uses
+        DATA = 2;             // data transfer
+        FIN = 3;              // transfer is complete
+        RETRANS = 4;          // request retransmission of prev packet
+    }
+    Flag type_flag = 4;       // flag to say what type of data is in the payload
+  }

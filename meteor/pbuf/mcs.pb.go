@@ -27,6 +27,61 @@ const (
 // of the legacy proto package is being used.
 const _ = proto.ProtoPackageIsVersion4
 
+type CTP_Flag int32
+
+const (
+	CTP_SESSION_INIT CTP_Flag = 0 // used by client to propose session ID
+	CTP_ACK          CTP_Flag = 1 // generic acknowledge, multiple uses
+	CTP_DATA         CTP_Flag = 2 // data transfer
+	CTP_FIN          CTP_Flag = 3 // transfer is complete
+	CTP_RETRANS      CTP_Flag = 4 // request retransmission of prev packet
+)
+
+// Enum value maps for CTP_Flag.
+var (
+	CTP_Flag_name = map[int32]string{
+		0: "SESSION_INIT",
+		1: "ACK",
+		2: "DATA",
+		3: "FIN",
+		4: "RETRANS",
+	}
+	CTP_Flag_value = map[string]int32{
+		"SESSION_INIT": 0,
+		"ACK":          1,
+		"DATA":         2,
+		"FIN":          3,
+		"RETRANS":      4,
+	}
+)
+
+func (x CTP_Flag) Enum() *CTP_Flag {
+	p := new(CTP_Flag)
+	*p = x
+	return p
+}
+
+func (x CTP_Flag) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CTP_Flag) Descriptor() protoreflect.EnumDescriptor {
+	return file_mcs_proto_enumTypes[0].Descriptor()
+}
+
+func (CTP_Flag) Type() protoreflect.EnumType {
+	return &file_mcs_proto_enumTypes[0]
+}
+
+func (x CTP_Flag) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CTP_Flag.Descriptor instead.
+func (CTP_Flag) EnumDescriptor() ([]byte, []int) {
+	return file_mcs_proto_rawDescGZIP(), []int{3, 0}
+}
+
 // Meteor Communication Standard
 type MCS struct {
 	state         protoimpl.MessageState
@@ -299,6 +354,78 @@ func (x *AuthDat) GetToken() string {
 	return ""
 }
 
+//Proto for Cera Transfer Protocol
+type CTP struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	SessionId int32    `protobuf:"varint,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`            // unique int will be generated for each session
+	Payload   []byte   `protobuf:"bytes,2,opt,name=payload,proto3" json:"payload,omitempty"`                                  // the actual data being sent will go here
+	Checksum  []byte   `protobuf:"bytes,3,opt,name=checksum,proto3" json:"checksum,omitempty"`                                // last 8 digits of payload SHA1 will go here
+	TypeFlag  CTP_Flag `protobuf:"varint,4,opt,name=type_flag,json=typeFlag,proto3,enum=CTP_Flag" json:"type_flag,omitempty"` // flag to say what type of data is in the payload
+}
+
+func (x *CTP) Reset() {
+	*x = CTP{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_mcs_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CTP) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CTP) ProtoMessage() {}
+
+func (x *CTP) ProtoReflect() protoreflect.Message {
+	mi := &file_mcs_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CTP.ProtoReflect.Descriptor instead.
+func (*CTP) Descriptor() ([]byte, []int) {
+	return file_mcs_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CTP) GetSessionId() int32 {
+	if x != nil {
+		return x.SessionId
+	}
+	return 0
+}
+
+func (x *CTP) GetPayload() []byte {
+	if x != nil {
+		return x.Payload
+	}
+	return nil
+}
+
+func (x *CTP) GetChecksum() []byte {
+	if x != nil {
+		return x.Checksum
+	}
+	return nil
+}
+
+func (x *CTP) GetTypeFlag() CTP_Flag {
+	if x != nil {
+		return x.TypeFlag
+	}
+	return CTP_SESSION_INIT
+}
+
 var File_mcs_proto protoreflect.FileDescriptor
 
 var file_mcs_proto_rawDesc = []byte{
@@ -334,7 +461,20 @@ var file_mcs_proto_rawDesc = []byte{
 	0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x18, 0x02, 0x20,
 	0x01, 0x28, 0x09, 0x52, 0x08, 0x70, 0x61, 0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x12, 0x14, 0x0a,
 	0x05, 0x74, 0x6f, 0x6b, 0x65, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x6f,
-	0x6b, 0x65, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6b, 0x65, 0x6e, 0x22, 0xc5, 0x01, 0x0a, 0x03, 0x43, 0x54, 0x50, 0x12, 0x1d, 0x0a, 0x0a, 0x73,
+	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x09, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x61,
+	0x79, 0x6c, 0x6f, 0x61, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x70, 0x61, 0x79,
+	0x6c, 0x6f, 0x61, 0x64, 0x12, 0x1a, 0x0a, 0x08, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x73, 0x75, 0x6d,
+	0x18, 0x03, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x08, 0x63, 0x68, 0x65, 0x63, 0x6b, 0x73, 0x75, 0x6d,
+	0x12, 0x26, 0x0a, 0x09, 0x74, 0x79, 0x70, 0x65, 0x5f, 0x66, 0x6c, 0x61, 0x67, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x0e, 0x32, 0x09, 0x2e, 0x43, 0x54, 0x50, 0x2e, 0x46, 0x6c, 0x61, 0x67, 0x52, 0x08,
+	0x74, 0x79, 0x70, 0x65, 0x46, 0x6c, 0x61, 0x67, 0x22, 0x41, 0x0a, 0x04, 0x46, 0x6c, 0x61, 0x67,
+	0x12, 0x10, 0x0a, 0x0c, 0x53, 0x45, 0x53, 0x53, 0x49, 0x4f, 0x4e, 0x5f, 0x49, 0x4e, 0x49, 0x54,
+	0x10, 0x00, 0x12, 0x07, 0x0a, 0x03, 0x41, 0x43, 0x4b, 0x10, 0x01, 0x12, 0x08, 0x0a, 0x04, 0x44,
+	0x41, 0x54, 0x41, 0x10, 0x02, 0x12, 0x07, 0x0a, 0x03, 0x46, 0x49, 0x4e, 0x10, 0x03, 0x12, 0x0b,
+	0x0a, 0x07, 0x52, 0x45, 0x54, 0x52, 0x41, 0x4e, 0x53, 0x10, 0x04, 0x62, 0x06, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x33,
 }
 
 var (
@@ -349,20 +489,24 @@ func file_mcs_proto_rawDescGZIP() []byte {
 	return file_mcs_proto_rawDescData
 }
 
-var file_mcs_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_mcs_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_mcs_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_mcs_proto_goTypes = []interface{}{
-	(*MCS)(nil),     // 0: MCS
-	(*Action)(nil),  // 1: Action
-	(*AuthDat)(nil), // 2: AuthDat
+	(CTP_Flag)(0),   // 0: CTP.Flag
+	(*MCS)(nil),     // 1: MCS
+	(*Action)(nil),  // 2: Action
+	(*AuthDat)(nil), // 3: AuthDat
+	(*CTP)(nil),     // 4: CTP
 }
 var file_mcs_proto_depIdxs = []int32{
-	1, // 0: MCS.actions:type_name -> Action
-	2, // 1: MCS.authDat:type_name -> AuthDat
-	2, // [2:2] is the sub-list for method output_type
-	2, // [2:2] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	2, // 0: MCS.actions:type_name -> Action
+	3, // 1: MCS.authDat:type_name -> AuthDat
+	0, // 2: CTP.type_flag:type_name -> CTP.Flag
+	3, // [3:3] is the sub-list for method output_type
+	3, // [3:3] is the sub-list for method input_type
+	3, // [3:3] is the sub-list for extension type_name
+	3, // [3:3] is the sub-list for extension extendee
+	0, // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_mcs_proto_init() }
@@ -407,19 +551,32 @@ func file_mcs_proto_init() {
 				return nil
 			}
 		}
+		file_mcs_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CTP); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_mcs_proto_rawDesc,
-			NumEnums:      0,
-			NumMessages:   3,
+			NumEnums:      1,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
 		GoTypes:           file_mcs_proto_goTypes,
 		DependencyIndexes: file_mcs_proto_depIdxs,
+		EnumInfos:         file_mcs_proto_enumTypes,
 		MessageInfos:      file_mcs_proto_msgTypes,
 	}.Build()
 	File_mcs_proto = out.File
