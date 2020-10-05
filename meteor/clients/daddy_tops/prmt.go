@@ -41,6 +41,14 @@ func prm() {
 	})
 
 	shell.AddCmd(&ishell.Cmd{
+		Name: "build",
+		Func: func(c *ishell.Context) {
+			retval := handleBuild(c.Args)
+			c.Println(retval)
+		},
+	})
+
+	shell.AddCmd(&ishell.Cmd{
 		Name: "help",
 		Func: func(c *ishell.Context) {
 			retval := handleHelpKW()
