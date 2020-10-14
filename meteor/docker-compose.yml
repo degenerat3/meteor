@@ -39,7 +39,7 @@ services:
       - "core"
     volumes:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
-    command: sh -c "/wait && /root/daddy_tops_serv"
+    command: sh -c "/wait && /root/daddy_tops"
     environment:
       - WAIT_HOSTS=db:5432
       - WAIT_HOSTS_TIMEOUT=300
