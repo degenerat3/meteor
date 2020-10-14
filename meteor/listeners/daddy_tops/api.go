@@ -185,3 +185,34 @@ func listForward(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write(rdata)
 }
+
+func buildReq(w http.ResponseWriter, r *http.Request) {
+	bytmessage, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		resp := &mcs.MCS{
+			Status: 500,
+		}
+		rdata, _ := proto.Marshal(resp)
+		w.Write(rdata)
+	}
+	if NESTSERVER == "" {
+		fmt.Println("NEST_SERVER is not defined, unable to build")
+		resp := &mcs.MCS{
+			Status: 500,
+		}
+		rdata, _ := proto.Marshal(resp)
+		w.Write(rdata)
+	}
+	url := "http://" + NESTSERVER + "/buildreq"
+	resp, err := http.Post(url, "application/json", bytes.NewBuffer(bytmessage))
+	if err != nil {
+		resp := &mcs.MCS{
+			Status: 500,
+		}
+		rdata, _ := proto.Marshal(resp)
+		w.Write(rdata)
+	}
+	ret, _ := ioutil.ReadAll(resp.Body)
+	w.Write(ret)
+
+}

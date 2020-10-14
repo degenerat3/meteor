@@ -14,6 +14,9 @@ var (
 	// CORESERVER is the IP:Port of the Meteor core
 	CORESERVER = os.Getenv("CORE_SERVER") // format: 9.9.9.9:9999
 
+	// NESTSERVER is the IP:Port of the Nest listener
+	NESTSERVER = os.Getenv("NEST_SERVER")
+
 	// DBClient is the connector to the postgres db
 	DBClient *ent.Client
 
@@ -48,6 +51,7 @@ func main() {
 	http.HandleFunc("/list/actions", listForward)
 	http.HandleFunc("/list/host", forwardReq)
 	http.HandleFunc("/list/group", forwardReq)
+	http.HandleFunc("/buildreq", buildReq)
 	log.Fatal(http.ListenAndServe(":8888", nil))
 	return
 }
