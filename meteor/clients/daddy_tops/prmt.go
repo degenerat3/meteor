@@ -7,6 +7,7 @@ import (
 func prm() {
 	shell := ishell.New()
 	shell.SetHomeHistoryPath(".dt_history")
+	shell.Actions.SetPrompt("DT>")
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "action",
