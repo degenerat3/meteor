@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"encoding/base64"
 	lUtils "github.com/degenerat3/meteor/meteor/listeners/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
@@ -57,8 +57,8 @@ func handleCTPPayload(respProto *mcs.CTP, peer net.Addr, conn *icmp.PacketConn) 
 	switch respFlag := respProto.GetTypeFlag(); respFlag {
 	case 0: // session init
 		ses := genSession(respProto, peer)
-		writeToListener(conn, peer, ses.sid, []byte("sidack"), []byte(""), 1)
-		updateSessionCache(ses.sid, []byte("sidack"), []byte(""), 1)
+		writeToListener(conn, peer, ses.sid, []byte("sidAck"), []byte(""), 1)
+		updateSessionCache(ses.sid, []byte("sidAck"), []byte(""), 1)
 		return
 	case 1: // ack
 		switch rcvdPyld := string(respProto.GetPayload()); rcvdPyld {
@@ -125,9 +125,8 @@ func handleMCSPayload(data []byte) []byte {
 		warnLog.Println("Recieved an unknown mode")
 		retData = []byte("")
 	}
-	fmt.Println(retData)
-	// send that data to the client
-	return retData
+	encoded := base64.StdEncoding.EncodeToString(retData)
+	return []byte(encoded)
 }
 
 func genSession(respProto *mcs.CTP, peer net.Addr) session {
