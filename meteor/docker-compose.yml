@@ -79,6 +79,20 @@ services:
     networks:
       meteornet: 
         ipv4_address: 172.16.77.6
+  
+  petrie:
+    build:
+      context: listeners/cera/
+    volumes:
+      - /var/log/meteor/cera:/var/log/meteor/cera
+      - ./bin:/app
+    environment:
+      - CORE_SERVER=172.16.77.2:9999
+      - LOGPATH=/var/log/meteor/cera/cera.log
+    restart: always
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.6
 
 
 networks:
