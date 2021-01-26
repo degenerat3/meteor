@@ -7,7 +7,7 @@ import (
 	goUUID "github.com/google/uuid"
 )
 
-func genRegister(interval int, delta int, regFile string, obfText string) string {
+func genRegisterRaw(interval int, delta int, regFile string, obfText string) []byte {
 	uuid := goUUID.New().String()
 	storeUUID(regFile, uuid, obfText)
 	hostname := getIP()
@@ -19,45 +19,64 @@ func genRegister(interval int, delta int, regFile string, obfText string) string
 		Mode:     "register",
 	}
 	data, _ := proto.Marshal(pro)
+	return data
+}
+
+// GenRegister returns b64 of the registration payload
+func GenRegister(interval int, delta int, regFile string, obfText string) string {
+	data := genRegisterRaw(interval, delta, regFile, obfText)
 	encoded := encodePayload(data)
 	return encoded
 }
 
-// GenRegister is the exported version of the registration payload generator
-func GenRegister(interval int, delta int, regFile string, obfText string) string {
-	return genRegister(interval, delta, regFile, obfText)
+// GenRegisterRaw returns raw MCS bytes of registration payload
+func GenRegisterRaw(interval int, delta int, regFile string, obfText string) []byte {
+	return genRegisterRaw(interval, delta, regFile, obfText)
+
 }
 
-func genCheckin(regFile string, obfText string) string {
+func genCheckinRaw(regFile string, obfText string) []byte {
 	uuid := fetchUUID(regFile, obfText)
 	pro := &mcs.MCS{
 		Uuid: uuid,
 		Mode: "checkin",
 	}
 	data, _ := proto.Marshal(pro)
+	return data
+}
+
+// GenCheckin returns the b64 of the "check in" payload
+func GenCheckin(regFile string, obfText string) string {
+	data := genCheckinRaw(regFile, obfText)
 	encoded := encodePayload(data)
 	return encoded
 }
 
-// GenCheckin is the exported version of the checkIn payload generator
-func GenCheckin(regFile string, obfText string) string {
-	return genCheckin(regFile, obfText)
+// GenCheckinRaw returns the raw MCS bytes of the "check in" payload
+func GenCheckinRaw(regFile string, obfText string) []byte {
+	return genCheckinRaw(regFile, obfText)
 }
 
-func genAddResult(uuid string, result string) string {
+func genAddResultRaw(uuid string, result string) []byte {
 	pro := &mcs.MCS{
 		Uuid:   uuid,
 		Result: result,
 		Mode:   "addResult",
 	}
 	data, _ := proto.Marshal(pro)
+	return data
+}
+
+// GenAddResult returns the b64 of the "result add" payload
+func GenAddResult(uuid string, result string) string {
+	data := genAddResultRaw(uuid, result)
 	encoded := encodePayload(data)
 	return encoded
 }
 
-// GenAddResult is the exported version of the result add payload generator
-func GenAddResult(uuid string, result string) string {
-	return genAddResult(uuid, result)
+// GenAddResultRaw returns the raw MCS bytes of the "result add" payload
+func GenAddResultRaw(uuid string, result string) []byte {
+	return genAddResultRaw(uuid, result)
 }
 
 func encodePayload(proto []byte) string {
