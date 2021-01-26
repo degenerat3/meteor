@@ -6,4 +6,4 @@ RUN mkdir -p /go/src/github.com/degenerat3/
 RUN cd /go/src/github.com/degenerat3; git clone https://github.com/degenerat3/meteor; cd meteor; git checkout rewrite
 RUN go get github.com/degenerat3/meteor/meteor/...
 RUN cd /go/src/github.com/degenerat3/meteor/meteor/listeners/cera; CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cera .
-COPY /go/src/github.com/degenerat3/meteor/meteor/listeners/cera/cera /app/cera_listener
+#COPY /go/src/github.com/degenerat3/meteor/meteor/listeners/cera/cera /app/cera_listener
