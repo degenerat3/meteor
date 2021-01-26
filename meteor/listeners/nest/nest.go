@@ -14,7 +14,7 @@ import (
 )
 
 // ValidClients is a ist of bot clients that have src code written (note: commander clients are not valid, only actual "bots")
-var ValidClients = []string{"cera", "petrie"}
+var ValidClients = []string{"cera", "petrie", "little_foot"}
 
 // BuildReq is the struct that holds the required fields for requesting a new client build
 type BuildReq struct {

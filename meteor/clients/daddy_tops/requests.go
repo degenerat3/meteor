@@ -474,7 +474,7 @@ func handleBuild(splitargs []string) string {
 
 func handleBuildAgent() string {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("\nClient type (petrie | cera): ")
+	fmt.Print("\nClient type (petrie | cera | little_foot): ")
 	cn, _ := reader.ReadString('\n')
 	cn = strings.TrimSuffix(cn, "\n")
 	cn = strings.TrimSuffix(cn, "\r")
