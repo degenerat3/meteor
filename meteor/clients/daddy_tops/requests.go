@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/degenerat3/meteor/meteor/pbuf"
@@ -253,9 +254,13 @@ func handleResultKW(splitargs []string) string {
 		return err.Error()
 	}
 	if stat.GetStatus() != 200 {
-		return "Error querying action"
+		return "Error querying action\n"
 	}
-	return stat.GetDesc()
+	decoded, err := base64.StdEncoding.DecodeString(stat.GetDesc())
+	if err != nil {
+		return "Error decoding base64 data\n"
+	}
+	return string(decoded)
 }
 
 func handleListKW(splitargs []string) string {
