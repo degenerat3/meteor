@@ -93,6 +93,20 @@ services:
       meteornet: 
         ipv4_address: 172.16.77.7
 
+  little_Foot:
+    build:
+      context: listeners/little_foot/
+    volumes:
+      - /var/log/meteor/little_foot:/var/log/meteor/little_foot
+      - ./bin:/app
+    environment:
+      - CORE_SERVER=172.16.77.2:9999
+      - LOGPATH=/var/log/meteor/little_foot/little_foot.log
+      - LF_PORT=8080
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.8
+
 
 networks:
   meteornet:
