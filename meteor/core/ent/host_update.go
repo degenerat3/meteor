@@ -19,37 +19,36 @@ import (
 // HostUpdate is the builder for updating Host entities.
 type HostUpdate struct {
 	config
-	hooks      []Hook
-	mutation   *HostMutation
-	predicates []predicate.Host
+	hooks    []Hook
+	mutation *HostMutation
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the HostUpdate builder.
 func (hu *HostUpdate) Where(ps ...predicate.Host) *HostUpdate {
-	hu.predicates = append(hu.predicates, ps...)
+	hu.mutation.predicates = append(hu.mutation.predicates, ps...)
 	return hu
 }
 
-// SetHostname sets the hostname field.
+// SetHostname sets the "hostname" field.
 func (hu *HostUpdate) SetHostname(s string) *HostUpdate {
 	hu.mutation.SetHostname(s)
 	return hu
 }
 
-// SetInterface sets the interface field.
+// SetInterface sets the "interface" field.
 func (hu *HostUpdate) SetInterface(s string) *HostUpdate {
 	hu.mutation.SetInterface(s)
 	return hu
 }
 
-// SetLastSeen sets the lastSeen field.
+// SetLastSeen sets the "lastSeen" field.
 func (hu *HostUpdate) SetLastSeen(i int) *HostUpdate {
 	hu.mutation.ResetLastSeen()
 	hu.mutation.SetLastSeen(i)
 	return hu
 }
 
-// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+// SetNillableLastSeen sets the "lastSeen" field if the given value is not nil.
 func (hu *HostUpdate) SetNillableLastSeen(i *int) *HostUpdate {
 	if i != nil {
 		hu.SetLastSeen(*i)
@@ -57,19 +56,19 @@ func (hu *HostUpdate) SetNillableLastSeen(i *int) *HostUpdate {
 	return hu
 }
 
-// AddLastSeen adds i to lastSeen.
+// AddLastSeen adds i to the "lastSeen" field.
 func (hu *HostUpdate) AddLastSeen(i int) *HostUpdate {
 	hu.mutation.AddLastSeen(i)
 	return hu
 }
 
-// AddBotIDs adds the bots edge to Bot by ids.
+// AddBotIDs adds the "bots" edge to the Bot entity by IDs.
 func (hu *HostUpdate) AddBotIDs(ids ...int) *HostUpdate {
 	hu.mutation.AddBotIDs(ids...)
 	return hu
 }
 
-// AddBots adds the bots edges to Bot.
+// AddBots adds the "bots" edges to the Bot entity.
 func (hu *HostUpdate) AddBots(b ...*Bot) *HostUpdate {
 	ids := make([]int, len(b))
 	for i := range b {
@@ -78,13 +77,13 @@ func (hu *HostUpdate) AddBots(b ...*Bot) *HostUpdate {
 	return hu.AddBotIDs(ids...)
 }
 
-// AddActionIDs adds the actions edge to Action by ids.
+// AddActionIDs adds the "actions" edge to the Action entity by IDs.
 func (hu *HostUpdate) AddActionIDs(ids ...int) *HostUpdate {
 	hu.mutation.AddActionIDs(ids...)
 	return hu
 }
 
-// AddActions adds the actions edges to Action.
+// AddActions adds the "actions" edges to the Action entity.
 func (hu *HostUpdate) AddActions(a ...*Action) *HostUpdate {
 	ids := make([]int, len(a))
 	for i := range a {
@@ -93,13 +92,13 @@ func (hu *HostUpdate) AddActions(a ...*Action) *HostUpdate {
 	return hu.AddActionIDs(ids...)
 }
 
-// AddMemberIDs adds the member edge to Group by ids.
+// AddMemberIDs adds the "member" edge to the Group entity by IDs.
 func (hu *HostUpdate) AddMemberIDs(ids ...int) *HostUpdate {
 	hu.mutation.AddMemberIDs(ids...)
 	return hu
 }
 
-// AddMember adds the member edges to Group.
+// AddMember adds the "member" edges to the Group entity.
 func (hu *HostUpdate) AddMember(g ...*Group) *HostUpdate {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -113,13 +112,19 @@ func (hu *HostUpdate) Mutation() *HostMutation {
 	return hu.mutation
 }
 
-// RemoveBotIDs removes the bots edge to Bot by ids.
+// ClearBots clears all "bots" edges to the Bot entity.
+func (hu *HostUpdate) ClearBots() *HostUpdate {
+	hu.mutation.ClearBots()
+	return hu
+}
+
+// RemoveBotIDs removes the "bots" edge to Bot entities by IDs.
 func (hu *HostUpdate) RemoveBotIDs(ids ...int) *HostUpdate {
 	hu.mutation.RemoveBotIDs(ids...)
 	return hu
 }
 
-// RemoveBots removes bots edges to Bot.
+// RemoveBots removes "bots" edges to Bot entities.
 func (hu *HostUpdate) RemoveBots(b ...*Bot) *HostUpdate {
 	ids := make([]int, len(b))
 	for i := range b {
@@ -128,13 +133,19 @@ func (hu *HostUpdate) RemoveBots(b ...*Bot) *HostUpdate {
 	return hu.RemoveBotIDs(ids...)
 }
 
-// RemoveActionIDs removes the actions edge to Action by ids.
+// ClearActions clears all "actions" edges to the Action entity.
+func (hu *HostUpdate) ClearActions() *HostUpdate {
+	hu.mutation.ClearActions()
+	return hu
+}
+
+// RemoveActionIDs removes the "actions" edge to Action entities by IDs.
 func (hu *HostUpdate) RemoveActionIDs(ids ...int) *HostUpdate {
 	hu.mutation.RemoveActionIDs(ids...)
 	return hu
 }
 
-// RemoveActions removes actions edges to Action.
+// RemoveActions removes "actions" edges to Action entities.
 func (hu *HostUpdate) RemoveActions(a ...*Action) *HostUpdate {
 	ids := make([]int, len(a))
 	for i := range a {
@@ -143,13 +154,19 @@ func (hu *HostUpdate) RemoveActions(a ...*Action) *HostUpdate {
 	return hu.RemoveActionIDs(ids...)
 }
 
-// RemoveMemberIDs removes the member edge to Group by ids.
+// ClearMember clears all "member" edges to the Group entity.
+func (hu *HostUpdate) ClearMember() *HostUpdate {
+	hu.mutation.ClearMember()
+	return hu
+}
+
+// RemoveMemberIDs removes the "member" edge to Group entities by IDs.
 func (hu *HostUpdate) RemoveMemberIDs(ids ...int) *HostUpdate {
 	hu.mutation.RemoveMemberIDs(ids...)
 	return hu
 }
 
-// RemoveMember removes member edges to Group.
+// RemoveMember removes "member" edges to Group entities.
 func (hu *HostUpdate) RemoveMember(g ...*Group) *HostUpdate {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -158,9 +175,8 @@ func (hu *HostUpdate) RemoveMember(g ...*Group) *HostUpdate {
 	return hu.RemoveMemberIDs(ids...)
 }
 
-// Save executes the query and returns the number of rows/vertices matched by this operation.
+// Save executes the query and returns the number of nodes affected by the update operation.
 func (hu *HostUpdate) Save(ctx context.Context) (int, error) {
-
 	var (
 		err      error
 		affected int
@@ -221,7 +237,7 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		},
 	}
-	if ps := hu.predicates; len(ps) > 0 {
+	if ps := hu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -256,7 +272,23 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: host.FieldLastSeen,
 		})
 	}
-	if nodes := hu.mutation.RemovedBotsIDs(); len(nodes) > 0 {
+	if hu.mutation.BotsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   host.BotsTable,
+			Columns: []string{host.BotsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bot.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := hu.mutation.RemovedBotsIDs(); len(nodes) > 0 && !hu.mutation.BotsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -294,7 +326,23 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := hu.mutation.RemovedActionsIDs(); len(nodes) > 0 {
+	if hu.mutation.ActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   host.ActionsTable,
+			Columns: []string{host.ActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: action.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := hu.mutation.RemovedActionsIDs(); len(nodes) > 0 && !hu.mutation.ActionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -332,7 +380,23 @@ func (hu *HostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := hu.mutation.RemovedMemberIDs(); len(nodes) > 0 {
+	if hu.mutation.MemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   host.MemberTable,
+			Columns: host.MemberPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: group.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := hu.mutation.RemovedMemberIDs(); len(nodes) > 0 && !hu.mutation.MemberCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -388,26 +452,26 @@ type HostUpdateOne struct {
 	mutation *HostMutation
 }
 
-// SetHostname sets the hostname field.
+// SetHostname sets the "hostname" field.
 func (huo *HostUpdateOne) SetHostname(s string) *HostUpdateOne {
 	huo.mutation.SetHostname(s)
 	return huo
 }
 
-// SetInterface sets the interface field.
+// SetInterface sets the "interface" field.
 func (huo *HostUpdateOne) SetInterface(s string) *HostUpdateOne {
 	huo.mutation.SetInterface(s)
 	return huo
 }
 
-// SetLastSeen sets the lastSeen field.
+// SetLastSeen sets the "lastSeen" field.
 func (huo *HostUpdateOne) SetLastSeen(i int) *HostUpdateOne {
 	huo.mutation.ResetLastSeen()
 	huo.mutation.SetLastSeen(i)
 	return huo
 }
 
-// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+// SetNillableLastSeen sets the "lastSeen" field if the given value is not nil.
 func (huo *HostUpdateOne) SetNillableLastSeen(i *int) *HostUpdateOne {
 	if i != nil {
 		huo.SetLastSeen(*i)
@@ -415,19 +479,19 @@ func (huo *HostUpdateOne) SetNillableLastSeen(i *int) *HostUpdateOne {
 	return huo
 }
 
-// AddLastSeen adds i to lastSeen.
+// AddLastSeen adds i to the "lastSeen" field.
 func (huo *HostUpdateOne) AddLastSeen(i int) *HostUpdateOne {
 	huo.mutation.AddLastSeen(i)
 	return huo
 }
 
-// AddBotIDs adds the bots edge to Bot by ids.
+// AddBotIDs adds the "bots" edge to the Bot entity by IDs.
 func (huo *HostUpdateOne) AddBotIDs(ids ...int) *HostUpdateOne {
 	huo.mutation.AddBotIDs(ids...)
 	return huo
 }
 
-// AddBots adds the bots edges to Bot.
+// AddBots adds the "bots" edges to the Bot entity.
 func (huo *HostUpdateOne) AddBots(b ...*Bot) *HostUpdateOne {
 	ids := make([]int, len(b))
 	for i := range b {
@@ -436,13 +500,13 @@ func (huo *HostUpdateOne) AddBots(b ...*Bot) *HostUpdateOne {
 	return huo.AddBotIDs(ids...)
 }
 
-// AddActionIDs adds the actions edge to Action by ids.
+// AddActionIDs adds the "actions" edge to the Action entity by IDs.
 func (huo *HostUpdateOne) AddActionIDs(ids ...int) *HostUpdateOne {
 	huo.mutation.AddActionIDs(ids...)
 	return huo
 }
 
-// AddActions adds the actions edges to Action.
+// AddActions adds the "actions" edges to the Action entity.
 func (huo *HostUpdateOne) AddActions(a ...*Action) *HostUpdateOne {
 	ids := make([]int, len(a))
 	for i := range a {
@@ -451,13 +515,13 @@ func (huo *HostUpdateOne) AddActions(a ...*Action) *HostUpdateOne {
 	return huo.AddActionIDs(ids...)
 }
 
-// AddMemberIDs adds the member edge to Group by ids.
+// AddMemberIDs adds the "member" edge to the Group entity by IDs.
 func (huo *HostUpdateOne) AddMemberIDs(ids ...int) *HostUpdateOne {
 	huo.mutation.AddMemberIDs(ids...)
 	return huo
 }
 
-// AddMember adds the member edges to Group.
+// AddMember adds the "member" edges to the Group entity.
 func (huo *HostUpdateOne) AddMember(g ...*Group) *HostUpdateOne {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -471,13 +535,19 @@ func (huo *HostUpdateOne) Mutation() *HostMutation {
 	return huo.mutation
 }
 
-// RemoveBotIDs removes the bots edge to Bot by ids.
+// ClearBots clears all "bots" edges to the Bot entity.
+func (huo *HostUpdateOne) ClearBots() *HostUpdateOne {
+	huo.mutation.ClearBots()
+	return huo
+}
+
+// RemoveBotIDs removes the "bots" edge to Bot entities by IDs.
 func (huo *HostUpdateOne) RemoveBotIDs(ids ...int) *HostUpdateOne {
 	huo.mutation.RemoveBotIDs(ids...)
 	return huo
 }
 
-// RemoveBots removes bots edges to Bot.
+// RemoveBots removes "bots" edges to Bot entities.
 func (huo *HostUpdateOne) RemoveBots(b ...*Bot) *HostUpdateOne {
 	ids := make([]int, len(b))
 	for i := range b {
@@ -486,13 +556,19 @@ func (huo *HostUpdateOne) RemoveBots(b ...*Bot) *HostUpdateOne {
 	return huo.RemoveBotIDs(ids...)
 }
 
-// RemoveActionIDs removes the actions edge to Action by ids.
+// ClearActions clears all "actions" edges to the Action entity.
+func (huo *HostUpdateOne) ClearActions() *HostUpdateOne {
+	huo.mutation.ClearActions()
+	return huo
+}
+
+// RemoveActionIDs removes the "actions" edge to Action entities by IDs.
 func (huo *HostUpdateOne) RemoveActionIDs(ids ...int) *HostUpdateOne {
 	huo.mutation.RemoveActionIDs(ids...)
 	return huo
 }
 
-// RemoveActions removes actions edges to Action.
+// RemoveActions removes "actions" edges to Action entities.
 func (huo *HostUpdateOne) RemoveActions(a ...*Action) *HostUpdateOne {
 	ids := make([]int, len(a))
 	for i := range a {
@@ -501,13 +577,19 @@ func (huo *HostUpdateOne) RemoveActions(a ...*Action) *HostUpdateOne {
 	return huo.RemoveActionIDs(ids...)
 }
 
-// RemoveMemberIDs removes the member edge to Group by ids.
+// ClearMember clears all "member" edges to the Group entity.
+func (huo *HostUpdateOne) ClearMember() *HostUpdateOne {
+	huo.mutation.ClearMember()
+	return huo
+}
+
+// RemoveMemberIDs removes the "member" edge to Group entities by IDs.
 func (huo *HostUpdateOne) RemoveMemberIDs(ids ...int) *HostUpdateOne {
 	huo.mutation.RemoveMemberIDs(ids...)
 	return huo
 }
 
-// RemoveMember removes member edges to Group.
+// RemoveMember removes "member" edges to Group entities.
 func (huo *HostUpdateOne) RemoveMember(g ...*Group) *HostUpdateOne {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -516,9 +598,8 @@ func (huo *HostUpdateOne) RemoveMember(g ...*Group) *HostUpdateOne {
 	return huo.RemoveMemberIDs(ids...)
 }
 
-// Save executes the query and returns the updated entity.
+// Save executes the query and returns the updated Host entity.
 func (huo *HostUpdateOne) Save(ctx context.Context) (*Host, error) {
-
 	var (
 		err  error
 		node *Host
@@ -548,11 +629,11 @@ func (huo *HostUpdateOne) Save(ctx context.Context) (*Host, error) {
 
 // SaveX is like Save, but panics if an error occurs.
 func (huo *HostUpdateOne) SaveX(ctx context.Context) *Host {
-	h, err := huo.Save(ctx)
+	node, err := huo.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return h
+	return node
 }
 
 // Exec executes the query on the entity.
@@ -568,7 +649,7 @@ func (huo *HostUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
+func (huo *HostUpdateOne) sqlSave(ctx context.Context) (_node *Host, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   host.Table,
@@ -584,6 +665,13 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing Host.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if ps := huo.mutation.predicates; len(ps) > 0 {
+		_spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
 	if value, ok := huo.mutation.Hostname(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -612,7 +700,23 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 			Column: host.FieldLastSeen,
 		})
 	}
-	if nodes := huo.mutation.RemovedBotsIDs(); len(nodes) > 0 {
+	if huo.mutation.BotsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   host.BotsTable,
+			Columns: []string{host.BotsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: bot.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := huo.mutation.RemovedBotsIDs(); len(nodes) > 0 && !huo.mutation.BotsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -650,7 +754,23 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := huo.mutation.RemovedActionsIDs(); len(nodes) > 0 {
+	if huo.mutation.ActionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   host.ActionsTable,
+			Columns: []string{host.ActionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: action.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := huo.mutation.RemovedActionsIDs(); len(nodes) > 0 && !huo.mutation.ActionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -688,7 +808,23 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nodes := huo.mutation.RemovedMemberIDs(); len(nodes) > 0 {
+	if huo.mutation.MemberCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   host.MemberTable,
+			Columns: host.MemberPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: group.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := huo.mutation.RemovedMemberIDs(); len(nodes) > 0 && !huo.mutation.MemberCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -726,9 +862,9 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	h = &Host{config: huo.config}
-	_spec.Assign = h.assignValues
-	_spec.ScanValues = h.scanValues()
+	_node = &Host{config: huo.config}
+	_spec.Assign = _node.assignValues
+	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, huo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{host.Label}
@@ -737,5 +873,5 @@ func (huo *HostUpdateOne) sqlSave(ctx context.Context) (h *Host, err error) {
 		}
 		return nil, err
 	}
-	return h, nil
+	return _node, nil
 }

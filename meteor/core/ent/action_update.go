@@ -17,42 +17,41 @@ import (
 // ActionUpdate is the builder for updating Action entities.
 type ActionUpdate struct {
 	config
-	hooks      []Hook
-	mutation   *ActionMutation
-	predicates []predicate.Action
+	hooks    []Hook
+	mutation *ActionMutation
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the ActionUpdate builder.
 func (au *ActionUpdate) Where(ps ...predicate.Action) *ActionUpdate {
-	au.predicates = append(au.predicates, ps...)
+	au.mutation.predicates = append(au.mutation.predicates, ps...)
 	return au
 }
 
-// SetUUID sets the uuid field.
+// SetUUID sets the "uuid" field.
 func (au *ActionUpdate) SetUUID(s string) *ActionUpdate {
 	au.mutation.SetUUID(s)
 	return au
 }
 
-// SetMode sets the mode field.
+// SetMode sets the "mode" field.
 func (au *ActionUpdate) SetMode(s string) *ActionUpdate {
 	au.mutation.SetMode(s)
 	return au
 }
 
-// SetArgs sets the args field.
+// SetArgs sets the "args" field.
 func (au *ActionUpdate) SetArgs(s string) *ActionUpdate {
 	au.mutation.SetArgs(s)
 	return au
 }
 
-// SetQueued sets the queued field.
+// SetQueued sets the "queued" field.
 func (au *ActionUpdate) SetQueued(b bool) *ActionUpdate {
 	au.mutation.SetQueued(b)
 	return au
 }
 
-// SetNillableQueued sets the queued field if the given value is not nil.
+// SetNillableQueued sets the "queued" field if the given value is not nil.
 func (au *ActionUpdate) SetNillableQueued(b *bool) *ActionUpdate {
 	if b != nil {
 		au.SetQueued(*b)
@@ -60,13 +59,13 @@ func (au *ActionUpdate) SetNillableQueued(b *bool) *ActionUpdate {
 	return au
 }
 
-// SetResponded sets the responded field.
+// SetResponded sets the "responded" field.
 func (au *ActionUpdate) SetResponded(b bool) *ActionUpdate {
 	au.mutation.SetResponded(b)
 	return au
 }
 
-// SetNillableResponded sets the responded field if the given value is not nil.
+// SetNillableResponded sets the "responded" field if the given value is not nil.
 func (au *ActionUpdate) SetNillableResponded(b *bool) *ActionUpdate {
 	if b != nil {
 		au.SetResponded(*b)
@@ -74,13 +73,13 @@ func (au *ActionUpdate) SetNillableResponded(b *bool) *ActionUpdate {
 	return au
 }
 
-// SetResult sets the result field.
+// SetResult sets the "result" field.
 func (au *ActionUpdate) SetResult(s string) *ActionUpdate {
 	au.mutation.SetResult(s)
 	return au
 }
 
-// SetNillableResult sets the result field if the given value is not nil.
+// SetNillableResult sets the "result" field if the given value is not nil.
 func (au *ActionUpdate) SetNillableResult(s *string) *ActionUpdate {
 	if s != nil {
 		au.SetResult(*s)
@@ -88,13 +87,13 @@ func (au *ActionUpdate) SetNillableResult(s *string) *ActionUpdate {
 	return au
 }
 
-// SetTargetingID sets the targeting edge to Host by id.
+// SetTargetingID sets the "targeting" edge to the Host entity by ID.
 func (au *ActionUpdate) SetTargetingID(id int) *ActionUpdate {
 	au.mutation.SetTargetingID(id)
 	return au
 }
 
-// SetNillableTargetingID sets the targeting edge to Host by id if the given value is not nil.
+// SetNillableTargetingID sets the "targeting" edge to the Host entity by ID if the given value is not nil.
 func (au *ActionUpdate) SetNillableTargetingID(id *int) *ActionUpdate {
 	if id != nil {
 		au = au.SetTargetingID(*id)
@@ -102,7 +101,7 @@ func (au *ActionUpdate) SetNillableTargetingID(id *int) *ActionUpdate {
 	return au
 }
 
-// SetTargeting sets the targeting edge to Host.
+// SetTargeting sets the "targeting" edge to the Host entity.
 func (au *ActionUpdate) SetTargeting(h *Host) *ActionUpdate {
 	return au.SetTargetingID(h.ID)
 }
@@ -112,15 +111,14 @@ func (au *ActionUpdate) Mutation() *ActionMutation {
 	return au.mutation
 }
 
-// ClearTargeting clears the targeting edge to Host.
+// ClearTargeting clears the "targeting" edge to the Host entity.
 func (au *ActionUpdate) ClearTargeting() *ActionUpdate {
 	au.mutation.ClearTargeting()
 	return au
 }
 
-// Save executes the query and returns the number of rows/vertices matched by this operation.
+// Save executes the query and returns the number of nodes affected by the update operation.
 func (au *ActionUpdate) Save(ctx context.Context) (int, error) {
-
 	var (
 		err      error
 		affected int
@@ -181,7 +179,7 @@ func (au *ActionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		},
 	}
-	if ps := au.predicates; len(ps) > 0 {
+	if ps := au.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -283,31 +281,31 @@ type ActionUpdateOne struct {
 	mutation *ActionMutation
 }
 
-// SetUUID sets the uuid field.
+// SetUUID sets the "uuid" field.
 func (auo *ActionUpdateOne) SetUUID(s string) *ActionUpdateOne {
 	auo.mutation.SetUUID(s)
 	return auo
 }
 
-// SetMode sets the mode field.
+// SetMode sets the "mode" field.
 func (auo *ActionUpdateOne) SetMode(s string) *ActionUpdateOne {
 	auo.mutation.SetMode(s)
 	return auo
 }
 
-// SetArgs sets the args field.
+// SetArgs sets the "args" field.
 func (auo *ActionUpdateOne) SetArgs(s string) *ActionUpdateOne {
 	auo.mutation.SetArgs(s)
 	return auo
 }
 
-// SetQueued sets the queued field.
+// SetQueued sets the "queued" field.
 func (auo *ActionUpdateOne) SetQueued(b bool) *ActionUpdateOne {
 	auo.mutation.SetQueued(b)
 	return auo
 }
 
-// SetNillableQueued sets the queued field if the given value is not nil.
+// SetNillableQueued sets the "queued" field if the given value is not nil.
 func (auo *ActionUpdateOne) SetNillableQueued(b *bool) *ActionUpdateOne {
 	if b != nil {
 		auo.SetQueued(*b)
@@ -315,13 +313,13 @@ func (auo *ActionUpdateOne) SetNillableQueued(b *bool) *ActionUpdateOne {
 	return auo
 }
 
-// SetResponded sets the responded field.
+// SetResponded sets the "responded" field.
 func (auo *ActionUpdateOne) SetResponded(b bool) *ActionUpdateOne {
 	auo.mutation.SetResponded(b)
 	return auo
 }
 
-// SetNillableResponded sets the responded field if the given value is not nil.
+// SetNillableResponded sets the "responded" field if the given value is not nil.
 func (auo *ActionUpdateOne) SetNillableResponded(b *bool) *ActionUpdateOne {
 	if b != nil {
 		auo.SetResponded(*b)
@@ -329,13 +327,13 @@ func (auo *ActionUpdateOne) SetNillableResponded(b *bool) *ActionUpdateOne {
 	return auo
 }
 
-// SetResult sets the result field.
+// SetResult sets the "result" field.
 func (auo *ActionUpdateOne) SetResult(s string) *ActionUpdateOne {
 	auo.mutation.SetResult(s)
 	return auo
 }
 
-// SetNillableResult sets the result field if the given value is not nil.
+// SetNillableResult sets the "result" field if the given value is not nil.
 func (auo *ActionUpdateOne) SetNillableResult(s *string) *ActionUpdateOne {
 	if s != nil {
 		auo.SetResult(*s)
@@ -343,13 +341,13 @@ func (auo *ActionUpdateOne) SetNillableResult(s *string) *ActionUpdateOne {
 	return auo
 }
 
-// SetTargetingID sets the targeting edge to Host by id.
+// SetTargetingID sets the "targeting" edge to the Host entity by ID.
 func (auo *ActionUpdateOne) SetTargetingID(id int) *ActionUpdateOne {
 	auo.mutation.SetTargetingID(id)
 	return auo
 }
 
-// SetNillableTargetingID sets the targeting edge to Host by id if the given value is not nil.
+// SetNillableTargetingID sets the "targeting" edge to the Host entity by ID if the given value is not nil.
 func (auo *ActionUpdateOne) SetNillableTargetingID(id *int) *ActionUpdateOne {
 	if id != nil {
 		auo = auo.SetTargetingID(*id)
@@ -357,7 +355,7 @@ func (auo *ActionUpdateOne) SetNillableTargetingID(id *int) *ActionUpdateOne {
 	return auo
 }
 
-// SetTargeting sets the targeting edge to Host.
+// SetTargeting sets the "targeting" edge to the Host entity.
 func (auo *ActionUpdateOne) SetTargeting(h *Host) *ActionUpdateOne {
 	return auo.SetTargetingID(h.ID)
 }
@@ -367,15 +365,14 @@ func (auo *ActionUpdateOne) Mutation() *ActionMutation {
 	return auo.mutation
 }
 
-// ClearTargeting clears the targeting edge to Host.
+// ClearTargeting clears the "targeting" edge to the Host entity.
 func (auo *ActionUpdateOne) ClearTargeting() *ActionUpdateOne {
 	auo.mutation.ClearTargeting()
 	return auo
 }
 
-// Save executes the query and returns the updated entity.
+// Save executes the query and returns the updated Action entity.
 func (auo *ActionUpdateOne) Save(ctx context.Context) (*Action, error) {
-
 	var (
 		err  error
 		node *Action
@@ -405,11 +402,11 @@ func (auo *ActionUpdateOne) Save(ctx context.Context) (*Action, error) {
 
 // SaveX is like Save, but panics if an error occurs.
 func (auo *ActionUpdateOne) SaveX(ctx context.Context) *Action {
-	a, err := auo.Save(ctx)
+	node, err := auo.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return a
+	return node
 }
 
 // Exec executes the query on the entity.
@@ -425,7 +422,7 @@ func (auo *ActionUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (a *Action, err error) {
+func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (_node *Action, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   action.Table,
@@ -441,6 +438,13 @@ func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (a *Action, err error) 
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing Action.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if ps := auo.mutation.predicates; len(ps) > 0 {
+		_spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
 	if value, ok := auo.mutation.UUID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -518,9 +522,9 @@ func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (a *Action, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	a = &Action{config: auo.config}
-	_spec.Assign = a.assignValues
-	_spec.ScanValues = a.scanValues()
+	_node = &Action{config: auo.config}
+	_spec.Assign = _node.assignValues
+	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, auo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{action.Label}
@@ -529,5 +533,5 @@ func (auo *ActionUpdateOne) sqlSave(ctx context.Context) (a *Action, err error) 
 		}
 		return nil, err
 	}
-	return a, nil
+	return _node, nil
 }

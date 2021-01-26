@@ -16,14 +16,13 @@ import (
 // BotDelete is the builder for deleting a Bot entity.
 type BotDelete struct {
 	config
-	hooks      []Hook
-	mutation   *BotMutation
-	predicates []predicate.Bot
+	hooks    []Hook
+	mutation *BotMutation
 }
 
-// Where adds a new predicate to the delete builder.
+// Where adds a new predicate to the BotDelete builder.
 func (bd *BotDelete) Where(ps ...predicate.Bot) *BotDelete {
-	bd.predicates = append(bd.predicates, ps...)
+	bd.mutation.predicates = append(bd.mutation.predicates, ps...)
 	return bd
 }
 
@@ -75,7 +74,7 @@ func (bd *BotDelete) sqlExec(ctx context.Context) (int, error) {
 			},
 		},
 	}
-	if ps := bd.predicates; len(ps) > 0 {
+	if ps := bd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)

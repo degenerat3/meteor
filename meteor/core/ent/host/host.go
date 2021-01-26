@@ -58,7 +58,17 @@ var (
 	MemberPrimaryKey = []string{"group_id", "host_id"}
 )
 
+// ValidColumn reports if the column name is valid (part of the table columns).
+func ValidColumn(column string) bool {
+	for i := range Columns {
+		if column == Columns[i] {
+			return true
+		}
+	}
+	return false
+}
+
 var (
-	// DefaultLastSeen holds the default value on creation for the lastSeen field.
+	// DefaultLastSeen holds the default value on creation for the "lastSeen" field.
 	DefaultLastSeen int
 )

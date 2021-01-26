@@ -29,11 +29,11 @@ type Host struct {
 // HostEdges holds the relations/edges for other nodes in the graph.
 type HostEdges struct {
 	// Bots holds the value of the bots edge.
-	Bots []*Bot
+	Bots []*Bot `json:"bots,omitempty"`
 	// Actions holds the value of the actions edge.
-	Actions []*Action
+	Actions []*Action `json:"actions,omitempty"`
 	// Member holds the value of the member edge.
-	Member []*Group
+	Member []*Group `json:"member,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -67,69 +67,82 @@ func (e HostEdges) MemberOrErr() ([]*Group, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Host) scanValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{},  // id
-		&sql.NullString{}, // hostname
-		&sql.NullString{}, // interface
-		&sql.NullInt64{},  // lastSeen
+func (*Host) scanValues(columns []string) ([]interface{}, error) {
+	values := make([]interface{}, len(columns))
+	for i := range columns {
+		switch columns[i] {
+		case host.FieldID, host.FieldLastSeen:
+			values[i] = &sql.NullInt64{}
+		case host.FieldHostname, host.FieldInterface:
+			values[i] = &sql.NullString{}
+		default:
+			return nil, fmt.Errorf("unexpected column %q for type Host", columns[i])
+		}
 	}
+	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Host fields.
-func (h *Host) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(host.Columns); m < n {
+func (h *Host) assignValues(columns []string, values []interface{}) error {
+	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	value, ok := values[0].(*sql.NullInt64)
-	if !ok {
-		return fmt.Errorf("unexpected type %T for field id", value)
-	}
-	h.ID = int(value.Int64)
-	values = values[1:]
-	if value, ok := values[0].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field hostname", values[0])
-	} else if value.Valid {
-		h.Hostname = value.String
-	}
-	if value, ok := values[1].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field interface", values[1])
-	} else if value.Valid {
-		h.Interface = value.String
-	}
-	if value, ok := values[2].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field lastSeen", values[2])
-	} else if value.Valid {
-		h.LastSeen = int(value.Int64)
+	for i := range columns {
+		switch columns[i] {
+		case host.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			h.ID = int(value.Int64)
+		case host.FieldHostname:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field hostname", values[i])
+			} else if value.Valid {
+				h.Hostname = value.String
+			}
+		case host.FieldInterface:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field interface", values[i])
+			} else if value.Valid {
+				h.Interface = value.String
+			}
+		case host.FieldLastSeen:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field lastSeen", values[i])
+			} else if value.Valid {
+				h.LastSeen = int(value.Int64)
+			}
+		}
 	}
 	return nil
 }
 
-// QueryBots queries the bots edge of the Host.
+// QueryBots queries the "bots" edge of the Host entity.
 func (h *Host) QueryBots() *BotQuery {
 	return (&HostClient{config: h.config}).QueryBots(h)
 }
 
-// QueryActions queries the actions edge of the Host.
+// QueryActions queries the "actions" edge of the Host entity.
 func (h *Host) QueryActions() *ActionQuery {
 	return (&HostClient{config: h.config}).QueryActions(h)
 }
 
-// QueryMember queries the member edge of the Host.
+// QueryMember queries the "member" edge of the Host entity.
 func (h *Host) QueryMember() *GroupQuery {
 	return (&HostClient{config: h.config}).QueryMember(h)
 }
 
 // Update returns a builder for updating this Host.
-// Note that, you need to call Host.Unwrap() before calling this method, if this Host
+// Note that you need to call Host.Unwrap() before calling this method if this Host
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (h *Host) Update() *HostUpdateOne {
 	return (&HostClient{config: h.config}).UpdateOne(h)
 }
 
-// Unwrap unwraps the entity that was returned from a transaction after it was closed,
-// so that all next queries will be executed through the driver which created the transaction.
+// Unwrap unwraps the Host entity that was returned from a transaction after it was closed,
+// so that all future queries will be executed through the driver which created the transaction.
 func (h *Host) Unwrap() *Host {
 	tx, ok := h.config.driver.(*txDriver)
 	if !ok {

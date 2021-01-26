@@ -37,7 +37,7 @@ type Action struct {
 // ActionEdges holds the relations/edges for other nodes in the graph.
 type ActionEdges struct {
 	// Targeting holds the value of the targeting edge.
-	Targeting *Host
+	Targeting *Host `json:"targeting,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -58,93 +58,101 @@ func (e ActionEdges) TargetingOrErr() (*Host, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Action) scanValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{},  // id
-		&sql.NullString{}, // uuid
-		&sql.NullString{}, // mode
-		&sql.NullString{}, // args
-		&sql.NullBool{},   // queued
-		&sql.NullBool{},   // responded
-		&sql.NullString{}, // result
+func (*Action) scanValues(columns []string) ([]interface{}, error) {
+	values := make([]interface{}, len(columns))
+	for i := range columns {
+		switch columns[i] {
+		case action.FieldQueued, action.FieldResponded:
+			values[i] = &sql.NullBool{}
+		case action.FieldID:
+			values[i] = &sql.NullInt64{}
+		case action.FieldUUID, action.FieldMode, action.FieldArgs, action.FieldResult:
+			values[i] = &sql.NullString{}
+		case action.ForeignKeys[0]: // host_actions
+			values[i] = &sql.NullInt64{}
+		default:
+			return nil, fmt.Errorf("unexpected column %q for type Action", columns[i])
+		}
 	}
-}
-
-// fkValues returns the types for scanning foreign-keys values from sql.Rows.
-func (*Action) fkValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{}, // host_actions
-	}
+	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Action fields.
-func (a *Action) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(action.Columns); m < n {
+func (a *Action) assignValues(columns []string, values []interface{}) error {
+	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	value, ok := values[0].(*sql.NullInt64)
-	if !ok {
-		return fmt.Errorf("unexpected type %T for field id", value)
-	}
-	a.ID = int(value.Int64)
-	values = values[1:]
-	if value, ok := values[0].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field uuid", values[0])
-	} else if value.Valid {
-		a.UUID = value.String
-	}
-	if value, ok := values[1].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field mode", values[1])
-	} else if value.Valid {
-		a.Mode = value.String
-	}
-	if value, ok := values[2].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field args", values[2])
-	} else if value.Valid {
-		a.Args = value.String
-	}
-	if value, ok := values[3].(*sql.NullBool); !ok {
-		return fmt.Errorf("unexpected type %T for field queued", values[3])
-	} else if value.Valid {
-		a.Queued = value.Bool
-	}
-	if value, ok := values[4].(*sql.NullBool); !ok {
-		return fmt.Errorf("unexpected type %T for field responded", values[4])
-	} else if value.Valid {
-		a.Responded = value.Bool
-	}
-	if value, ok := values[5].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field result", values[5])
-	} else if value.Valid {
-		a.Result = value.String
-	}
-	values = values[6:]
-	if len(values) == len(action.ForeignKeys) {
-		if value, ok := values[0].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field host_actions", value)
-		} else if value.Valid {
-			a.host_actions = new(int)
-			*a.host_actions = int(value.Int64)
+	for i := range columns {
+		switch columns[i] {
+		case action.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			a.ID = int(value.Int64)
+		case action.FieldUUID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value.Valid {
+				a.UUID = value.String
+			}
+		case action.FieldMode:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field mode", values[i])
+			} else if value.Valid {
+				a.Mode = value.String
+			}
+		case action.FieldArgs:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field args", values[i])
+			} else if value.Valid {
+				a.Args = value.String
+			}
+		case action.FieldQueued:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field queued", values[i])
+			} else if value.Valid {
+				a.Queued = value.Bool
+			}
+		case action.FieldResponded:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field responded", values[i])
+			} else if value.Valid {
+				a.Responded = value.Bool
+			}
+		case action.FieldResult:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field result", values[i])
+			} else if value.Valid {
+				a.Result = value.String
+			}
+		case action.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field host_actions", value)
+			} else if value.Valid {
+				a.host_actions = new(int)
+				*a.host_actions = int(value.Int64)
+			}
 		}
 	}
 	return nil
 }
 
-// QueryTargeting queries the targeting edge of the Action.
+// QueryTargeting queries the "targeting" edge of the Action entity.
 func (a *Action) QueryTargeting() *HostQuery {
 	return (&ActionClient{config: a.config}).QueryTargeting(a)
 }
 
 // Update returns a builder for updating this Action.
-// Note that, you need to call Action.Unwrap() before calling this method, if this Action
+// Note that you need to call Action.Unwrap() before calling this method if this Action
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (a *Action) Update() *ActionUpdateOne {
 	return (&ActionClient{config: a.config}).UpdateOne(a)
 }
 
-// Unwrap unwraps the entity that was returned from a transaction after it was closed,
-// so that all next queries will be executed through the driver which created the transaction.
+// Unwrap unwraps the Action entity that was returned from a transaction after it was closed,
+// so that all future queries will be executed through the driver which created the transaction.
 func (a *Action) Unwrap() *Action {
 	tx, ok := a.config.driver.(*txDriver)
 	if !ok {

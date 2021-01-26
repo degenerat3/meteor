@@ -20,25 +20,25 @@ type GroupCreate struct {
 	hooks    []Hook
 }
 
-// SetName sets the name field.
+// SetName sets the "name" field.
 func (gc *GroupCreate) SetName(s string) *GroupCreate {
 	gc.mutation.SetName(s)
 	return gc
 }
 
-// SetDesc sets the desc field.
+// SetDesc sets the "desc" field.
 func (gc *GroupCreate) SetDesc(s string) *GroupCreate {
 	gc.mutation.SetDesc(s)
 	return gc
 }
 
-// AddMemberIDs adds the members edge to Host by ids.
+// AddMemberIDs adds the "members" edge to the Host entity by IDs.
 func (gc *GroupCreate) AddMemberIDs(ids ...int) *GroupCreate {
 	gc.mutation.AddMemberIDs(ids...)
 	return gc
 }
 
-// AddMembers adds the members edges to Host.
+// AddMembers adds the "members" edges to the Host entity.
 func (gc *GroupCreate) AddMembers(h ...*Host) *GroupCreate {
 	ids := make([]int, len(h))
 	for i := range h {
@@ -54,20 +54,23 @@ func (gc *GroupCreate) Mutation() *GroupMutation {
 
 // Save creates the Group in the database.
 func (gc *GroupCreate) Save(ctx context.Context) (*Group, error) {
-	if err := gc.preSave(); err != nil {
-		return nil, err
-	}
 	var (
 		err  error
 		node *Group
 	)
 	if len(gc.hooks) == 0 {
+		if err = gc.check(); err != nil {
+			return nil, err
+		}
 		node, err = gc.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*GroupMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = gc.check(); err != nil {
+				return nil, err
 			}
 			gc.mutation = mutation
 			node, err = gc.sqlSave(ctx)
@@ -93,7 +96,8 @@ func (gc *GroupCreate) SaveX(ctx context.Context) *Group {
 	return v
 }
 
-func (gc *GroupCreate) preSave() error {
+// check runs all checks and user-defined validators on the builder.
+func (gc *GroupCreate) check() error {
 	if _, ok := gc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New("ent: missing required field \"name\"")}
 	}
@@ -104,7 +108,7 @@ func (gc *GroupCreate) preSave() error {
 }
 
 func (gc *GroupCreate) sqlSave(ctx context.Context) (*Group, error) {
-	gr, _spec := gc.createSpec()
+	_node, _spec := gc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, gc.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
@@ -112,13 +116,13 @@ func (gc *GroupCreate) sqlSave(ctx context.Context) (*Group, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	gr.ID = int(id)
-	return gr, nil
+	_node.ID = int(id)
+	return _node, nil
 }
 
 func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 	var (
-		gr    = &Group{config: gc.config}
+		_node = &Group{config: gc.config}
 		_spec = &sqlgraph.CreateSpec{
 			Table: group.Table,
 			ID: &sqlgraph.FieldSpec{
@@ -133,7 +137,7 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: group.FieldName,
 		})
-		gr.Name = value
+		_node.Name = value
 	}
 	if value, ok := gc.mutation.Desc(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -141,7 +145,7 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: group.FieldDesc,
 		})
-		gr.Desc = value
+		_node.Desc = value
 	}
 	if nodes := gc.mutation.MembersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -162,10 +166,10 @@ func (gc *GroupCreate) createSpec() (*Group, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	return gr, _spec
+	return _node, _spec
 }
 
-// GroupCreateBulk is the builder for creating a bulk of Group entities.
+// GroupCreateBulk is the builder for creating many Group entities in bulk.
 type GroupCreateBulk struct {
 	config
 	builders []*GroupCreate
@@ -180,12 +184,12 @@ func (gcb *GroupCreateBulk) Save(ctx context.Context) ([]*Group, error) {
 		func(i int, root context.Context) {
 			builder := gcb.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				if err := builder.preSave(); err != nil {
-					return nil, err
-				}
 				mutation, ok := m.(*GroupMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
+				}
+				if err := builder.check(); err != nil {
+					return nil, err
 				}
 				builder.mutation = mutation
 				nodes[i], specs[i] = builder.createSpec()
@@ -222,7 +226,7 @@ func (gcb *GroupCreateBulk) Save(ctx context.Context) ([]*Group, error) {
 	return nodes, nil
 }
 
-// SaveX calls Save and panics if Save returns an error.
+// SaveX is like Save, but panics if an error occurs.
 func (gcb *GroupCreateBulk) SaveX(ctx context.Context) []*Group {
 	v, err := gcb.Save(ctx)
 	if err != nil {

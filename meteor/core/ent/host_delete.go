@@ -16,14 +16,13 @@ import (
 // HostDelete is the builder for deleting a Host entity.
 type HostDelete struct {
 	config
-	hooks      []Hook
-	mutation   *HostMutation
-	predicates []predicate.Host
+	hooks    []Hook
+	mutation *HostMutation
 }
 
-// Where adds a new predicate to the delete builder.
+// Where adds a new predicate to the HostDelete builder.
 func (hd *HostDelete) Where(ps ...predicate.Host) *HostDelete {
-	hd.predicates = append(hd.predicates, ps...)
+	hd.mutation.predicates = append(hd.mutation.predicates, ps...)
 	return hd
 }
 
@@ -75,7 +74,7 @@ func (hd *HostDelete) sqlExec(ctx context.Context) (int, error) {
 			},
 		},
 	}
-	if ps := hd.predicates; len(ps) > 0 {
+	if ps := hd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)

@@ -16,14 +16,13 @@ import (
 // ActionDelete is the builder for deleting a Action entity.
 type ActionDelete struct {
 	config
-	hooks      []Hook
-	mutation   *ActionMutation
-	predicates []predicate.Action
+	hooks    []Hook
+	mutation *ActionMutation
 }
 
-// Where adds a new predicate to the delete builder.
+// Where adds a new predicate to the ActionDelete builder.
 func (ad *ActionDelete) Where(ps ...predicate.Action) *ActionDelete {
-	ad.predicates = append(ad.predicates, ps...)
+	ad.mutation.predicates = append(ad.mutation.predicates, ps...)
 	return ad
 }
 
@@ -75,7 +74,7 @@ func (ad *ActionDelete) sqlExec(ctx context.Context) (int, error) {
 			},
 		},
 	}
-	if ps := ad.predicates; len(ps) > 0 {
+	if ps := ad.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)

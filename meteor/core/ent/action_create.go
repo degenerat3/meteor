@@ -20,31 +20,31 @@ type ActionCreate struct {
 	hooks    []Hook
 }
 
-// SetUUID sets the uuid field.
+// SetUUID sets the "uuid" field.
 func (ac *ActionCreate) SetUUID(s string) *ActionCreate {
 	ac.mutation.SetUUID(s)
 	return ac
 }
 
-// SetMode sets the mode field.
+// SetMode sets the "mode" field.
 func (ac *ActionCreate) SetMode(s string) *ActionCreate {
 	ac.mutation.SetMode(s)
 	return ac
 }
 
-// SetArgs sets the args field.
+// SetArgs sets the "args" field.
 func (ac *ActionCreate) SetArgs(s string) *ActionCreate {
 	ac.mutation.SetArgs(s)
 	return ac
 }
 
-// SetQueued sets the queued field.
+// SetQueued sets the "queued" field.
 func (ac *ActionCreate) SetQueued(b bool) *ActionCreate {
 	ac.mutation.SetQueued(b)
 	return ac
 }
 
-// SetNillableQueued sets the queued field if the given value is not nil.
+// SetNillableQueued sets the "queued" field if the given value is not nil.
 func (ac *ActionCreate) SetNillableQueued(b *bool) *ActionCreate {
 	if b != nil {
 		ac.SetQueued(*b)
@@ -52,13 +52,13 @@ func (ac *ActionCreate) SetNillableQueued(b *bool) *ActionCreate {
 	return ac
 }
 
-// SetResponded sets the responded field.
+// SetResponded sets the "responded" field.
 func (ac *ActionCreate) SetResponded(b bool) *ActionCreate {
 	ac.mutation.SetResponded(b)
 	return ac
 }
 
-// SetNillableResponded sets the responded field if the given value is not nil.
+// SetNillableResponded sets the "responded" field if the given value is not nil.
 func (ac *ActionCreate) SetNillableResponded(b *bool) *ActionCreate {
 	if b != nil {
 		ac.SetResponded(*b)
@@ -66,13 +66,13 @@ func (ac *ActionCreate) SetNillableResponded(b *bool) *ActionCreate {
 	return ac
 }
 
-// SetResult sets the result field.
+// SetResult sets the "result" field.
 func (ac *ActionCreate) SetResult(s string) *ActionCreate {
 	ac.mutation.SetResult(s)
 	return ac
 }
 
-// SetNillableResult sets the result field if the given value is not nil.
+// SetNillableResult sets the "result" field if the given value is not nil.
 func (ac *ActionCreate) SetNillableResult(s *string) *ActionCreate {
 	if s != nil {
 		ac.SetResult(*s)
@@ -80,13 +80,13 @@ func (ac *ActionCreate) SetNillableResult(s *string) *ActionCreate {
 	return ac
 }
 
-// SetTargetingID sets the targeting edge to Host by id.
+// SetTargetingID sets the "targeting" edge to the Host entity by ID.
 func (ac *ActionCreate) SetTargetingID(id int) *ActionCreate {
 	ac.mutation.SetTargetingID(id)
 	return ac
 }
 
-// SetNillableTargetingID sets the targeting edge to Host by id if the given value is not nil.
+// SetNillableTargetingID sets the "targeting" edge to the Host entity by ID if the given value is not nil.
 func (ac *ActionCreate) SetNillableTargetingID(id *int) *ActionCreate {
 	if id != nil {
 		ac = ac.SetTargetingID(*id)
@@ -94,7 +94,7 @@ func (ac *ActionCreate) SetNillableTargetingID(id *int) *ActionCreate {
 	return ac
 }
 
-// SetTargeting sets the targeting edge to Host.
+// SetTargeting sets the "targeting" edge to the Host entity.
 func (ac *ActionCreate) SetTargeting(h *Host) *ActionCreate {
 	return ac.SetTargetingID(h.ID)
 }
@@ -106,20 +106,24 @@ func (ac *ActionCreate) Mutation() *ActionMutation {
 
 // Save creates the Action in the database.
 func (ac *ActionCreate) Save(ctx context.Context) (*Action, error) {
-	if err := ac.preSave(); err != nil {
-		return nil, err
-	}
 	var (
 		err  error
 		node *Action
 	)
+	ac.defaults()
 	if len(ac.hooks) == 0 {
+		if err = ac.check(); err != nil {
+			return nil, err
+		}
 		node, err = ac.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*ActionMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = ac.check(); err != nil {
+				return nil, err
 			}
 			ac.mutation = mutation
 			node, err = ac.sqlSave(ctx)
@@ -145,16 +149,8 @@ func (ac *ActionCreate) SaveX(ctx context.Context) *Action {
 	return v
 }
 
-func (ac *ActionCreate) preSave() error {
-	if _, ok := ac.mutation.UUID(); !ok {
-		return &ValidationError{Name: "uuid", err: errors.New("ent: missing required field \"uuid\"")}
-	}
-	if _, ok := ac.mutation.Mode(); !ok {
-		return &ValidationError{Name: "mode", err: errors.New("ent: missing required field \"mode\"")}
-	}
-	if _, ok := ac.mutation.Args(); !ok {
-		return &ValidationError{Name: "args", err: errors.New("ent: missing required field \"args\"")}
-	}
+// defaults sets the default values of the builder before save.
+func (ac *ActionCreate) defaults() {
 	if _, ok := ac.mutation.Queued(); !ok {
 		v := action.DefaultQueued
 		ac.mutation.SetQueued(v)
@@ -167,11 +163,33 @@ func (ac *ActionCreate) preSave() error {
 		v := action.DefaultResult
 		ac.mutation.SetResult(v)
 	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (ac *ActionCreate) check() error {
+	if _, ok := ac.mutation.UUID(); !ok {
+		return &ValidationError{Name: "uuid", err: errors.New("ent: missing required field \"uuid\"")}
+	}
+	if _, ok := ac.mutation.Mode(); !ok {
+		return &ValidationError{Name: "mode", err: errors.New("ent: missing required field \"mode\"")}
+	}
+	if _, ok := ac.mutation.Args(); !ok {
+		return &ValidationError{Name: "args", err: errors.New("ent: missing required field \"args\"")}
+	}
+	if _, ok := ac.mutation.Queued(); !ok {
+		return &ValidationError{Name: "queued", err: errors.New("ent: missing required field \"queued\"")}
+	}
+	if _, ok := ac.mutation.Responded(); !ok {
+		return &ValidationError{Name: "responded", err: errors.New("ent: missing required field \"responded\"")}
+	}
+	if _, ok := ac.mutation.Result(); !ok {
+		return &ValidationError{Name: "result", err: errors.New("ent: missing required field \"result\"")}
+	}
 	return nil
 }
 
 func (ac *ActionCreate) sqlSave(ctx context.Context) (*Action, error) {
-	a, _spec := ac.createSpec()
+	_node, _spec := ac.createSpec()
 	if err := sqlgraph.CreateNode(ctx, ac.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
@@ -179,13 +197,13 @@ func (ac *ActionCreate) sqlSave(ctx context.Context) (*Action, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	a.ID = int(id)
-	return a, nil
+	_node.ID = int(id)
+	return _node, nil
 }
 
 func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 	var (
-		a     = &Action{config: ac.config}
+		_node = &Action{config: ac.config}
 		_spec = &sqlgraph.CreateSpec{
 			Table: action.Table,
 			ID: &sqlgraph.FieldSpec{
@@ -200,7 +218,7 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: action.FieldUUID,
 		})
-		a.UUID = value
+		_node.UUID = value
 	}
 	if value, ok := ac.mutation.Mode(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -208,7 +226,7 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: action.FieldMode,
 		})
-		a.Mode = value
+		_node.Mode = value
 	}
 	if value, ok := ac.mutation.Args(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -216,7 +234,7 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: action.FieldArgs,
 		})
-		a.Args = value
+		_node.Args = value
 	}
 	if value, ok := ac.mutation.Queued(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -224,7 +242,7 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: action.FieldQueued,
 		})
-		a.Queued = value
+		_node.Queued = value
 	}
 	if value, ok := ac.mutation.Responded(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -232,7 +250,7 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: action.FieldResponded,
 		})
-		a.Responded = value
+		_node.Responded = value
 	}
 	if value, ok := ac.mutation.Result(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -240,7 +258,7 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: action.FieldResult,
 		})
-		a.Result = value
+		_node.Result = value
 	}
 	if nodes := ac.mutation.TargetingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -261,10 +279,10 @@ func (ac *ActionCreate) createSpec() (*Action, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	return a, _spec
+	return _node, _spec
 }
 
-// ActionCreateBulk is the builder for creating a bulk of Action entities.
+// ActionCreateBulk is the builder for creating many Action entities in bulk.
 type ActionCreateBulk struct {
 	config
 	builders []*ActionCreate
@@ -278,13 +296,14 @@ func (acb *ActionCreateBulk) Save(ctx context.Context) ([]*Action, error) {
 	for i := range acb.builders {
 		func(i int, root context.Context) {
 			builder := acb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				if err := builder.preSave(); err != nil {
-					return nil, err
-				}
 				mutation, ok := m.(*ActionMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
+				}
+				if err := builder.check(); err != nil {
+					return nil, err
 				}
 				builder.mutation = mutation
 				nodes[i], specs[i] = builder.createSpec()
@@ -321,7 +340,7 @@ func (acb *ActionCreateBulk) Save(ctx context.Context) ([]*Action, error) {
 	return nodes, nil
 }
 
-// SaveX calls Save and panics if Save returns an error.
+// SaveX is like Save, but panics if an error occurs.
 func (acb *ActionCreateBulk) SaveX(ctx context.Context) []*Action {
 	v, err := acb.Save(ctx)
 	if err != nil {

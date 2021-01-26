@@ -17,36 +17,35 @@ import (
 // GroupUpdate is the builder for updating Group entities.
 type GroupUpdate struct {
 	config
-	hooks      []Hook
-	mutation   *GroupMutation
-	predicates []predicate.Group
+	hooks    []Hook
+	mutation *GroupMutation
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the GroupUpdate builder.
 func (gu *GroupUpdate) Where(ps ...predicate.Group) *GroupUpdate {
-	gu.predicates = append(gu.predicates, ps...)
+	gu.mutation.predicates = append(gu.mutation.predicates, ps...)
 	return gu
 }
 
-// SetName sets the name field.
+// SetName sets the "name" field.
 func (gu *GroupUpdate) SetName(s string) *GroupUpdate {
 	gu.mutation.SetName(s)
 	return gu
 }
 
-// SetDesc sets the desc field.
+// SetDesc sets the "desc" field.
 func (gu *GroupUpdate) SetDesc(s string) *GroupUpdate {
 	gu.mutation.SetDesc(s)
 	return gu
 }
 
-// AddMemberIDs adds the members edge to Host by ids.
+// AddMemberIDs adds the "members" edge to the Host entity by IDs.
 func (gu *GroupUpdate) AddMemberIDs(ids ...int) *GroupUpdate {
 	gu.mutation.AddMemberIDs(ids...)
 	return gu
 }
 
-// AddMembers adds the members edges to Host.
+// AddMembers adds the "members" edges to the Host entity.
 func (gu *GroupUpdate) AddMembers(h ...*Host) *GroupUpdate {
 	ids := make([]int, len(h))
 	for i := range h {
@@ -60,13 +59,19 @@ func (gu *GroupUpdate) Mutation() *GroupMutation {
 	return gu.mutation
 }
 
-// RemoveMemberIDs removes the members edge to Host by ids.
+// ClearMembers clears all "members" edges to the Host entity.
+func (gu *GroupUpdate) ClearMembers() *GroupUpdate {
+	gu.mutation.ClearMembers()
+	return gu
+}
+
+// RemoveMemberIDs removes the "members" edge to Host entities by IDs.
 func (gu *GroupUpdate) RemoveMemberIDs(ids ...int) *GroupUpdate {
 	gu.mutation.RemoveMemberIDs(ids...)
 	return gu
 }
 
-// RemoveMembers removes members edges to Host.
+// RemoveMembers removes "members" edges to Host entities.
 func (gu *GroupUpdate) RemoveMembers(h ...*Host) *GroupUpdate {
 	ids := make([]int, len(h))
 	for i := range h {
@@ -75,9 +80,8 @@ func (gu *GroupUpdate) RemoveMembers(h ...*Host) *GroupUpdate {
 	return gu.RemoveMemberIDs(ids...)
 }
 
-// Save executes the query and returns the number of rows/vertices matched by this operation.
+// Save executes the query and returns the number of nodes affected by the update operation.
 func (gu *GroupUpdate) Save(ctx context.Context) (int, error) {
-
 	var (
 		err      error
 		affected int
@@ -138,7 +142,7 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		},
 	}
-	if ps := gu.predicates; len(ps) > 0 {
+	if ps := gu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -159,7 +163,23 @@ func (gu *GroupUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: group.FieldDesc,
 		})
 	}
-	if nodes := gu.mutation.RemovedMembersIDs(); len(nodes) > 0 {
+	if gu.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: group.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: host.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := gu.mutation.RemovedMembersIDs(); len(nodes) > 0 && !gu.mutation.MembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -215,25 +235,25 @@ type GroupUpdateOne struct {
 	mutation *GroupMutation
 }
 
-// SetName sets the name field.
+// SetName sets the "name" field.
 func (guo *GroupUpdateOne) SetName(s string) *GroupUpdateOne {
 	guo.mutation.SetName(s)
 	return guo
 }
 
-// SetDesc sets the desc field.
+// SetDesc sets the "desc" field.
 func (guo *GroupUpdateOne) SetDesc(s string) *GroupUpdateOne {
 	guo.mutation.SetDesc(s)
 	return guo
 }
 
-// AddMemberIDs adds the members edge to Host by ids.
+// AddMemberIDs adds the "members" edge to the Host entity by IDs.
 func (guo *GroupUpdateOne) AddMemberIDs(ids ...int) *GroupUpdateOne {
 	guo.mutation.AddMemberIDs(ids...)
 	return guo
 }
 
-// AddMembers adds the members edges to Host.
+// AddMembers adds the "members" edges to the Host entity.
 func (guo *GroupUpdateOne) AddMembers(h ...*Host) *GroupUpdateOne {
 	ids := make([]int, len(h))
 	for i := range h {
@@ -247,13 +267,19 @@ func (guo *GroupUpdateOne) Mutation() *GroupMutation {
 	return guo.mutation
 }
 
-// RemoveMemberIDs removes the members edge to Host by ids.
+// ClearMembers clears all "members" edges to the Host entity.
+func (guo *GroupUpdateOne) ClearMembers() *GroupUpdateOne {
+	guo.mutation.ClearMembers()
+	return guo
+}
+
+// RemoveMemberIDs removes the "members" edge to Host entities by IDs.
 func (guo *GroupUpdateOne) RemoveMemberIDs(ids ...int) *GroupUpdateOne {
 	guo.mutation.RemoveMemberIDs(ids...)
 	return guo
 }
 
-// RemoveMembers removes members edges to Host.
+// RemoveMembers removes "members" edges to Host entities.
 func (guo *GroupUpdateOne) RemoveMembers(h ...*Host) *GroupUpdateOne {
 	ids := make([]int, len(h))
 	for i := range h {
@@ -262,9 +288,8 @@ func (guo *GroupUpdateOne) RemoveMembers(h ...*Host) *GroupUpdateOne {
 	return guo.RemoveMemberIDs(ids...)
 }
 
-// Save executes the query and returns the updated entity.
+// Save executes the query and returns the updated Group entity.
 func (guo *GroupUpdateOne) Save(ctx context.Context) (*Group, error) {
-
 	var (
 		err  error
 		node *Group
@@ -294,11 +319,11 @@ func (guo *GroupUpdateOne) Save(ctx context.Context) (*Group, error) {
 
 // SaveX is like Save, but panics if an error occurs.
 func (guo *GroupUpdateOne) SaveX(ctx context.Context) *Group {
-	gr, err := guo.Save(ctx)
+	node, err := guo.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return gr
+	return node
 }
 
 // Exec executes the query on the entity.
@@ -314,7 +339,7 @@ func (guo *GroupUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (gr *Group, err error) {
+func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (_node *Group, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   group.Table,
@@ -330,6 +355,13 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (gr *Group, err error) {
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing Group.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if ps := guo.mutation.predicates; len(ps) > 0 {
+		_spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
 	if value, ok := guo.mutation.Name(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -344,7 +376,23 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (gr *Group, err error) {
 			Column: group.FieldDesc,
 		})
 	}
-	if nodes := guo.mutation.RemovedMembersIDs(); len(nodes) > 0 {
+	if guo.mutation.MembersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   group.MembersTable,
+			Columns: group.MembersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: host.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := guo.mutation.RemovedMembersIDs(); len(nodes) > 0 && !guo.mutation.MembersCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -382,9 +430,9 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (gr *Group, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	gr = &Group{config: guo.config}
-	_spec.Assign = gr.assignValues
-	_spec.ScanValues = gr.scanValues()
+	_node = &Group{config: guo.config}
+	_spec.Assign = _node.assignValues
+	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, guo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{group.Label}
@@ -393,5 +441,5 @@ func (guo *GroupUpdateOne) sqlSave(ctx context.Context) (gr *Group, err error) {
 		}
 		return nil, err
 	}
-	return gr, nil
+	return _node, nil
 }

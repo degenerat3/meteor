@@ -20,31 +20,31 @@ type BotCreate struct {
 	hooks    []Hook
 }
 
-// SetUUID sets the uuid field.
+// SetUUID sets the "uuid" field.
 func (bc *BotCreate) SetUUID(s string) *BotCreate {
 	bc.mutation.SetUUID(s)
 	return bc
 }
 
-// SetInterval sets the interval field.
+// SetInterval sets the "interval" field.
 func (bc *BotCreate) SetInterval(i int) *BotCreate {
 	bc.mutation.SetInterval(i)
 	return bc
 }
 
-// SetDelta sets the delta field.
+// SetDelta sets the "delta" field.
 func (bc *BotCreate) SetDelta(i int) *BotCreate {
 	bc.mutation.SetDelta(i)
 	return bc
 }
 
-// SetLastSeen sets the lastSeen field.
+// SetLastSeen sets the "lastSeen" field.
 func (bc *BotCreate) SetLastSeen(i int) *BotCreate {
 	bc.mutation.SetLastSeen(i)
 	return bc
 }
 
-// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+// SetNillableLastSeen sets the "lastSeen" field if the given value is not nil.
 func (bc *BotCreate) SetNillableLastSeen(i *int) *BotCreate {
 	if i != nil {
 		bc.SetLastSeen(*i)
@@ -52,13 +52,13 @@ func (bc *BotCreate) SetNillableLastSeen(i *int) *BotCreate {
 	return bc
 }
 
-// SetInfectingID sets the infecting edge to Host by id.
+// SetInfectingID sets the "infecting" edge to the Host entity by ID.
 func (bc *BotCreate) SetInfectingID(id int) *BotCreate {
 	bc.mutation.SetInfectingID(id)
 	return bc
 }
 
-// SetNillableInfectingID sets the infecting edge to Host by id if the given value is not nil.
+// SetNillableInfectingID sets the "infecting" edge to the Host entity by ID if the given value is not nil.
 func (bc *BotCreate) SetNillableInfectingID(id *int) *BotCreate {
 	if id != nil {
 		bc = bc.SetInfectingID(*id)
@@ -66,7 +66,7 @@ func (bc *BotCreate) SetNillableInfectingID(id *int) *BotCreate {
 	return bc
 }
 
-// SetInfecting sets the infecting edge to Host.
+// SetInfecting sets the "infecting" edge to the Host entity.
 func (bc *BotCreate) SetInfecting(h *Host) *BotCreate {
 	return bc.SetInfectingID(h.ID)
 }
@@ -78,20 +78,24 @@ func (bc *BotCreate) Mutation() *BotMutation {
 
 // Save creates the Bot in the database.
 func (bc *BotCreate) Save(ctx context.Context) (*Bot, error) {
-	if err := bc.preSave(); err != nil {
-		return nil, err
-	}
 	var (
 		err  error
 		node *Bot
 	)
+	bc.defaults()
 	if len(bc.hooks) == 0 {
+		if err = bc.check(); err != nil {
+			return nil, err
+		}
 		node, err = bc.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*BotMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = bc.check(); err != nil {
+				return nil, err
 			}
 			bc.mutation = mutation
 			node, err = bc.sqlSave(ctx)
@@ -117,7 +121,16 @@ func (bc *BotCreate) SaveX(ctx context.Context) *Bot {
 	return v
 }
 
-func (bc *BotCreate) preSave() error {
+// defaults sets the default values of the builder before save.
+func (bc *BotCreate) defaults() {
+	if _, ok := bc.mutation.LastSeen(); !ok {
+		v := bot.DefaultLastSeen
+		bc.mutation.SetLastSeen(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (bc *BotCreate) check() error {
 	if _, ok := bc.mutation.UUID(); !ok {
 		return &ValidationError{Name: "uuid", err: errors.New("ent: missing required field \"uuid\"")}
 	}
@@ -128,14 +141,13 @@ func (bc *BotCreate) preSave() error {
 		return &ValidationError{Name: "delta", err: errors.New("ent: missing required field \"delta\"")}
 	}
 	if _, ok := bc.mutation.LastSeen(); !ok {
-		v := bot.DefaultLastSeen
-		bc.mutation.SetLastSeen(v)
+		return &ValidationError{Name: "lastSeen", err: errors.New("ent: missing required field \"lastSeen\"")}
 	}
 	return nil
 }
 
 func (bc *BotCreate) sqlSave(ctx context.Context) (*Bot, error) {
-	b, _spec := bc.createSpec()
+	_node, _spec := bc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, bc.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
@@ -143,13 +155,13 @@ func (bc *BotCreate) sqlSave(ctx context.Context) (*Bot, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	b.ID = int(id)
-	return b, nil
+	_node.ID = int(id)
+	return _node, nil
 }
 
 func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 	var (
-		b     = &Bot{config: bc.config}
+		_node = &Bot{config: bc.config}
 		_spec = &sqlgraph.CreateSpec{
 			Table: bot.Table,
 			ID: &sqlgraph.FieldSpec{
@@ -164,7 +176,7 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: bot.FieldUUID,
 		})
-		b.UUID = value
+		_node.UUID = value
 	}
 	if value, ok := bc.mutation.Interval(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -172,7 +184,7 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: bot.FieldInterval,
 		})
-		b.Interval = value
+		_node.Interval = value
 	}
 	if value, ok := bc.mutation.Delta(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -180,7 +192,7 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: bot.FieldDelta,
 		})
-		b.Delta = value
+		_node.Delta = value
 	}
 	if value, ok := bc.mutation.LastSeen(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -188,7 +200,7 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: bot.FieldLastSeen,
 		})
-		b.LastSeen = value
+		_node.LastSeen = value
 	}
 	if nodes := bc.mutation.InfectingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -209,10 +221,10 @@ func (bc *BotCreate) createSpec() (*Bot, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	return b, _spec
+	return _node, _spec
 }
 
-// BotCreateBulk is the builder for creating a bulk of Bot entities.
+// BotCreateBulk is the builder for creating many Bot entities in bulk.
 type BotCreateBulk struct {
 	config
 	builders []*BotCreate
@@ -226,13 +238,14 @@ func (bcb *BotCreateBulk) Save(ctx context.Context) ([]*Bot, error) {
 	for i := range bcb.builders {
 		func(i int, root context.Context) {
 			builder := bcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				if err := builder.preSave(); err != nil {
-					return nil, err
-				}
 				mutation, ok := m.(*BotMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
+				}
+				if err := builder.check(); err != nil {
+					return nil, err
 				}
 				builder.mutation = mutation
 				nodes[i], specs[i] = builder.createSpec()
@@ -269,7 +282,7 @@ func (bcb *BotCreateBulk) Save(ctx context.Context) ([]*Bot, error) {
 	return nodes, nil
 }
 
-// SaveX calls Save and panics if Save returns an error.
+// SaveX is like Save, but panics if an error occurs.
 func (bcb *BotCreateBulk) SaveX(ctx context.Context) []*Bot {
 	v, err := bcb.Save(ctx)
 	if err != nil {

@@ -27,7 +27,7 @@ type Group struct {
 // GroupEdges holds the relations/edges for other nodes in the graph.
 type GroupEdges struct {
 	// Members holds the value of the members edge.
-	Members []*Host
+	Members []*Host `json:"members,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -43,53 +43,66 @@ func (e GroupEdges) MembersOrErr() ([]*Host, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Group) scanValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{},  // id
-		&sql.NullString{}, // name
-		&sql.NullString{}, // desc
+func (*Group) scanValues(columns []string) ([]interface{}, error) {
+	values := make([]interface{}, len(columns))
+	for i := range columns {
+		switch columns[i] {
+		case group.FieldID:
+			values[i] = &sql.NullInt64{}
+		case group.FieldName, group.FieldDesc:
+			values[i] = &sql.NullString{}
+		default:
+			return nil, fmt.Errorf("unexpected column %q for type Group", columns[i])
+		}
 	}
+	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Group fields.
-func (gr *Group) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(group.Columns); m < n {
+func (gr *Group) assignValues(columns []string, values []interface{}) error {
+	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	value, ok := values[0].(*sql.NullInt64)
-	if !ok {
-		return fmt.Errorf("unexpected type %T for field id", value)
-	}
-	gr.ID = int(value.Int64)
-	values = values[1:]
-	if value, ok := values[0].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field name", values[0])
-	} else if value.Valid {
-		gr.Name = value.String
-	}
-	if value, ok := values[1].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field desc", values[1])
-	} else if value.Valid {
-		gr.Desc = value.String
+	for i := range columns {
+		switch columns[i] {
+		case group.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			gr.ID = int(value.Int64)
+		case group.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				gr.Name = value.String
+			}
+		case group.FieldDesc:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value.Valid {
+				gr.Desc = value.String
+			}
+		}
 	}
 	return nil
 }
 
-// QueryMembers queries the members edge of the Group.
+// QueryMembers queries the "members" edge of the Group entity.
 func (gr *Group) QueryMembers() *HostQuery {
 	return (&GroupClient{config: gr.config}).QueryMembers(gr)
 }
 
 // Update returns a builder for updating this Group.
-// Note that, you need to call Group.Unwrap() before calling this method, if this Group
+// Note that you need to call Group.Unwrap() before calling this method if this Group
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (gr *Group) Update() *GroupUpdateOne {
 	return (&GroupClient{config: gr.config}).UpdateOne(gr)
 }
 
-// Unwrap unwraps the entity that was returned from a transaction after it was closed,
-// so that all next queries will be executed through the driver which created the transaction.
+// Unwrap unwraps the Group entity that was returned from a transaction after it was closed,
+// so that all future queries will be executed through the driver which created the transaction.
 func (gr *Group) Unwrap() *Group {
 	tx, ok := gr.config.driver.(*txDriver)
 	if !ok {

@@ -17,57 +17,56 @@ import (
 // BotUpdate is the builder for updating Bot entities.
 type BotUpdate struct {
 	config
-	hooks      []Hook
-	mutation   *BotMutation
-	predicates []predicate.Bot
+	hooks    []Hook
+	mutation *BotMutation
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the BotUpdate builder.
 func (bu *BotUpdate) Where(ps ...predicate.Bot) *BotUpdate {
-	bu.predicates = append(bu.predicates, ps...)
+	bu.mutation.predicates = append(bu.mutation.predicates, ps...)
 	return bu
 }
 
-// SetUUID sets the uuid field.
+// SetUUID sets the "uuid" field.
 func (bu *BotUpdate) SetUUID(s string) *BotUpdate {
 	bu.mutation.SetUUID(s)
 	return bu
 }
 
-// SetInterval sets the interval field.
+// SetInterval sets the "interval" field.
 func (bu *BotUpdate) SetInterval(i int) *BotUpdate {
 	bu.mutation.ResetInterval()
 	bu.mutation.SetInterval(i)
 	return bu
 }
 
-// AddInterval adds i to interval.
+// AddInterval adds i to the "interval" field.
 func (bu *BotUpdate) AddInterval(i int) *BotUpdate {
 	bu.mutation.AddInterval(i)
 	return bu
 }
 
-// SetDelta sets the delta field.
+// SetDelta sets the "delta" field.
 func (bu *BotUpdate) SetDelta(i int) *BotUpdate {
 	bu.mutation.ResetDelta()
 	bu.mutation.SetDelta(i)
 	return bu
 }
 
-// AddDelta adds i to delta.
+// AddDelta adds i to the "delta" field.
 func (bu *BotUpdate) AddDelta(i int) *BotUpdate {
 	bu.mutation.AddDelta(i)
 	return bu
 }
 
-// SetLastSeen sets the lastSeen field.
+// SetLastSeen sets the "lastSeen" field.
 func (bu *BotUpdate) SetLastSeen(i int) *BotUpdate {
 	bu.mutation.ResetLastSeen()
 	bu.mutation.SetLastSeen(i)
 	return bu
 }
 
-// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+// SetNillableLastSeen sets the "lastSeen" field if the given value is not nil.
 func (bu *BotUpdate) SetNillableLastSeen(i *int) *BotUpdate {
 	if i != nil {
 		bu.SetLastSeen(*i)
@@ -75,19 +74,19 @@ func (bu *BotUpdate) SetNillableLastSeen(i *int) *BotUpdate {
 	return bu
 }
 
-// AddLastSeen adds i to lastSeen.
+// AddLastSeen adds i to the "lastSeen" field.
 func (bu *BotUpdate) AddLastSeen(i int) *BotUpdate {
 	bu.mutation.AddLastSeen(i)
 	return bu
 }
 
-// SetInfectingID sets the infecting edge to Host by id.
+// SetInfectingID sets the "infecting" edge to the Host entity by ID.
 func (bu *BotUpdate) SetInfectingID(id int) *BotUpdate {
 	bu.mutation.SetInfectingID(id)
 	return bu
 }
 
-// SetNillableInfectingID sets the infecting edge to Host by id if the given value is not nil.
+// SetNillableInfectingID sets the "infecting" edge to the Host entity by ID if the given value is not nil.
 func (bu *BotUpdate) SetNillableInfectingID(id *int) *BotUpdate {
 	if id != nil {
 		bu = bu.SetInfectingID(*id)
@@ -95,7 +94,7 @@ func (bu *BotUpdate) SetNillableInfectingID(id *int) *BotUpdate {
 	return bu
 }
 
-// SetInfecting sets the infecting edge to Host.
+// SetInfecting sets the "infecting" edge to the Host entity.
 func (bu *BotUpdate) SetInfecting(h *Host) *BotUpdate {
 	return bu.SetInfectingID(h.ID)
 }
@@ -105,15 +104,14 @@ func (bu *BotUpdate) Mutation() *BotMutation {
 	return bu.mutation
 }
 
-// ClearInfecting clears the infecting edge to Host.
+// ClearInfecting clears the "infecting" edge to the Host entity.
 func (bu *BotUpdate) ClearInfecting() *BotUpdate {
 	bu.mutation.ClearInfecting()
 	return bu
 }
 
-// Save executes the query and returns the number of rows/vertices matched by this operation.
+// Save executes the query and returns the number of nodes affected by the update operation.
 func (bu *BotUpdate) Save(ctx context.Context) (int, error) {
-
 	var (
 		err      error
 		affected int
@@ -174,7 +172,7 @@ func (bu *BotUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			},
 		},
 	}
-	if ps := bu.predicates; len(ps) > 0 {
+	if ps := bu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -283,46 +281,46 @@ type BotUpdateOne struct {
 	mutation *BotMutation
 }
 
-// SetUUID sets the uuid field.
+// SetUUID sets the "uuid" field.
 func (buo *BotUpdateOne) SetUUID(s string) *BotUpdateOne {
 	buo.mutation.SetUUID(s)
 	return buo
 }
 
-// SetInterval sets the interval field.
+// SetInterval sets the "interval" field.
 func (buo *BotUpdateOne) SetInterval(i int) *BotUpdateOne {
 	buo.mutation.ResetInterval()
 	buo.mutation.SetInterval(i)
 	return buo
 }
 
-// AddInterval adds i to interval.
+// AddInterval adds i to the "interval" field.
 func (buo *BotUpdateOne) AddInterval(i int) *BotUpdateOne {
 	buo.mutation.AddInterval(i)
 	return buo
 }
 
-// SetDelta sets the delta field.
+// SetDelta sets the "delta" field.
 func (buo *BotUpdateOne) SetDelta(i int) *BotUpdateOne {
 	buo.mutation.ResetDelta()
 	buo.mutation.SetDelta(i)
 	return buo
 }
 
-// AddDelta adds i to delta.
+// AddDelta adds i to the "delta" field.
 func (buo *BotUpdateOne) AddDelta(i int) *BotUpdateOne {
 	buo.mutation.AddDelta(i)
 	return buo
 }
 
-// SetLastSeen sets the lastSeen field.
+// SetLastSeen sets the "lastSeen" field.
 func (buo *BotUpdateOne) SetLastSeen(i int) *BotUpdateOne {
 	buo.mutation.ResetLastSeen()
 	buo.mutation.SetLastSeen(i)
 	return buo
 }
 
-// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+// SetNillableLastSeen sets the "lastSeen" field if the given value is not nil.
 func (buo *BotUpdateOne) SetNillableLastSeen(i *int) *BotUpdateOne {
 	if i != nil {
 		buo.SetLastSeen(*i)
@@ -330,19 +328,19 @@ func (buo *BotUpdateOne) SetNillableLastSeen(i *int) *BotUpdateOne {
 	return buo
 }
 
-// AddLastSeen adds i to lastSeen.
+// AddLastSeen adds i to the "lastSeen" field.
 func (buo *BotUpdateOne) AddLastSeen(i int) *BotUpdateOne {
 	buo.mutation.AddLastSeen(i)
 	return buo
 }
 
-// SetInfectingID sets the infecting edge to Host by id.
+// SetInfectingID sets the "infecting" edge to the Host entity by ID.
 func (buo *BotUpdateOne) SetInfectingID(id int) *BotUpdateOne {
 	buo.mutation.SetInfectingID(id)
 	return buo
 }
 
-// SetNillableInfectingID sets the infecting edge to Host by id if the given value is not nil.
+// SetNillableInfectingID sets the "infecting" edge to the Host entity by ID if the given value is not nil.
 func (buo *BotUpdateOne) SetNillableInfectingID(id *int) *BotUpdateOne {
 	if id != nil {
 		buo = buo.SetInfectingID(*id)
@@ -350,7 +348,7 @@ func (buo *BotUpdateOne) SetNillableInfectingID(id *int) *BotUpdateOne {
 	return buo
 }
 
-// SetInfecting sets the infecting edge to Host.
+// SetInfecting sets the "infecting" edge to the Host entity.
 func (buo *BotUpdateOne) SetInfecting(h *Host) *BotUpdateOne {
 	return buo.SetInfectingID(h.ID)
 }
@@ -360,15 +358,14 @@ func (buo *BotUpdateOne) Mutation() *BotMutation {
 	return buo.mutation
 }
 
-// ClearInfecting clears the infecting edge to Host.
+// ClearInfecting clears the "infecting" edge to the Host entity.
 func (buo *BotUpdateOne) ClearInfecting() *BotUpdateOne {
 	buo.mutation.ClearInfecting()
 	return buo
 }
 
-// Save executes the query and returns the updated entity.
+// Save executes the query and returns the updated Bot entity.
 func (buo *BotUpdateOne) Save(ctx context.Context) (*Bot, error) {
-
 	var (
 		err  error
 		node *Bot
@@ -398,11 +395,11 @@ func (buo *BotUpdateOne) Save(ctx context.Context) (*Bot, error) {
 
 // SaveX is like Save, but panics if an error occurs.
 func (buo *BotUpdateOne) SaveX(ctx context.Context) *Bot {
-	b, err := buo.Save(ctx)
+	node, err := buo.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return node
 }
 
 // Exec executes the query on the entity.
@@ -418,7 +415,7 @@ func (buo *BotUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-func (buo *BotUpdateOne) sqlSave(ctx context.Context) (b *Bot, err error) {
+func (buo *BotUpdateOne) sqlSave(ctx context.Context) (_node *Bot, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   bot.Table,
@@ -434,6 +431,13 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (b *Bot, err error) {
 		return nil, &ValidationError{Name: "ID", err: fmt.Errorf("missing Bot.ID for update")}
 	}
 	_spec.Node.ID.Value = id
+	if ps := buo.mutation.predicates; len(ps) > 0 {
+		_spec.Predicate = func(selector *sql.Selector) {
+			for i := range ps {
+				ps[i](selector)
+			}
+		}
+	}
 	if value, ok := buo.mutation.UUID(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -518,9 +522,9 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (b *Bot, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	b = &Bot{config: buo.config}
-	_spec.Assign = b.assignValues
-	_spec.ScanValues = b.scanValues()
+	_node = &Bot{config: buo.config}
+	_spec.Assign = _node.assignValues
+	_spec.ScanValues = _node.scanValues
 	if err = sqlgraph.UpdateNode(ctx, buo.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{bot.Label}
@@ -529,5 +533,5 @@ func (buo *BotUpdateOne) sqlSave(ctx context.Context) (b *Bot, err error) {
 		}
 		return nil, err
 	}
-	return b, nil
+	return _node, nil
 }

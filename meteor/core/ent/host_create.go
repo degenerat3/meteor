@@ -22,25 +22,25 @@ type HostCreate struct {
 	hooks    []Hook
 }
 
-// SetHostname sets the hostname field.
+// SetHostname sets the "hostname" field.
 func (hc *HostCreate) SetHostname(s string) *HostCreate {
 	hc.mutation.SetHostname(s)
 	return hc
 }
 
-// SetInterface sets the interface field.
+// SetInterface sets the "interface" field.
 func (hc *HostCreate) SetInterface(s string) *HostCreate {
 	hc.mutation.SetInterface(s)
 	return hc
 }
 
-// SetLastSeen sets the lastSeen field.
+// SetLastSeen sets the "lastSeen" field.
 func (hc *HostCreate) SetLastSeen(i int) *HostCreate {
 	hc.mutation.SetLastSeen(i)
 	return hc
 }
 
-// SetNillableLastSeen sets the lastSeen field if the given value is not nil.
+// SetNillableLastSeen sets the "lastSeen" field if the given value is not nil.
 func (hc *HostCreate) SetNillableLastSeen(i *int) *HostCreate {
 	if i != nil {
 		hc.SetLastSeen(*i)
@@ -48,13 +48,13 @@ func (hc *HostCreate) SetNillableLastSeen(i *int) *HostCreate {
 	return hc
 }
 
-// AddBotIDs adds the bots edge to Bot by ids.
+// AddBotIDs adds the "bots" edge to the Bot entity by IDs.
 func (hc *HostCreate) AddBotIDs(ids ...int) *HostCreate {
 	hc.mutation.AddBotIDs(ids...)
 	return hc
 }
 
-// AddBots adds the bots edges to Bot.
+// AddBots adds the "bots" edges to the Bot entity.
 func (hc *HostCreate) AddBots(b ...*Bot) *HostCreate {
 	ids := make([]int, len(b))
 	for i := range b {
@@ -63,13 +63,13 @@ func (hc *HostCreate) AddBots(b ...*Bot) *HostCreate {
 	return hc.AddBotIDs(ids...)
 }
 
-// AddActionIDs adds the actions edge to Action by ids.
+// AddActionIDs adds the "actions" edge to the Action entity by IDs.
 func (hc *HostCreate) AddActionIDs(ids ...int) *HostCreate {
 	hc.mutation.AddActionIDs(ids...)
 	return hc
 }
 
-// AddActions adds the actions edges to Action.
+// AddActions adds the "actions" edges to the Action entity.
 func (hc *HostCreate) AddActions(a ...*Action) *HostCreate {
 	ids := make([]int, len(a))
 	for i := range a {
@@ -78,13 +78,13 @@ func (hc *HostCreate) AddActions(a ...*Action) *HostCreate {
 	return hc.AddActionIDs(ids...)
 }
 
-// AddMemberIDs adds the member edge to Group by ids.
+// AddMemberIDs adds the "member" edge to the Group entity by IDs.
 func (hc *HostCreate) AddMemberIDs(ids ...int) *HostCreate {
 	hc.mutation.AddMemberIDs(ids...)
 	return hc
 }
 
-// AddMember adds the member edges to Group.
+// AddMember adds the "member" edges to the Group entity.
 func (hc *HostCreate) AddMember(g ...*Group) *HostCreate {
 	ids := make([]int, len(g))
 	for i := range g {
@@ -100,20 +100,24 @@ func (hc *HostCreate) Mutation() *HostMutation {
 
 // Save creates the Host in the database.
 func (hc *HostCreate) Save(ctx context.Context) (*Host, error) {
-	if err := hc.preSave(); err != nil {
-		return nil, err
-	}
 	var (
 		err  error
 		node *Host
 	)
+	hc.defaults()
 	if len(hc.hooks) == 0 {
+		if err = hc.check(); err != nil {
+			return nil, err
+		}
 		node, err = hc.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*HostMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = hc.check(); err != nil {
+				return nil, err
 			}
 			hc.mutation = mutation
 			node, err = hc.sqlSave(ctx)
@@ -139,7 +143,16 @@ func (hc *HostCreate) SaveX(ctx context.Context) *Host {
 	return v
 }
 
-func (hc *HostCreate) preSave() error {
+// defaults sets the default values of the builder before save.
+func (hc *HostCreate) defaults() {
+	if _, ok := hc.mutation.LastSeen(); !ok {
+		v := host.DefaultLastSeen
+		hc.mutation.SetLastSeen(v)
+	}
+}
+
+// check runs all checks and user-defined validators on the builder.
+func (hc *HostCreate) check() error {
 	if _, ok := hc.mutation.Hostname(); !ok {
 		return &ValidationError{Name: "hostname", err: errors.New("ent: missing required field \"hostname\"")}
 	}
@@ -147,14 +160,13 @@ func (hc *HostCreate) preSave() error {
 		return &ValidationError{Name: "interface", err: errors.New("ent: missing required field \"interface\"")}
 	}
 	if _, ok := hc.mutation.LastSeen(); !ok {
-		v := host.DefaultLastSeen
-		hc.mutation.SetLastSeen(v)
+		return &ValidationError{Name: "lastSeen", err: errors.New("ent: missing required field \"lastSeen\"")}
 	}
 	return nil
 }
 
 func (hc *HostCreate) sqlSave(ctx context.Context) (*Host, error) {
-	h, _spec := hc.createSpec()
+	_node, _spec := hc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, hc.driver, _spec); err != nil {
 		if cerr, ok := isSQLConstraintError(err); ok {
 			err = cerr
@@ -162,13 +174,13 @@ func (hc *HostCreate) sqlSave(ctx context.Context) (*Host, error) {
 		return nil, err
 	}
 	id := _spec.ID.Value.(int64)
-	h.ID = int(id)
-	return h, nil
+	_node.ID = int(id)
+	return _node, nil
 }
 
 func (hc *HostCreate) createSpec() (*Host, *sqlgraph.CreateSpec) {
 	var (
-		h     = &Host{config: hc.config}
+		_node = &Host{config: hc.config}
 		_spec = &sqlgraph.CreateSpec{
 			Table: host.Table,
 			ID: &sqlgraph.FieldSpec{
@@ -183,7 +195,7 @@ func (hc *HostCreate) createSpec() (*Host, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: host.FieldHostname,
 		})
-		h.Hostname = value
+		_node.Hostname = value
 	}
 	if value, ok := hc.mutation.Interface(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -191,7 +203,7 @@ func (hc *HostCreate) createSpec() (*Host, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: host.FieldInterface,
 		})
-		h.Interface = value
+		_node.Interface = value
 	}
 	if value, ok := hc.mutation.LastSeen(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -199,7 +211,7 @@ func (hc *HostCreate) createSpec() (*Host, *sqlgraph.CreateSpec) {
 			Value:  value,
 			Column: host.FieldLastSeen,
 		})
-		h.LastSeen = value
+		_node.LastSeen = value
 	}
 	if nodes := hc.mutation.BotsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -258,10 +270,10 @@ func (hc *HostCreate) createSpec() (*Host, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	return h, _spec
+	return _node, _spec
 }
 
-// HostCreateBulk is the builder for creating a bulk of Host entities.
+// HostCreateBulk is the builder for creating many Host entities in bulk.
 type HostCreateBulk struct {
 	config
 	builders []*HostCreate
@@ -275,13 +287,14 @@ func (hcb *HostCreateBulk) Save(ctx context.Context) ([]*Host, error) {
 	for i := range hcb.builders {
 		func(i int, root context.Context) {
 			builder := hcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				if err := builder.preSave(); err != nil {
-					return nil, err
-				}
 				mutation, ok := m.(*HostMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
+				}
+				if err := builder.check(); err != nil {
+					return nil, err
 				}
 				builder.mutation = mutation
 				nodes[i], specs[i] = builder.createSpec()
@@ -318,7 +331,7 @@ func (hcb *HostCreateBulk) Save(ctx context.Context) ([]*Host, error) {
 	return nodes, nil
 }
 
-// SaveX calls Save and panics if Save returns an error.
+// SaveX is like Save, but panics if an error occurs.
 func (hcb *HostCreateBulk) SaveX(ctx context.Context) []*Host {
 	v, err := hcb.Save(ctx)
 	if err != nil {

@@ -33,7 +33,7 @@ type Bot struct {
 // BotEdges holds the relations/edges for other nodes in the graph.
 type BotEdges struct {
 	// Infecting holds the value of the infecting edge.
-	Infecting *Host
+	Infecting *Host `json:"infecting,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
@@ -54,81 +54,87 @@ func (e BotEdges) InfectingOrErr() (*Host, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*Bot) scanValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{},  // id
-		&sql.NullString{}, // uuid
-		&sql.NullInt64{},  // interval
-		&sql.NullInt64{},  // delta
-		&sql.NullInt64{},  // lastSeen
+func (*Bot) scanValues(columns []string) ([]interface{}, error) {
+	values := make([]interface{}, len(columns))
+	for i := range columns {
+		switch columns[i] {
+		case bot.FieldID, bot.FieldInterval, bot.FieldDelta, bot.FieldLastSeen:
+			values[i] = &sql.NullInt64{}
+		case bot.FieldUUID:
+			values[i] = &sql.NullString{}
+		case bot.ForeignKeys[0]: // host_bots
+			values[i] = &sql.NullInt64{}
+		default:
+			return nil, fmt.Errorf("unexpected column %q for type Bot", columns[i])
+		}
 	}
-}
-
-// fkValues returns the types for scanning foreign-keys values from sql.Rows.
-func (*Bot) fkValues() []interface{} {
-	return []interface{}{
-		&sql.NullInt64{}, // host_bots
-	}
+	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Bot fields.
-func (b *Bot) assignValues(values ...interface{}) error {
-	if m, n := len(values), len(bot.Columns); m < n {
+func (b *Bot) assignValues(columns []string, values []interface{}) error {
+	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	value, ok := values[0].(*sql.NullInt64)
-	if !ok {
-		return fmt.Errorf("unexpected type %T for field id", value)
-	}
-	b.ID = int(value.Int64)
-	values = values[1:]
-	if value, ok := values[0].(*sql.NullString); !ok {
-		return fmt.Errorf("unexpected type %T for field uuid", values[0])
-	} else if value.Valid {
-		b.UUID = value.String
-	}
-	if value, ok := values[1].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field interval", values[1])
-	} else if value.Valid {
-		b.Interval = int(value.Int64)
-	}
-	if value, ok := values[2].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field delta", values[2])
-	} else if value.Valid {
-		b.Delta = int(value.Int64)
-	}
-	if value, ok := values[3].(*sql.NullInt64); !ok {
-		return fmt.Errorf("unexpected type %T for field lastSeen", values[3])
-	} else if value.Valid {
-		b.LastSeen = int(value.Int64)
-	}
-	values = values[4:]
-	if len(values) == len(bot.ForeignKeys) {
-		if value, ok := values[0].(*sql.NullInt64); !ok {
-			return fmt.Errorf("unexpected type %T for edge-field host_bots", value)
-		} else if value.Valid {
-			b.host_bots = new(int)
-			*b.host_bots = int(value.Int64)
+	for i := range columns {
+		switch columns[i] {
+		case bot.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			b.ID = int(value.Int64)
+		case bot.FieldUUID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value.Valid {
+				b.UUID = value.String
+			}
+		case bot.FieldInterval:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field interval", values[i])
+			} else if value.Valid {
+				b.Interval = int(value.Int64)
+			}
+		case bot.FieldDelta:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field delta", values[i])
+			} else if value.Valid {
+				b.Delta = int(value.Int64)
+			}
+		case bot.FieldLastSeen:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field lastSeen", values[i])
+			} else if value.Valid {
+				b.LastSeen = int(value.Int64)
+			}
+		case bot.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field host_bots", value)
+			} else if value.Valid {
+				b.host_bots = new(int)
+				*b.host_bots = int(value.Int64)
+			}
 		}
 	}
 	return nil
 }
 
-// QueryInfecting queries the infecting edge of the Bot.
+// QueryInfecting queries the "infecting" edge of the Bot entity.
 func (b *Bot) QueryInfecting() *HostQuery {
 	return (&BotClient{config: b.config}).QueryInfecting(b)
 }
 
 // Update returns a builder for updating this Bot.
-// Note that, you need to call Bot.Unwrap() before calling this method, if this Bot
+// Note that you need to call Bot.Unwrap() before calling this method if this Bot
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (b *Bot) Update() *BotUpdateOne {
 	return (&BotClient{config: b.config}).UpdateOne(b)
 }
 
-// Unwrap unwraps the entity that was returned from a transaction after it was closed,
-// so that all next queries will be executed through the driver which created the transaction.
+// Unwrap unwraps the Bot entity that was returned from a transaction after it was closed,
+// so that all future queries will be executed through the driver which created the transaction.
 func (b *Bot) Unwrap() *Bot {
 	tx, ok := b.config.driver.(*txDriver)
 	if !ok {

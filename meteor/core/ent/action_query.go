@@ -22,7 +22,7 @@ type ActionQuery struct {
 	limit      *int
 	offset     *int
 	order      []OrderFunc
-	unique     []string
+	fields     []string
 	predicates []predicate.Action
 	// eager-loading edges.
 	withTargeting *HostQuery
@@ -32,7 +32,7 @@ type ActionQuery struct {
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the ActionQuery builder.
 func (aq *ActionQuery) Where(ps ...predicate.Action) *ActionQuery {
 	aq.predicates = append(aq.predicates, ps...)
 	return aq
@@ -56,15 +56,19 @@ func (aq *ActionQuery) Order(o ...OrderFunc) *ActionQuery {
 	return aq
 }
 
-// QueryTargeting chains the current query on the targeting edge.
+// QueryTargeting chains the current query on the "targeting" edge.
 func (aq *ActionQuery) QueryTargeting() *HostQuery {
 	query := &HostQuery{config: aq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(action.Table, action.FieldID, aq.sqlQuery()),
+			sqlgraph.From(action.Table, action.FieldID, selector),
 			sqlgraph.To(host.Table, host.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, action.TargetingTable, action.TargetingColumn),
 		)
@@ -74,28 +78,30 @@ func (aq *ActionQuery) QueryTargeting() *HostQuery {
 	return query
 }
 
-// First returns the first Action entity in the query. Returns *NotFoundError when no action was found.
+// First returns the first Action entity from the query.
+// Returns a *NotFoundError when no Action was found.
 func (aq *ActionQuery) First(ctx context.Context) (*Action, error) {
-	as, err := aq.Limit(1).All(ctx)
+	nodes, err := aq.Limit(1).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if len(as) == 0 {
+	if len(nodes) == 0 {
 		return nil, &NotFoundError{action.Label}
 	}
-	return as[0], nil
+	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
 func (aq *ActionQuery) FirstX(ctx context.Context) *Action {
-	a, err := aq.First(ctx)
+	node, err := aq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
-	return a
+	return node
 }
 
-// FirstID returns the first Action id in the query. Returns *NotFoundError when no id was found.
+// FirstID returns the first Action ID from the query.
+// Returns a *NotFoundError when no Action ID was found.
 func (aq *ActionQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = aq.Limit(1).IDs(ctx); err != nil {
@@ -108,8 +114,8 @@ func (aq *ActionQuery) FirstID(ctx context.Context) (id int, err error) {
 	return ids[0], nil
 }
 
-// FirstXID is like FirstID, but panics if an error occurs.
-func (aq *ActionQuery) FirstXID(ctx context.Context) int {
+// FirstIDX is like FirstID, but panics if an error occurs.
+func (aq *ActionQuery) FirstIDX(ctx context.Context) int {
 	id, err := aq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -117,15 +123,17 @@ func (aq *ActionQuery) FirstXID(ctx context.Context) int {
 	return id
 }
 
-// Only returns the only Action entity in the query, returns an error if not exactly one entity was returned.
+// Only returns a single Action entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when exactly one Action entity is not found.
+// Returns a *NotFoundError when no Action entities are found.
 func (aq *ActionQuery) Only(ctx context.Context) (*Action, error) {
-	as, err := aq.Limit(2).All(ctx)
+	nodes, err := aq.Limit(2).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	switch len(as) {
+	switch len(nodes) {
 	case 1:
-		return as[0], nil
+		return nodes[0], nil
 	case 0:
 		return nil, &NotFoundError{action.Label}
 	default:
@@ -135,14 +143,16 @@ func (aq *ActionQuery) Only(ctx context.Context) (*Action, error) {
 
 // OnlyX is like Only, but panics if an error occurs.
 func (aq *ActionQuery) OnlyX(ctx context.Context) *Action {
-	a, err := aq.Only(ctx)
+	node, err := aq.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return a
+	return node
 }
 
-// OnlyID returns the only Action id in the query, returns an error if not exactly one id was returned.
+// OnlyID is like Only, but returns the only Action ID in the query.
+// Returns a *NotSingularError when exactly one Action ID is not found.
+// Returns a *NotFoundError when no entities are found.
 func (aq *ActionQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = aq.Limit(2).IDs(ctx); err != nil {
@@ -178,14 +188,14 @@ func (aq *ActionQuery) All(ctx context.Context) ([]*Action, error) {
 
 // AllX is like All, but panics if an error occurs.
 func (aq *ActionQuery) AllX(ctx context.Context) []*Action {
-	as, err := aq.All(ctx)
+	nodes, err := aq.All(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return as
+	return nodes
 }
 
-// IDs executes the query and returns a list of Action ids.
+// IDs executes the query and returns a list of Action IDs.
 func (aq *ActionQuery) IDs(ctx context.Context) ([]int, error) {
 	var ids []int
 	if err := aq.Select(action.FieldID).Scan(ctx, &ids); err != nil {
@@ -237,24 +247,27 @@ func (aq *ActionQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the query builder, including all associated steps. It can be
+// Clone returns a duplicate of the ActionQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
 func (aq *ActionQuery) Clone() *ActionQuery {
+	if aq == nil {
+		return nil
+	}
 	return &ActionQuery{
-		config:     aq.config,
-		limit:      aq.limit,
-		offset:     aq.offset,
-		order:      append([]OrderFunc{}, aq.order...),
-		unique:     append([]string{}, aq.unique...),
-		predicates: append([]predicate.Action{}, aq.predicates...),
+		config:        aq.config,
+		limit:         aq.limit,
+		offset:        aq.offset,
+		order:         append([]OrderFunc{}, aq.order...),
+		predicates:    append([]predicate.Action{}, aq.predicates...),
+		withTargeting: aq.withTargeting.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
 	}
 }
 
-//  WithTargeting tells the query-builder to eager-loads the nodes that are connected to
-// the "targeting" edge. The optional arguments used to configure the query builder of the edge.
+// WithTargeting tells the query-builder to eager-load the nodes that are connected to
+// the "targeting" edge. The optional arguments are used to configure the query builder of the edge.
 func (aq *ActionQuery) WithTargeting(opts ...func(*HostQuery)) *ActionQuery {
 	query := &HostQuery{config: aq.config}
 	for _, opt := range opts {
@@ -264,7 +277,7 @@ func (aq *ActionQuery) WithTargeting(opts ...func(*HostQuery)) *ActionQuery {
 	return aq
 }
 
-// GroupBy used to group vertices by one or more fields/columns.
+// GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
@@ -286,12 +299,13 @@ func (aq *ActionQuery) GroupBy(field string, fields ...string) *ActionGroupBy {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		return aq.sqlQuery(), nil
+		return aq.sqlQuery(ctx), nil
 	}
 	return group
 }
 
-// Select one or more fields from the given query.
+// Select allows the selection one or more fields/columns for the given query,
+// instead of selecting all fields in the entity.
 //
 // Example:
 //
@@ -304,18 +318,16 @@ func (aq *ActionQuery) GroupBy(field string, fields ...string) *ActionGroupBy {
 //		Scan(ctx, &v)
 //
 func (aq *ActionQuery) Select(field string, fields ...string) *ActionSelect {
-	selector := &ActionSelect{config: aq.config}
-	selector.fields = append([]string{field}, fields...)
-	selector.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return aq.sqlQuery(), nil
-	}
-	return selector
+	aq.fields = append([]string{field}, fields...)
+	return &ActionSelect{ActionQuery: aq}
 }
 
 func (aq *ActionQuery) prepareQuery(ctx context.Context) error {
+	for _, f := range aq.fields {
+		if !action.ValidColumn(f) {
+			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
+		}
+	}
 	if aq.path != nil {
 		prev, err := aq.path(ctx)
 		if err != nil {
@@ -341,22 +353,18 @@ func (aq *ActionQuery) sqlAll(ctx context.Context) ([]*Action, error) {
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, action.ForeignKeys...)
 	}
-	_spec.ScanValues = func() []interface{} {
+	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Action{config: aq.config}
 		nodes = append(nodes, node)
-		values := node.scanValues()
-		if withFKs {
-			values = append(values, node.fkValues()...)
-		}
-		return values
+		return node.scanValues(columns)
 	}
-	_spec.Assign = func(values ...interface{}) error {
+	_spec.Assign = func(columns []string, values []interface{}) error {
 		if len(nodes) == 0 {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
 		node.Edges.loadedTypes = loadedTypes
-		return node.assignValues(values...)
+		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, aq.driver, _spec); err != nil {
 		return nil, err
@@ -419,6 +427,15 @@ func (aq *ActionQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   aq.sql,
 		Unique: true,
 	}
+	if fields := aq.fields; len(fields) > 0 {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, action.FieldID)
+		for i := range fields {
+			if fields[i] != action.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			}
+		}
+	}
 	if ps := aq.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -435,14 +452,14 @@ func (aq *ActionQuery) querySpec() *sqlgraph.QuerySpec {
 	if ps := aq.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
-				ps[i](selector)
+				ps[i](selector, action.ValidColumn)
 			}
 		}
 	}
 	return _spec
 }
 
-func (aq *ActionQuery) sqlQuery() *sql.Selector {
+func (aq *ActionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(aq.driver.Dialect())
 	t1 := builder.Table(action.Table)
 	selector := builder.Select(t1.Columns(action.Columns...)...).From(t1)
@@ -454,7 +471,7 @@ func (aq *ActionQuery) sqlQuery() *sql.Selector {
 		p(selector)
 	}
 	for _, p := range aq.order {
-		p(selector)
+		p(selector, action.ValidColumn)
 	}
 	if offset := aq.offset; offset != nil {
 		// limit is mandatory for offset clause. We start
@@ -467,7 +484,7 @@ func (aq *ActionQuery) sqlQuery() *sql.Selector {
 	return selector
 }
 
-// ActionGroupBy is the builder for group-by Action entities.
+// ActionGroupBy is the group-by builder for Action entities.
 type ActionGroupBy struct {
 	config
 	fields []string
@@ -483,7 +500,7 @@ func (agb *ActionGroupBy) Aggregate(fns ...AggregateFunc) *ActionGroupBy {
 	return agb
 }
 
-// Scan applies the group-by query and scan the result into the given value.
+// Scan applies the group-by query and scans the result into the given value.
 func (agb *ActionGroupBy) Scan(ctx context.Context, v interface{}) error {
 	query, err := agb.path(ctx)
 	if err != nil {
@@ -500,7 +517,8 @@ func (agb *ActionGroupBy) ScanX(ctx context.Context, v interface{}) {
 	}
 }
 
-// Strings returns list of strings from group-by. It is only allowed when querying group-by with one field.
+// Strings returns list of strings from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) Strings(ctx context.Context) ([]string, error) {
 	if len(agb.fields) > 1 {
 		return nil, errors.New("ent: ActionGroupBy.Strings is not achievable when grouping more than 1 field")
@@ -521,7 +539,8 @@ func (agb *ActionGroupBy) StringsX(ctx context.Context) []string {
 	return v
 }
 
-// String returns a single string from group-by. It is only allowed when querying group-by with one field.
+// String returns a single string from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) String(ctx context.Context) (_ string, err error) {
 	var v []string
 	if v, err = agb.Strings(ctx); err != nil {
@@ -547,7 +566,8 @@ func (agb *ActionGroupBy) StringX(ctx context.Context) string {
 	return v
 }
 
-// Ints returns list of ints from group-by. It is only allowed when querying group-by with one field.
+// Ints returns list of ints from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) Ints(ctx context.Context) ([]int, error) {
 	if len(agb.fields) > 1 {
 		return nil, errors.New("ent: ActionGroupBy.Ints is not achievable when grouping more than 1 field")
@@ -568,7 +588,8 @@ func (agb *ActionGroupBy) IntsX(ctx context.Context) []int {
 	return v
 }
 
-// Int returns a single int from group-by. It is only allowed when querying group-by with one field.
+// Int returns a single int from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) Int(ctx context.Context) (_ int, err error) {
 	var v []int
 	if v, err = agb.Ints(ctx); err != nil {
@@ -594,7 +615,8 @@ func (agb *ActionGroupBy) IntX(ctx context.Context) int {
 	return v
 }
 
-// Float64s returns list of float64s from group-by. It is only allowed when querying group-by with one field.
+// Float64s returns list of float64s from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) Float64s(ctx context.Context) ([]float64, error) {
 	if len(agb.fields) > 1 {
 		return nil, errors.New("ent: ActionGroupBy.Float64s is not achievable when grouping more than 1 field")
@@ -615,7 +637,8 @@ func (agb *ActionGroupBy) Float64sX(ctx context.Context) []float64 {
 	return v
 }
 
-// Float64 returns a single float64 from group-by. It is only allowed when querying group-by with one field.
+// Float64 returns a single float64 from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
 	if v, err = agb.Float64s(ctx); err != nil {
@@ -641,7 +664,8 @@ func (agb *ActionGroupBy) Float64X(ctx context.Context) float64 {
 	return v
 }
 
-// Bools returns list of bools from group-by. It is only allowed when querying group-by with one field.
+// Bools returns list of bools from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) Bools(ctx context.Context) ([]bool, error) {
 	if len(agb.fields) > 1 {
 		return nil, errors.New("ent: ActionGroupBy.Bools is not achievable when grouping more than 1 field")
@@ -662,7 +686,8 @@ func (agb *ActionGroupBy) BoolsX(ctx context.Context) []bool {
 	return v
 }
 
-// Bool returns a single bool from group-by. It is only allowed when querying group-by with one field.
+// Bool returns a single bool from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (agb *ActionGroupBy) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
 	if v, err = agb.Bools(ctx); err != nil {
@@ -689,8 +714,17 @@ func (agb *ActionGroupBy) BoolX(ctx context.Context) bool {
 }
 
 func (agb *ActionGroupBy) sqlScan(ctx context.Context, v interface{}) error {
+	for _, f := range agb.fields {
+		if !action.ValidColumn(f) {
+			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
+		}
+	}
+	selector := agb.sqlQuery()
+	if err := selector.Err(); err != nil {
+		return err
+	}
 	rows := &sql.Rows{}
-	query, args := agb.sqlQuery().Query()
+	query, args := selector.Query()
 	if err := agb.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
@@ -703,27 +737,24 @@ func (agb *ActionGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(agb.fields)+len(agb.fns))
 	columns = append(columns, agb.fields...)
 	for _, fn := range agb.fns {
-		columns = append(columns, fn(selector))
+		columns = append(columns, fn(selector, action.ValidColumn))
 	}
 	return selector.Select(columns...).GroupBy(agb.fields...)
 }
 
-// ActionSelect is the builder for select fields of Action entities.
+// ActionSelect is the builder for selecting fields of Action entities.
 type ActionSelect struct {
-	config
-	fields []string
+	*ActionQuery
 	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	sql *sql.Selector
 }
 
-// Scan applies the selector query and scan the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (as *ActionSelect) Scan(ctx context.Context, v interface{}) error {
-	query, err := as.path(ctx)
-	if err != nil {
+	if err := as.prepareQuery(ctx); err != nil {
 		return err
 	}
-	as.sql = query
+	as.sql = as.ActionQuery.sqlQuery(ctx)
 	return as.sqlScan(ctx, v)
 }
 
@@ -734,7 +765,7 @@ func (as *ActionSelect) ScanX(ctx context.Context, v interface{}) {
 	}
 }
 
-// Strings returns list of strings from selector. It is only allowed when selecting one field.
+// Strings returns list of strings from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) Strings(ctx context.Context) ([]string, error) {
 	if len(as.fields) > 1 {
 		return nil, errors.New("ent: ActionSelect.Strings is not achievable when selecting more than 1 field")
@@ -755,7 +786,7 @@ func (as *ActionSelect) StringsX(ctx context.Context) []string {
 	return v
 }
 
-// String returns a single string from selector. It is only allowed when selecting one field.
+// String returns a single string from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) String(ctx context.Context) (_ string, err error) {
 	var v []string
 	if v, err = as.Strings(ctx); err != nil {
@@ -781,7 +812,7 @@ func (as *ActionSelect) StringX(ctx context.Context) string {
 	return v
 }
 
-// Ints returns list of ints from selector. It is only allowed when selecting one field.
+// Ints returns list of ints from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) Ints(ctx context.Context) ([]int, error) {
 	if len(as.fields) > 1 {
 		return nil, errors.New("ent: ActionSelect.Ints is not achievable when selecting more than 1 field")
@@ -802,7 +833,7 @@ func (as *ActionSelect) IntsX(ctx context.Context) []int {
 	return v
 }
 
-// Int returns a single int from selector. It is only allowed when selecting one field.
+// Int returns a single int from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) Int(ctx context.Context) (_ int, err error) {
 	var v []int
 	if v, err = as.Ints(ctx); err != nil {
@@ -828,7 +859,7 @@ func (as *ActionSelect) IntX(ctx context.Context) int {
 	return v
 }
 
-// Float64s returns list of float64s from selector. It is only allowed when selecting one field.
+// Float64s returns list of float64s from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) Float64s(ctx context.Context) ([]float64, error) {
 	if len(as.fields) > 1 {
 		return nil, errors.New("ent: ActionSelect.Float64s is not achievable when selecting more than 1 field")
@@ -849,7 +880,7 @@ func (as *ActionSelect) Float64sX(ctx context.Context) []float64 {
 	return v
 }
 
-// Float64 returns a single float64 from selector. It is only allowed when selecting one field.
+// Float64 returns a single float64 from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
 	if v, err = as.Float64s(ctx); err != nil {
@@ -875,7 +906,7 @@ func (as *ActionSelect) Float64X(ctx context.Context) float64 {
 	return v
 }
 
-// Bools returns list of bools from selector. It is only allowed when selecting one field.
+// Bools returns list of bools from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) Bools(ctx context.Context) ([]bool, error) {
 	if len(as.fields) > 1 {
 		return nil, errors.New("ent: ActionSelect.Bools is not achievable when selecting more than 1 field")
@@ -896,7 +927,7 @@ func (as *ActionSelect) BoolsX(ctx context.Context) []bool {
 	return v
 }
 
-// Bool returns a single bool from selector. It is only allowed when selecting one field.
+// Bool returns a single bool from a selector. It is only allowed when selecting one field.
 func (as *ActionSelect) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
 	if v, err = as.Bools(ctx); err != nil {

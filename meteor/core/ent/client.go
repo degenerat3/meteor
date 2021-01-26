@@ -81,7 +81,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	if err != nil {
 		return nil, fmt.Errorf("ent: starting a transaction: %v", err)
 	}
-	cfg := config{driver: tx, log: c.log, debug: c.debug, hooks: c.hooks}
+	cfg := c.config
+	cfg.driver = tx
 	return &Tx{
 		ctx:    ctx,
 		config: cfg,
@@ -93,16 +94,19 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	}, nil
 }
 
-// BeginTx returns a transactional client with options.
+// BeginTx returns a transactional client with specified options.
 func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) {
 	if _, ok := c.driver.(*txDriver); ok {
 		return nil, fmt.Errorf("ent: cannot start a transaction within a transaction")
 	}
-	tx, err := c.driver.(*sql.Driver).BeginTx(ctx, opts)
+	tx, err := c.driver.(interface {
+		BeginTx(context.Context, *sql.TxOptions) (dialect.Tx, error)
+	}).BeginTx(ctx, opts)
 	if err != nil {
 		return nil, fmt.Errorf("ent: starting a transaction: %v", err)
 	}
-	cfg := config{driver: &txDriver{tx: tx, drv: c.driver}, log: c.log, debug: c.debug, hooks: c.hooks}
+	cfg := c.config
+	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
 		config: cfg,
 		Action: NewActionClient(cfg),
@@ -124,7 +128,8 @@ func (c *Client) Debug() *Client {
 	if c.debug {
 		return c
 	}
-	cfg := config{driver: dialect.Debug(c.driver, c.log), log: c.log, debug: true, hooks: c.hooks}
+	cfg := c.config
+	cfg.driver = dialect.Debug(c.driver, c.log)
 	client := &Client{config: cfg}
 	client.init()
 	return client
@@ -167,7 +172,7 @@ func (c *ActionClient) Create() *ActionCreate {
 	return &ActionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// BulkCreate returns a builder for creating a bulk of Action entities.
+// CreateBulk returns a builder for creating a bulk of Action entities.
 func (c *ActionClient) CreateBulk(builders ...*ActionCreate) *ActionCreateBulk {
 	return &ActionCreateBulk{config: c.config, builders: builders}
 }
@@ -221,11 +226,11 @@ func (c *ActionClient) Get(ctx context.Context, id int) (*Action, error) {
 
 // GetX is like Get, but panics if an error occurs.
 func (c *ActionClient) GetX(ctx context.Context, id int) *Action {
-	a, err := c.Get(ctx, id)
+	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
-	return a
+	return obj
 }
 
 // QueryTargeting queries the targeting edge of a Action.
@@ -271,7 +276,7 @@ func (c *BotClient) Create() *BotCreate {
 	return &BotCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// BulkCreate returns a builder for creating a bulk of Bot entities.
+// CreateBulk returns a builder for creating a bulk of Bot entities.
 func (c *BotClient) CreateBulk(builders ...*BotCreate) *BotCreateBulk {
 	return &BotCreateBulk{config: c.config, builders: builders}
 }
@@ -325,11 +330,11 @@ func (c *BotClient) Get(ctx context.Context, id int) (*Bot, error) {
 
 // GetX is like Get, but panics if an error occurs.
 func (c *BotClient) GetX(ctx context.Context, id int) *Bot {
-	b, err := c.Get(ctx, id)
+	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return obj
 }
 
 // QueryInfecting queries the infecting edge of a Bot.
@@ -375,7 +380,7 @@ func (c *GroupClient) Create() *GroupCreate {
 	return &GroupCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// BulkCreate returns a builder for creating a bulk of Group entities.
+// CreateBulk returns a builder for creating a bulk of Group entities.
 func (c *GroupClient) CreateBulk(builders ...*GroupCreate) *GroupCreateBulk {
 	return &GroupCreateBulk{config: c.config, builders: builders}
 }
@@ -429,11 +434,11 @@ func (c *GroupClient) Get(ctx context.Context, id int) (*Group, error) {
 
 // GetX is like Get, but panics if an error occurs.
 func (c *GroupClient) GetX(ctx context.Context, id int) *Group {
-	gr, err := c.Get(ctx, id)
+	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
-	return gr
+	return obj
 }
 
 // QueryMembers queries the members edge of a Group.
@@ -479,7 +484,7 @@ func (c *HostClient) Create() *HostCreate {
 	return &HostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// BulkCreate returns a builder for creating a bulk of Host entities.
+// CreateBulk returns a builder for creating a bulk of Host entities.
 func (c *HostClient) CreateBulk(builders ...*HostCreate) *HostCreateBulk {
 	return &HostCreateBulk{config: c.config, builders: builders}
 }
@@ -533,11 +538,11 @@ func (c *HostClient) Get(ctx context.Context, id int) (*Host, error) {
 
 // GetX is like Get, but panics if an error occurs.
 func (c *HostClient) GetX(ctx context.Context, id int) *Host {
-	h, err := c.Get(ctx, id)
+	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
-	return h
+	return obj
 }
 
 // QueryBots queries the bots edge of a Host.
@@ -615,7 +620,7 @@ func (c *UserClient) Create() *UserCreate {
 	return &UserCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// BulkCreate returns a builder for creating a bulk of User entities.
+// CreateBulk returns a builder for creating a bulk of User entities.
 func (c *UserClient) CreateBulk(builders ...*UserCreate) *UserCreateBulk {
 	return &UserCreateBulk{config: c.config, builders: builders}
 }
@@ -669,11 +674,11 @@ func (c *UserClient) Get(ctx context.Context, id int) (*User, error) {
 
 // GetX is like Get, but panics if an error occurs.
 func (c *UserClient) GetX(ctx context.Context, id int) *User {
-	u, err := c.Get(ctx, id)
+	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
-	return u
+	return obj
 }
 
 // Hooks returns the client hooks.

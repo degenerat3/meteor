@@ -22,7 +22,7 @@ type BotQuery struct {
 	limit      *int
 	offset     *int
 	order      []OrderFunc
-	unique     []string
+	fields     []string
 	predicates []predicate.Bot
 	// eager-loading edges.
 	withInfecting *HostQuery
@@ -32,7 +32,7 @@ type BotQuery struct {
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the builder.
+// Where adds a new predicate for the BotQuery builder.
 func (bq *BotQuery) Where(ps ...predicate.Bot) *BotQuery {
 	bq.predicates = append(bq.predicates, ps...)
 	return bq
@@ -56,15 +56,19 @@ func (bq *BotQuery) Order(o ...OrderFunc) *BotQuery {
 	return bq
 }
 
-// QueryInfecting chains the current query on the infecting edge.
+// QueryInfecting chains the current query on the "infecting" edge.
 func (bq *BotQuery) QueryInfecting() *HostQuery {
 	query := &HostQuery{config: bq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := bq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
+		selector := bq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(bot.Table, bot.FieldID, bq.sqlQuery()),
+			sqlgraph.From(bot.Table, bot.FieldID, selector),
 			sqlgraph.To(host.Table, host.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, bot.InfectingTable, bot.InfectingColumn),
 		)
@@ -74,28 +78,30 @@ func (bq *BotQuery) QueryInfecting() *HostQuery {
 	return query
 }
 
-// First returns the first Bot entity in the query. Returns *NotFoundError when no bot was found.
+// First returns the first Bot entity from the query.
+// Returns a *NotFoundError when no Bot was found.
 func (bq *BotQuery) First(ctx context.Context) (*Bot, error) {
-	bs, err := bq.Limit(1).All(ctx)
+	nodes, err := bq.Limit(1).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	if len(bs) == 0 {
+	if len(nodes) == 0 {
 		return nil, &NotFoundError{bot.Label}
 	}
-	return bs[0], nil
+	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
 func (bq *BotQuery) FirstX(ctx context.Context) *Bot {
-	b, err := bq.First(ctx)
+	node, err := bq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
-	return b
+	return node
 }
 
-// FirstID returns the first Bot id in the query. Returns *NotFoundError when no id was found.
+// FirstID returns the first Bot ID from the query.
+// Returns a *NotFoundError when no Bot ID was found.
 func (bq *BotQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = bq.Limit(1).IDs(ctx); err != nil {
@@ -108,8 +114,8 @@ func (bq *BotQuery) FirstID(ctx context.Context) (id int, err error) {
 	return ids[0], nil
 }
 
-// FirstXID is like FirstID, but panics if an error occurs.
-func (bq *BotQuery) FirstXID(ctx context.Context) int {
+// FirstIDX is like FirstID, but panics if an error occurs.
+func (bq *BotQuery) FirstIDX(ctx context.Context) int {
 	id, err := bq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -117,15 +123,17 @@ func (bq *BotQuery) FirstXID(ctx context.Context) int {
 	return id
 }
 
-// Only returns the only Bot entity in the query, returns an error if not exactly one entity was returned.
+// Only returns a single Bot entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when exactly one Bot entity is not found.
+// Returns a *NotFoundError when no Bot entities are found.
 func (bq *BotQuery) Only(ctx context.Context) (*Bot, error) {
-	bs, err := bq.Limit(2).All(ctx)
+	nodes, err := bq.Limit(2).All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	switch len(bs) {
+	switch len(nodes) {
 	case 1:
-		return bs[0], nil
+		return nodes[0], nil
 	case 0:
 		return nil, &NotFoundError{bot.Label}
 	default:
@@ -135,14 +143,16 @@ func (bq *BotQuery) Only(ctx context.Context) (*Bot, error) {
 
 // OnlyX is like Only, but panics if an error occurs.
 func (bq *BotQuery) OnlyX(ctx context.Context) *Bot {
-	b, err := bq.Only(ctx)
+	node, err := bq.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return b
+	return node
 }
 
-// OnlyID returns the only Bot id in the query, returns an error if not exactly one id was returned.
+// OnlyID is like Only, but returns the only Bot ID in the query.
+// Returns a *NotSingularError when exactly one Bot ID is not found.
+// Returns a *NotFoundError when no entities are found.
 func (bq *BotQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = bq.Limit(2).IDs(ctx); err != nil {
@@ -178,14 +188,14 @@ func (bq *BotQuery) All(ctx context.Context) ([]*Bot, error) {
 
 // AllX is like All, but panics if an error occurs.
 func (bq *BotQuery) AllX(ctx context.Context) []*Bot {
-	bs, err := bq.All(ctx)
+	nodes, err := bq.All(ctx)
 	if err != nil {
 		panic(err)
 	}
-	return bs
+	return nodes
 }
 
-// IDs executes the query and returns a list of Bot ids.
+// IDs executes the query and returns a list of Bot IDs.
 func (bq *BotQuery) IDs(ctx context.Context) ([]int, error) {
 	var ids []int
 	if err := bq.Select(bot.FieldID).Scan(ctx, &ids); err != nil {
@@ -237,24 +247,27 @@ func (bq *BotQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the query builder, including all associated steps. It can be
+// Clone returns a duplicate of the BotQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
 func (bq *BotQuery) Clone() *BotQuery {
+	if bq == nil {
+		return nil
+	}
 	return &BotQuery{
-		config:     bq.config,
-		limit:      bq.limit,
-		offset:     bq.offset,
-		order:      append([]OrderFunc{}, bq.order...),
-		unique:     append([]string{}, bq.unique...),
-		predicates: append([]predicate.Bot{}, bq.predicates...),
+		config:        bq.config,
+		limit:         bq.limit,
+		offset:        bq.offset,
+		order:         append([]OrderFunc{}, bq.order...),
+		predicates:    append([]predicate.Bot{}, bq.predicates...),
+		withInfecting: bq.withInfecting.Clone(),
 		// clone intermediate query.
 		sql:  bq.sql.Clone(),
 		path: bq.path,
 	}
 }
 
-//  WithInfecting tells the query-builder to eager-loads the nodes that are connected to
-// the "infecting" edge. The optional arguments used to configure the query builder of the edge.
+// WithInfecting tells the query-builder to eager-load the nodes that are connected to
+// the "infecting" edge. The optional arguments are used to configure the query builder of the edge.
 func (bq *BotQuery) WithInfecting(opts ...func(*HostQuery)) *BotQuery {
 	query := &HostQuery{config: bq.config}
 	for _, opt := range opts {
@@ -264,7 +277,7 @@ func (bq *BotQuery) WithInfecting(opts ...func(*HostQuery)) *BotQuery {
 	return bq
 }
 
-// GroupBy used to group vertices by one or more fields/columns.
+// GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
@@ -286,12 +299,13 @@ func (bq *BotQuery) GroupBy(field string, fields ...string) *BotGroupBy {
 		if err := bq.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		return bq.sqlQuery(), nil
+		return bq.sqlQuery(ctx), nil
 	}
 	return group
 }
 
-// Select one or more fields from the given query.
+// Select allows the selection one or more fields/columns for the given query,
+// instead of selecting all fields in the entity.
 //
 // Example:
 //
@@ -304,18 +318,16 @@ func (bq *BotQuery) GroupBy(field string, fields ...string) *BotGroupBy {
 //		Scan(ctx, &v)
 //
 func (bq *BotQuery) Select(field string, fields ...string) *BotSelect {
-	selector := &BotSelect{config: bq.config}
-	selector.fields = append([]string{field}, fields...)
-	selector.path = func(ctx context.Context) (prev *sql.Selector, err error) {
-		if err := bq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		return bq.sqlQuery(), nil
-	}
-	return selector
+	bq.fields = append([]string{field}, fields...)
+	return &BotSelect{BotQuery: bq}
 }
 
 func (bq *BotQuery) prepareQuery(ctx context.Context) error {
+	for _, f := range bq.fields {
+		if !bot.ValidColumn(f) {
+			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
+		}
+	}
 	if bq.path != nil {
 		prev, err := bq.path(ctx)
 		if err != nil {
@@ -341,22 +353,18 @@ func (bq *BotQuery) sqlAll(ctx context.Context) ([]*Bot, error) {
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, bot.ForeignKeys...)
 	}
-	_spec.ScanValues = func() []interface{} {
+	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &Bot{config: bq.config}
 		nodes = append(nodes, node)
-		values := node.scanValues()
-		if withFKs {
-			values = append(values, node.fkValues()...)
-		}
-		return values
+		return node.scanValues(columns)
 	}
-	_spec.Assign = func(values ...interface{}) error {
+	_spec.Assign = func(columns []string, values []interface{}) error {
 		if len(nodes) == 0 {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
 		node.Edges.loadedTypes = loadedTypes
-		return node.assignValues(values...)
+		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, bq.driver, _spec); err != nil {
 		return nil, err
@@ -419,6 +427,15 @@ func (bq *BotQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   bq.sql,
 		Unique: true,
 	}
+	if fields := bq.fields; len(fields) > 0 {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, bot.FieldID)
+		for i := range fields {
+			if fields[i] != bot.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			}
+		}
+	}
 	if ps := bq.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -435,14 +452,14 @@ func (bq *BotQuery) querySpec() *sqlgraph.QuerySpec {
 	if ps := bq.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
-				ps[i](selector)
+				ps[i](selector, bot.ValidColumn)
 			}
 		}
 	}
 	return _spec
 }
 
-func (bq *BotQuery) sqlQuery() *sql.Selector {
+func (bq *BotQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(bq.driver.Dialect())
 	t1 := builder.Table(bot.Table)
 	selector := builder.Select(t1.Columns(bot.Columns...)...).From(t1)
@@ -454,7 +471,7 @@ func (bq *BotQuery) sqlQuery() *sql.Selector {
 		p(selector)
 	}
 	for _, p := range bq.order {
-		p(selector)
+		p(selector, bot.ValidColumn)
 	}
 	if offset := bq.offset; offset != nil {
 		// limit is mandatory for offset clause. We start
@@ -467,7 +484,7 @@ func (bq *BotQuery) sqlQuery() *sql.Selector {
 	return selector
 }
 
-// BotGroupBy is the builder for group-by Bot entities.
+// BotGroupBy is the group-by builder for Bot entities.
 type BotGroupBy struct {
 	config
 	fields []string
@@ -483,7 +500,7 @@ func (bgb *BotGroupBy) Aggregate(fns ...AggregateFunc) *BotGroupBy {
 	return bgb
 }
 
-// Scan applies the group-by query and scan the result into the given value.
+// Scan applies the group-by query and scans the result into the given value.
 func (bgb *BotGroupBy) Scan(ctx context.Context, v interface{}) error {
 	query, err := bgb.path(ctx)
 	if err != nil {
@@ -500,7 +517,8 @@ func (bgb *BotGroupBy) ScanX(ctx context.Context, v interface{}) {
 	}
 }
 
-// Strings returns list of strings from group-by. It is only allowed when querying group-by with one field.
+// Strings returns list of strings from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) Strings(ctx context.Context) ([]string, error) {
 	if len(bgb.fields) > 1 {
 		return nil, errors.New("ent: BotGroupBy.Strings is not achievable when grouping more than 1 field")
@@ -521,7 +539,8 @@ func (bgb *BotGroupBy) StringsX(ctx context.Context) []string {
 	return v
 }
 
-// String returns a single string from group-by. It is only allowed when querying group-by with one field.
+// String returns a single string from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) String(ctx context.Context) (_ string, err error) {
 	var v []string
 	if v, err = bgb.Strings(ctx); err != nil {
@@ -547,7 +566,8 @@ func (bgb *BotGroupBy) StringX(ctx context.Context) string {
 	return v
 }
 
-// Ints returns list of ints from group-by. It is only allowed when querying group-by with one field.
+// Ints returns list of ints from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) Ints(ctx context.Context) ([]int, error) {
 	if len(bgb.fields) > 1 {
 		return nil, errors.New("ent: BotGroupBy.Ints is not achievable when grouping more than 1 field")
@@ -568,7 +588,8 @@ func (bgb *BotGroupBy) IntsX(ctx context.Context) []int {
 	return v
 }
 
-// Int returns a single int from group-by. It is only allowed when querying group-by with one field.
+// Int returns a single int from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) Int(ctx context.Context) (_ int, err error) {
 	var v []int
 	if v, err = bgb.Ints(ctx); err != nil {
@@ -594,7 +615,8 @@ func (bgb *BotGroupBy) IntX(ctx context.Context) int {
 	return v
 }
 
-// Float64s returns list of float64s from group-by. It is only allowed when querying group-by with one field.
+// Float64s returns list of float64s from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) Float64s(ctx context.Context) ([]float64, error) {
 	if len(bgb.fields) > 1 {
 		return nil, errors.New("ent: BotGroupBy.Float64s is not achievable when grouping more than 1 field")
@@ -615,7 +637,8 @@ func (bgb *BotGroupBy) Float64sX(ctx context.Context) []float64 {
 	return v
 }
 
-// Float64 returns a single float64 from group-by. It is only allowed when querying group-by with one field.
+// Float64 returns a single float64 from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
 	if v, err = bgb.Float64s(ctx); err != nil {
@@ -641,7 +664,8 @@ func (bgb *BotGroupBy) Float64X(ctx context.Context) float64 {
 	return v
 }
 
-// Bools returns list of bools from group-by. It is only allowed when querying group-by with one field.
+// Bools returns list of bools from group-by.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) Bools(ctx context.Context) ([]bool, error) {
 	if len(bgb.fields) > 1 {
 		return nil, errors.New("ent: BotGroupBy.Bools is not achievable when grouping more than 1 field")
@@ -662,7 +686,8 @@ func (bgb *BotGroupBy) BoolsX(ctx context.Context) []bool {
 	return v
 }
 
-// Bool returns a single bool from group-by. It is only allowed when querying group-by with one field.
+// Bool returns a single bool from a group-by query.
+// It is only allowed when executing a group-by query with one field.
 func (bgb *BotGroupBy) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
 	if v, err = bgb.Bools(ctx); err != nil {
@@ -689,8 +714,17 @@ func (bgb *BotGroupBy) BoolX(ctx context.Context) bool {
 }
 
 func (bgb *BotGroupBy) sqlScan(ctx context.Context, v interface{}) error {
+	for _, f := range bgb.fields {
+		if !bot.ValidColumn(f) {
+			return &ValidationError{Name: f, err: fmt.Errorf("invalid field %q for group-by", f)}
+		}
+	}
+	selector := bgb.sqlQuery()
+	if err := selector.Err(); err != nil {
+		return err
+	}
 	rows := &sql.Rows{}
-	query, args := bgb.sqlQuery().Query()
+	query, args := selector.Query()
 	if err := bgb.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
@@ -703,27 +737,24 @@ func (bgb *BotGroupBy) sqlQuery() *sql.Selector {
 	columns := make([]string, 0, len(bgb.fields)+len(bgb.fns))
 	columns = append(columns, bgb.fields...)
 	for _, fn := range bgb.fns {
-		columns = append(columns, fn(selector))
+		columns = append(columns, fn(selector, bot.ValidColumn))
 	}
 	return selector.Select(columns...).GroupBy(bgb.fields...)
 }
 
-// BotSelect is the builder for select fields of Bot entities.
+// BotSelect is the builder for selecting fields of Bot entities.
 type BotSelect struct {
-	config
-	fields []string
+	*BotQuery
 	// intermediate query (i.e. traversal path).
-	sql  *sql.Selector
-	path func(context.Context) (*sql.Selector, error)
+	sql *sql.Selector
 }
 
-// Scan applies the selector query and scan the result into the given value.
+// Scan applies the selector query and scans the result into the given value.
 func (bs *BotSelect) Scan(ctx context.Context, v interface{}) error {
-	query, err := bs.path(ctx)
-	if err != nil {
+	if err := bs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	bs.sql = query
+	bs.sql = bs.BotQuery.sqlQuery(ctx)
 	return bs.sqlScan(ctx, v)
 }
 
@@ -734,7 +765,7 @@ func (bs *BotSelect) ScanX(ctx context.Context, v interface{}) {
 	}
 }
 
-// Strings returns list of strings from selector. It is only allowed when selecting one field.
+// Strings returns list of strings from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) Strings(ctx context.Context) ([]string, error) {
 	if len(bs.fields) > 1 {
 		return nil, errors.New("ent: BotSelect.Strings is not achievable when selecting more than 1 field")
@@ -755,7 +786,7 @@ func (bs *BotSelect) StringsX(ctx context.Context) []string {
 	return v
 }
 
-// String returns a single string from selector. It is only allowed when selecting one field.
+// String returns a single string from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) String(ctx context.Context) (_ string, err error) {
 	var v []string
 	if v, err = bs.Strings(ctx); err != nil {
@@ -781,7 +812,7 @@ func (bs *BotSelect) StringX(ctx context.Context) string {
 	return v
 }
 
-// Ints returns list of ints from selector. It is only allowed when selecting one field.
+// Ints returns list of ints from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) Ints(ctx context.Context) ([]int, error) {
 	if len(bs.fields) > 1 {
 		return nil, errors.New("ent: BotSelect.Ints is not achievable when selecting more than 1 field")
@@ -802,7 +833,7 @@ func (bs *BotSelect) IntsX(ctx context.Context) []int {
 	return v
 }
 
-// Int returns a single int from selector. It is only allowed when selecting one field.
+// Int returns a single int from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) Int(ctx context.Context) (_ int, err error) {
 	var v []int
 	if v, err = bs.Ints(ctx); err != nil {
@@ -828,7 +859,7 @@ func (bs *BotSelect) IntX(ctx context.Context) int {
 	return v
 }
 
-// Float64s returns list of float64s from selector. It is only allowed when selecting one field.
+// Float64s returns list of float64s from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) Float64s(ctx context.Context) ([]float64, error) {
 	if len(bs.fields) > 1 {
 		return nil, errors.New("ent: BotSelect.Float64s is not achievable when selecting more than 1 field")
@@ -849,7 +880,7 @@ func (bs *BotSelect) Float64sX(ctx context.Context) []float64 {
 	return v
 }
 
-// Float64 returns a single float64 from selector. It is only allowed when selecting one field.
+// Float64 returns a single float64 from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) Float64(ctx context.Context) (_ float64, err error) {
 	var v []float64
 	if v, err = bs.Float64s(ctx); err != nil {
@@ -875,7 +906,7 @@ func (bs *BotSelect) Float64X(ctx context.Context) float64 {
 	return v
 }
 
-// Bools returns list of bools from selector. It is only allowed when selecting one field.
+// Bools returns list of bools from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) Bools(ctx context.Context) ([]bool, error) {
 	if len(bs.fields) > 1 {
 		return nil, errors.New("ent: BotSelect.Bools is not achievable when selecting more than 1 field")
@@ -896,7 +927,7 @@ func (bs *BotSelect) BoolsX(ctx context.Context) []bool {
 	return v
 }
 
-// Bool returns a single bool from selector. It is only allowed when selecting one field.
+// Bool returns a single bool from a selector. It is only allowed when selecting one field.
 func (bs *BotSelect) Bool(ctx context.Context) (_ bool, err error) {
 	var v []bool
 	if v, err = bs.Bools(ctx); err != nil {

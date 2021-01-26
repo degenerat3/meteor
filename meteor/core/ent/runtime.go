@@ -9,8 +9,8 @@ import (
 	"github.com/degenerat3/meteor/meteor/core/ent/schema"
 )
 
-// The init function reads all schema descriptors with runtime
-// code (default values, validators or hooks) and stitches it
+// The init function reads all schema descriptors with runtime code
+// (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
 	actionFields := schema.Action{}.Fields()
