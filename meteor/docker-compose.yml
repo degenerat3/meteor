@@ -93,7 +93,7 @@ services:
       meteornet: 
         ipv4_address: 172.16.77.7
 
-  little_Foot:
+  little_foot:
     build:
       context: listeners/little_foot/
     volumes:
