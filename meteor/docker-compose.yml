@@ -96,6 +96,8 @@ services:
   little_foot:
     build:
       context: listeners/little_foot/
+    ports:
+      - "8080:8080"
     volumes:
       - /var/log/meteor/little_foot:/var/log/meteor/little_foot
       - ./bin:/app
