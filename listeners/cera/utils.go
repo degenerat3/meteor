@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/base64"
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	"github.com/degenerat3/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"

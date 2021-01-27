@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	"github.com/degenerat3/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"

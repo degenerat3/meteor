@@ -7,13 +7,13 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/degenerat3/meteor/meteor/core/ent/migrate"
+	"github.com/degenerat3/meteor/core/ent/migrate"
 
-	"github.com/degenerat3/meteor/meteor/core/ent/action"
-	"github.com/degenerat3/meteor/meteor/core/ent/bot"
-	"github.com/degenerat3/meteor/meteor/core/ent/group"
-	"github.com/degenerat3/meteor/meteor/core/ent/host"
-	"github.com/degenerat3/meteor/meteor/core/ent/user"
+	"github.com/degenerat3/meteor/core/ent/action"
+	"github.com/degenerat3/meteor/core/ent/bot"
+	"github.com/degenerat3/meteor/core/ent/group"
+	"github.com/degenerat3/meteor/core/ent/host"
+	"github.com/degenerat3/meteor/core/ent/user"
 
 	"github.com/facebook/ent/dialect"
 	"github.com/facebook/ent/dialect/sql"

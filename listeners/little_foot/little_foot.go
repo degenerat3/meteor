@@ -1,8 +1,8 @@
 package main
 
 import (
-	lUtils "github.com/degenerat3/meteor/meteor/listeners/utils"
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	lUtils "github.com/degenerat3/meteor/listeners/utils"
+	"github.com/degenerat3/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"log"

@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/base64"
-	lUtils "github.com/degenerat3/meteor/meteor/listeners/utils"
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	lUtils "github.com/degenerat3/meteor/listeners/utils"
+	"github.com/degenerat3/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/net/icmp"
 	"log"

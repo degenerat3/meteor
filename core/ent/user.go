@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/degenerat3/meteor/meteor/core/ent/user"
+	"github.com/degenerat3/meteor/core/ent/user"
 	"github.com/facebook/ent/dialect/sql"
 )
 

@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/degenerat3/meteor/meteor/core/ent/action"
-	"github.com/degenerat3/meteor/meteor/core/ent/bot"
-	"github.com/degenerat3/meteor/meteor/core/ent/group"
-	"github.com/degenerat3/meteor/meteor/core/ent/host"
-	"github.com/degenerat3/meteor/meteor/core/ent/predicate"
-	"github.com/degenerat3/meteor/meteor/core/ent/user"
+	"github.com/degenerat3/meteor/core/ent/action"
+	"github.com/degenerat3/meteor/core/ent/bot"
+	"github.com/degenerat3/meteor/core/ent/group"
+	"github.com/degenerat3/meteor/core/ent/host"
+	"github.com/degenerat3/meteor/core/ent/predicate"
+	"github.com/degenerat3/meteor/core/ent/user"
 
 	"github.com/facebook/ent"
 )

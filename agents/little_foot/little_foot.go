@@ -3,8 +3,8 @@ package main
 import (
 	"bytes"
 	"fmt"
-	agentUtils "github.com/degenerat3/meteor/meteor/agents/utils"
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	agentUtils "github.com/degenerat3/meteor/agents/utils"
+	"github.com/degenerat3/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"io/ioutil"
 	"math/rand"

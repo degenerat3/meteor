@@ -3,7 +3,7 @@
 package user
 
 import (
-	"github.com/degenerat3/meteor/meteor/core/ent/predicate"
+	"github.com/degenerat3/meteor/core/ent/predicate"
 	"github.com/facebook/ent/dialect/sql"
 )
 

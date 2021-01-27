@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	"github.com/degenerat3/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	_ "github.com/lib/pq"
 	"io/ioutil"

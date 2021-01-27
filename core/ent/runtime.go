@@ -3,10 +3,10 @@
 package ent
 
 import (
-	"github.com/degenerat3/meteor/meteor/core/ent/action"
-	"github.com/degenerat3/meteor/meteor/core/ent/bot"
-	"github.com/degenerat3/meteor/meteor/core/ent/host"
-	"github.com/degenerat3/meteor/meteor/core/ent/schema"
+	"github.com/degenerat3/meteor/core/ent/action"
+	"github.com/degenerat3/meteor/core/ent/bot"
+	"github.com/degenerat3/meteor/core/ent/host"
+	"github.com/degenerat3/meteor/core/ent/schema"
 )
 
 // The init function reads all schema descriptors with runtime code

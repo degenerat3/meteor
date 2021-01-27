@@ -7,8 +7,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/degenerat3/meteor/meteor/core/ent/bot"
-	"github.com/degenerat3/meteor/meteor/core/ent/host"
+	"github.com/degenerat3/meteor/core/ent/bot"
+	"github.com/degenerat3/meteor/core/ent/host"
 	"github.com/facebook/ent/dialect/sql/sqlgraph"
 	"github.com/facebook/ent/schema/field"
 )

@@ -2,4 +2,4 @@
 
 package runtime
 
-// The schema-stitching logic is generated in github.com/degenerat3/meteor/meteor/core/ent/runtime.go
+// The schema-stitching logic is generated in github.com/degenerat3/meteor/core/ent/runtime.go

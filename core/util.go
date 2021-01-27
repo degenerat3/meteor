@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/degenerat3/meteor/meteor/core/ent/action"
-	"github.com/degenerat3/meteor/meteor/core/ent/bot"
-	"github.com/degenerat3/meteor/meteor/core/ent/group"
-	"github.com/degenerat3/meteor/meteor/core/ent/host"
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	"github.com/degenerat3/meteor/core/ent/action"
+	"github.com/degenerat3/meteor/core/ent/bot"
+	"github.com/degenerat3/meteor/core/ent/group"
+	"github.com/degenerat3/meteor/core/ent/host"
+	"github.com/degenerat3/meteor/pbuf"
 	goUUID "github.com/google/uuid"
 	"strconv"
 	"time"

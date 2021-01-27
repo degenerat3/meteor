@@ -5,9 +5,9 @@ package enttest
 import (
 	"context"
 
-	"github.com/degenerat3/meteor/meteor/core/ent"
+	"github.com/degenerat3/meteor/core/ent"
 	// required by schema hooks.
-	_ "github.com/degenerat3/meteor/meteor/core/ent/runtime"
+	_ "github.com/degenerat3/meteor/core/ent/runtime"
 
 	"github.com/facebook/ent/dialect/sql/schema"
 )

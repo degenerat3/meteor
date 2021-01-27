@@ -3,8 +3,8 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/base64"
-	"github.com/degenerat3/meteor/meteor/core/ent/user"
-	"github.com/degenerat3/meteor/meteor/pbuf"
+	"github.com/degenerat3/meteor/core/ent/user"
+	"github.com/degenerat3/meteor/pbuf"
 	"github.com/golang/protobuf/proto"
 	"math/rand"
 	"os"
