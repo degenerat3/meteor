@@ -63,3 +63,9 @@ The `result` option is used to view the output of your actions. Simply pass in t
 The `list` option is used to view objects that are currently being tracked in the Meteor backend. Ex: use it to list all the currently tracked hosts/bots, all the actions you've queued, or all the available action modes.   
 
 The `build` option will take you through an interactive prompt in order to build various meteor objects (currently only agent buildig is supported). You'll choose the agent type you want to build, target OS, beacon time, and a few other required configs. The output of the `build` command will be a Nest link to download the object. While agents are the only thing currently able to be compiled using DT `build`, future support for things such as droppers and other resources is planned.  
+
+
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/degenerat3/meteor/master/docs/images/dt_walkthrough.gif">
+</p>
