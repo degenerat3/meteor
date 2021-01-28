@@ -44,10 +44,11 @@ func genInvalidTok() []byte {
 	return rdata
 }
 
-func newSession() string {
+func newSession(username string) string {
 	token := genRando()
 	exp := time.Now().Unix() + 600
 	ses := session{
+		User:  username,
 		Token: token,
 		Exp:   exp,
 	}
@@ -94,4 +95,18 @@ func genRando() string {
 	}
 	str := b.String()
 	return str
+}
+
+func validateUserToken(tok string, user string) bool {
+	for _, ses := range sessions {
+		if tok == ses.Token {
+			if ses.User == user {
+				return true
+			} else if user == "admin" {
+				return true
+			}
+			return false
+		}
+	}
+	return false
 }

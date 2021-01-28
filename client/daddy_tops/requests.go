@@ -17,6 +17,15 @@ import (
 )
 
 func login() {
+	envtoken := os.Getenv("DT_TOK")
+	if envtoken != "" {
+		authToken = envtoken
+		valid := checkRefresh()
+		if valid {
+			return
+		}
+		fmt.Println("Current token is invalid, please re-auth.")
+	}
 	fmt.Println("LOGIN")
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Username: ")
@@ -61,6 +70,28 @@ func login() {
 		os.Exit(0)
 	}
 	authToken = tok
+	os.Setenv("DT_TOK", tok)
+}
+
+func checkRefresh() bool {
+	authdat := generateAuthData()
+	refcheck := &mcs.MCS{
+		AuthDat: authdat,
+	}
+	refbytes, err := proto.Marshal(refcheck)
+	if err != nil {
+		panic(err)
+	}
+	url := "http://" + DTSERVER + "/refresh"
+	resp, err := http.Post(url, "", bytes.NewBuffer(refbytes))
+	if err != nil {
+		panic(err)
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if string(data) == "ok" {
+		return true
+	}
+	return false
 }
 
 func generateAuthData() *mcs.AuthDat {

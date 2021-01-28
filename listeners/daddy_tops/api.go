@@ -14,6 +14,7 @@ import (
 )
 
 type session struct {
+	User  string
 	Token string
 	Exp   int64
 }
@@ -79,6 +80,59 @@ func registerUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func changeUserPassword(w http.ResponseWriter, r *http.Request) {
+	data, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	webdat := &mcs.MCS{}
+	proto.Unmarshal(data, webdat)
+	authDat := webdat.GetAuthDat()
+	tok := authDat.GetToken()
+	targetUser := authDat.GetUsername()
+	targetPassword := authDat.GetPassword()
+	authorized := validateUserToken(tok, targetUser)
+	if authorized {
+		hasher := sha1.New()
+		hasher.Write([]byte(targetPassword))
+		encpw := base64.URLEncoding.EncodeToString(hasher.Sum(nil))
+		userObj, err := DBClient.User.Query().Where(user.Username(targetUser)).Only(ctx)
+		if err != nil {
+			resp := &mcs.MCS{
+				Status: 500,
+				Desc:   err.Error(),
+			}
+			rdata, _ := proto.Marshal(resp)
+			w.Write(rdata)
+			return
+		}
+		_, err = userObj.Update().SetPassword(encpw).Save(ctx)
+		if err != nil {
+			resp := &mcs.MCS{
+				Status: 500,
+				Desc:   err.Error(),
+			}
+			rdata, _ := proto.Marshal(resp)
+			w.Write(rdata)
+			return
+		}
+		resp := &mcs.MCS{
+			Status: 200,
+			Desc:   "Password upated",
+		}
+		rdata, _ := proto.Marshal(resp)
+		w.Write(rdata)
+		return
+	}
+	resp := &mcs.MCS{
+		Status: 401,
+		Desc:   "User is not authorized for this operation",
+	}
+	rdata, _ := proto.Marshal(resp)
+	w.Write(rdata)
+	return
+}
+
 func refresh(w http.ResponseWriter, r *http.Request) {
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -91,6 +145,9 @@ func refresh(w http.ResponseWriter, r *http.Request) {
 		authDat := refReq.GetAuthDat()
 		tok := authDat.GetToken()
 		refreshSession(tok)
+		w.Write([]byte("ok"))
+	} else {
+		w.Write([]byte("expired"))
 	}
 }
 
@@ -120,7 +177,7 @@ func userLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	resp := &mcs.MCS{
 		Status: 200,
-		Desc:   newSession(),
+		Desc:   newSession(un),
 	}
 	rdata, _ := proto.Marshal(resp)
 	w.Write(rdata)

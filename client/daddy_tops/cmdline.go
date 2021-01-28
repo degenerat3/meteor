@@ -61,6 +61,7 @@ func registerHosts(cfname string) {
 
 func setServer(sv string) {
 	DTSERVER = sv
+	os.Setenv("DT_SERVER", sv)
 	return
 }
 
@@ -108,6 +109,45 @@ func registerUser() {
 	}
 	url := "http://" + DTSERVER + "/register/user"
 	_, err = http.Post(url, "", bytes.NewBuffer(hdata))
+	if err != nil {
+		panic(err)
+	}
+	return
+}
+
+func changePW() {
+	login()
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("\nTarget Username: ")
+	un, _ := reader.ReadString('\n')
+	un = strings.TrimSuffix(un, "\n")
+	un = strings.TrimSuffix(un, "\r")
+	DTUSER = un
+	fmt.Print("New Password: ")
+	bytePassword, _ := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Print("\nConfirm Password: ")
+	bytePassword2, _ := terminal.ReadPassword(int(syscall.Stdin))
+	fmt.Println()
+	pw := string(bytePassword)
+	pw2 := string(bytePassword2)
+	if pw != pw2 {
+		fmt.Println("Error: Passwords do not match")
+		os.Exit(0)
+	}
+	authdat := &mcs.AuthDat{
+		Username: un,
+		Password: pw,
+		Token:    authToken,
+	}
+	chpw := &mcs.MCS{
+		AuthDat: authdat,
+	}
+	chpwdata, err := proto.Marshal(chpw)
+	if err != nil {
+		panic(err)
+	}
+	url := "http://" + DTSERVER + "/changepassword"
+	_, err = http.Post(url, "", bytes.NewBuffer(chpwdata))
 	if err != nil {
 		panic(err)
 	}
