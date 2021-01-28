@@ -32,6 +32,7 @@ var (
 
 func main() {
 	infoLog, warnLog, errLog = lUtils.InitLogger(LOGPATH)
+	infoLog.Println("Listening for Little_Foot connections on port: " + PORT)
 	http.HandleFunc("/", status)
 	http.HandleFunc("/status", status)
 	http.HandleFunc("/lf", connHandle)
@@ -50,7 +51,6 @@ func status(w http.ResponseWriter, r *http.Request) {
 }
 
 func connHandle(w http.ResponseWriter, r *http.Request) {
-	infoLog.Println("Connection recieved, reading data...")
 	data, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		errLog.Println(err.Error())

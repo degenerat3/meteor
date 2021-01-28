@@ -43,7 +43,7 @@ func main() {
 	}
 
 	defer l.Close()
-	infoLog.Println("Listening for Petrie connections on port:" + PORT)
+	infoLog.Println("Listening for Petrie connections on port: " + PORT)
 	for {
 		conn, err := l.Accept()
 		if err != nil {
@@ -56,7 +56,6 @@ func main() {
 }
 
 func connHandle(conn net.Conn) {
-	infoLog.Println("Connection recieved, reading data...")
 	data, _ := bufio.NewReader(conn).ReadString('\n')
 	data = strings.TrimSuffix(data, "\n")
 	decoded, err := base64.StdEncoding.DecodeString(data)
