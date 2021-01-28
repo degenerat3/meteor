@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="200" height="200" src="http://link.to.meteor">
+  <img width="200" height="200" src="https://raw.githubusercontent.com/degenerat3/meteor/master/docs/images/meteor_logo.png">
 </p>
 
 # Meteor
