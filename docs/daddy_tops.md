@@ -18,6 +18,7 @@ Only DT versions for Linux and Windows automatically compiled, others can be bui
  - `./dt --register-hosts <config.yml>` - parse a hosts yml file, register the host/group objects in the meteor backend. An example config file can be found at `meteor/client/daddy_tops/example_hosts.yml`  
  - `./dt --register-user` - follow the prompts to add a new user. This requires the admin password
  - `./dt --change-password` - follow prompts to update the password for an existing target user. Can be done by admin or the target user themself
+ - `./dt --clear-token` - clear your session token so you can log in as a different user
 
 ## Interactive Prompt  
 In order to access the interactive CLI, simply run `./dt` without any arguments and follow the login prompt. Afterwhich you will be dumped to the Daddy Tops shell: `DT>`. From here, the user has access to the following utilities:

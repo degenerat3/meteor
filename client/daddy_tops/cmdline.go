@@ -154,6 +154,10 @@ func changePW() {
 	return
 }
 
+func clearToken() {
+	setDTEnv("token", "*")
+}
+
 func initDTEnv() {
 	if _, err := os.Stat(".dtenv"); os.IsNotExist(err) {
 		file, err := os.Create(".dtenv")

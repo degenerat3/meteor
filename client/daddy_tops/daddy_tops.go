@@ -57,6 +57,8 @@ func main() {
 		} else if os.Args[1] == "--change-password" {
 			changePW()
 			os.Exit(0)
+		} else if os.Args[1] == "--clear-token" {
+			clearToken()
 		} else {
 			fmt.Println("Unknown argument")
 			os.Exit(0)
