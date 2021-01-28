@@ -19,7 +19,7 @@ var authToken string
 func getDTServ() string {
 	s := os.Getenv("DT_SERVER")
 	if s == "" {
-		if os.Args[1] == "--server" {
+		if (len(os.Args) > 1) && (os.Args[1] == "--server") {
 			return "placeholder"
 		}
 		fmt.Println("'DT_SERVER' env is undefined, please specify the upstream Daddy Tops server.")
