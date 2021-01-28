@@ -17,12 +17,12 @@ var DTUSER string
 var authToken string
 
 func getDTServ() string {
-	s := os.Getenv("DT_SERVER")
-	if s == "" {
+	s := getDTEnv("server")
+	if s == "*" {
 		if (len(os.Args) > 1) && (os.Args[1] == "--server") {
 			return "placeholder"
 		}
-		fmt.Println("'DT_SERVER' env is undefined, please specify the upstream Daddy Tops server.")
+		fmt.Println("'server' in .dtenv is undefined, please specify the upstream Daddy Tops server.")
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Enter DT Server (ex 127.0.0.1:8888): ")
 		s, _ = reader.ReadString('\n')
@@ -34,6 +34,7 @@ func getDTServ() string {
 }
 
 func main() {
+	initDTEnv()
 	DTSERVER = getDTServ()
 	if len(os.Args) > 1 {
 		if os.Args[1] == "--register-hosts" {

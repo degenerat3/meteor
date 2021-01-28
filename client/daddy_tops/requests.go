@@ -17,8 +17,8 @@ import (
 )
 
 func login() {
-	envtoken := os.Getenv("DT_TOK")
-	if envtoken != "" {
+	envtoken := getDTEnv("token")
+	if envtoken != "*" {
 		authToken = envtoken
 		valid := checkRefresh()
 		if valid {
@@ -70,7 +70,7 @@ func login() {
 		os.Exit(0)
 	}
 	authToken = tok
-	os.Setenv("DT_TOK", tok)
+	setDTEnv("token", tok)
 }
 
 func checkRefresh() bool {

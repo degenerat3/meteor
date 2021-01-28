@@ -61,7 +61,7 @@ func registerHosts(cfname string) {
 
 func setServer(sv string) {
 	DTSERVER = sv
-	os.Setenv("DT_SERVER", sv)
+	setDTEnv("server", sv)
 	return
 }
 
@@ -152,4 +152,51 @@ func changePW() {
 		panic(err)
 	}
 	return
+}
+
+func initDTEnv() {
+	if _, err := os.Stat(".dtenv"); os.IsNotExist(err) {
+		file, err := os.Create(".dtenv")
+
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+		file.WriteString("*|*")
+	}
+}
+
+func getDTEnv(key string) string {
+	b, err := ioutil.ReadFile(".dtenv")
+	if err != nil {
+		panic(err)
+	}
+	vals := strings.Split(string(b), "|")
+	if key == "token" {
+		return vals[1]
+	} else if key == "server" {
+		return vals[0]
+	}
+	return ""
+}
+
+func setDTEnv(key string, value string) {
+	newEnv := ""
+	b, err := ioutil.ReadFile(".dtenv")
+	if err != nil {
+		panic(err)
+	}
+	vals := strings.Split(string(b), "|")
+	if key == "token" {
+		newEnv = vals[0] + "|" + value
+	} else if key == "server" {
+		newEnv = value + "|" + vals[1]
+	}
+	file, err := os.Create(".dtenv")
+
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+	file.WriteString(newEnv)
 }
