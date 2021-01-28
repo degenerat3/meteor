@@ -1,107 +1,216 @@
-# Core API Endpoints
+# Core API
+Details on the to communicate with the Meteor Core API.  
 
-## Registration Endpoints
+All of these requests/responses will make use of the MCS protobuf as defined in `meteor/pbuf/mcs.proto`.  
 
-### /register/bot  
-Description:  Register a new bot with the database  
-Method: POST  
-Parameters: 
+
+### Registration Endpoints
+---
+
+### `/register/bot`
+Desc: create new bot entry  
+Method: `POST`   
+Request Params:   
 ```
 uuid:      the client-generated unique identifier for the new bot [string]
-interval:  the interval (in seconds) between callbacks [string]
-delta:     the variation (in seconds) of each interval [string]
-hostname:  the host that the bot is running on (generally an IP address) [string]
+interval:  the interval (in seconds) between callbacks [int32]
+delta:     the variation (in seconds) of each interval [int32]
+hostname:  the host that the bot is running on [string]
+```  
+Response Params:   
+```
+status: HTTP response [int32]
 ```
 
-### /register/host 
-Description:  Register a new host with the database  
-Method: POST  
-Parameters: 
+---
+
+### `/register/host`
+Desc: create new host entry  
+Method: `POST`   
+Request Params:   
 ```
-hostname:   the host to be registered (usually an IP address) [string]
-interface:  the name of the primary networking interface (ex: ens33, eth1, etc) [string]
-groupname:  the name of the group that the host belongs to (web, windows, etc) [string]
+hostname:  the name of the host being registered [string]
+interface: the primary interface used by the host [string]
+```
+Response Params: 
+```
+status: HTTP response [int32]
 ```
 
-### /register/group
-Description:  Register a new group with the database  
-Method: POST  
-Parameters: 
+---
+
+### `/register/group`
+Desc: create new group entry  
+Method: `POST`    
+Request Params:   
 ```
-groupname:  the name of the group being created [string]
+groupname: the name of the group being registered [string]
+desc:      the description of the group [string]
+``` 
+Response Params:   
+```
+status: HTTP response [int32]
 ```
 
-## Add Endpoints
-### /add/command/single
-Description:  Queue an action targeting a single host
-Method: POST  
-Parameters: 
-```
-hostname:   the host that the action will be run on [string]
-mode:       the type of action being executed (see mode documentation for options) [string]
-arguments:  data neccessary for the action selection (ex: command line arguments) [string]
-options:    for future use, not currently utilized [string]
-```
+---
 
-### /add/command/group
-Description:  Queue an action targeting an entire group  
-Method: POST  
-Parameters: 
+### `/register/hostgroup`
+Desc: assign a group to a host  
+Method: `POST`    
+Request Params:   
 ```
-groupname:  the group of hosts that the action will be run on [string]
-mode:       the type of action being executed (see mode documentation for options) [string]
-arguments:  data neccessary for the action selection (ex: command line arguments) [string]
-options:    for future use, not currently utilized [string]
+hostname:  the host that will be assigned [string]
+groupname: the group that the host will be added to [string]
+``` 
+Response Params:   
+```
+status: HTTP response [int32]
 ```
 
-### /add/actionresult
-Description:  Track feedback of action (stdout/stderr/etc)  
-Method: POST  
-Parameters: 
-```
-actionid:   the ID of the action that was executed [string] 
-data:       the output of the action (stdout/stderr/etc) [string]
-```
-## Get Endpoints
-### /get/actionresult
-Description:  View the feedback from an executed action
-Method: POST  
-Parameters: 
-```
-actionid:   the ID of the action you want to view the result of [string]
-```
+---
 
-### /get/command
-Description:  Fetch all actions that are currently queue'd for your host
-Method: POST  
-Parameters: 
+## Action Endpoints
+
+---
+
+### `/add/action/single`	
+Desc: queue a new action assigned to a specific host  
+Method: `POST`  
+Request Params:   
 ```
-uuid:   the unique ID of the bot requesting the actions [string]
+mode:      the action mode [string]
+args:      required arg data for the mode type [string]
+hostname:    the host to run the action against [string]
+```
+Response Params:   
+```
+status: HTTP response [int32]
 ```
 
-### List Endpoints
-### /list/actions
-Description:  show details of all registered actions  
-Method: GET
+---
 
-### /list/bots
-Description:  show details of all registered bots  
-Method: GET 
+### `/add/action/group`
+Desc: queue a new action assigned to a group  
+Method: `POST`   
+Request Params:   
+```
+mode:      the action mode [string]
+args:      required arg data for the mode type [string]
+groupname:    the group to run the action against [string]     
+```
+Response Params:   
+```
+status: HTTP response [int32]
+```
 
-### /list/groups
-Description:  show details of all registered groups  
-Method: GET
+---
 
-### /list/hosts
-Description:  show details of all registered hosts  
-Method: GET
+### `/add/result`
+Desc: update an action with the included "result" (usually oputput of action)  
+Method: `POST`   
+Request Params:   
+```
+uuid:      the action id this result is associated with [string]
+result:      the action result data to store (usually output of the action) [string]
+```
+Response Params:   
+```
+status: HTTP response [int32]
+```
 
-## Other Endpoints
-### /dumpdb or /list/db
-Description:  show every record in every table of the meteor DB  
-Method: GET
+---
 
-### /cleardb
-Description:  delete every record in every table of the meteor DB  
-Method: GET
+### `/bot/checkin`
+Desc: the endpoint listeners will query when a bot "beacons." Checks if any action is pending, returns proto for any pending actions or "None"  
+Method: `POST`  
+Request Params:   
+```
+uuid:      the previously-registered unique identifier for the bot [string]
+```
+Response Params:   
+```
+status: HTTP response [int32]
+actions: an array of actions to execute [Action]
+```
 
+---
+
+## List Endpoints
+
+---
+
+### `/list/bots`	
+Desc: print all bots and what host they're associated with  
+Method: `GET`  
+Request Params:   
+```
+None
+```
+Response Params:   
+```
+status: HTTP response [int32]
+desc: newline-separated '<UUID> : <lastseen>' [string]
+```
+
+---
+
+### `/list/hosts`
+Desc: print all hosts and what group they're associated with  
+Method: `GET`  
+Request Params:   
+```
+None
+```
+Response Params:   
+```
+status: HTTP response [int32]
+desc: newline-separated '<hostnme> : <group(s)> : <lastseen>' [string]
+```
+
+---
+
+### `/list/groups`
+Desc: print all group names and how many members they have  
+Method: `GET`  
+Request Params:   
+```
+None
+```
+Response Params:   
+```
+status: HTTP response [int32]
+desc: newline-separated '<name> : <desc>' [string]
+```
+
+---
+
+## Misc Endpoints
+
+---
+
+### `/cleardata`
+Desc: delete all the current bots/hosts/groups/actions on the server  
+Method: `GET`   
+Request Params:   
+```
+None
+``` 
+Response Params:   
+```
+status: HTTP response [int32]
+```
+
+---
+
+### `/status` or `/`
+Desc: get status of the Core server, either "Core is running." or no response  
+Method: `Get`  
+Request Params:   
+```
+None
+```  
+Response Params:   
+```
+status: HTTP response [int32]
+desc: error, if any [string]
+```

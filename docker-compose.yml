@@ -8,59 +8,111 @@ services:
       - "db"
     volumes:
       - /var/log/meteor/core:/var/log/meteor/core
+    command: sh -c "/wait && /root/core"
+    environment:
+      - WAIT_HOSTS=db:5432
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=3
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+      - LOGPATH=/var/log/meteor/core/core.log
     networks:
       meteornet:
-        ipv4_address: 172.69.1.1
+        ipv4_address: 172.16.77.2
 
   db:
     build:
       context: database/
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
+    environment: 
+      POSTGRES_HOST_AUTH_METHOD: "trust"
     networks:
       meteornet:
-        ipv4_address: 172.69.1.2
+        ipv4_address: 172.16.77.3
   
   daddytops:
     build:
-      context: modules/daddy_tops/
+      context: listeners/daddy_tops/
     ports:
       - "8888:8888"
+    depends_on:
+      - "core"
     volumes:
       - /var/log/meteor/daddytops:/var/log/meteor/daddytops
-      - ./dtdb-data:/etc/dbfiles
+    command: sh -c "/wait && /root/daddy_tops"
+    environment:
+      - WAIT_HOSTS=db:5432
+      - WAIT_HOSTS_TIMEOUT=300
+      - WAIT_SLEEP_INTERVAL=3
+      - WAIT_HOST_CONNECT_TIMEOUT=30
+      - CORE_SERVER=172.16.77.2
+      - NEST_SERVER=172.16.77.5:45678
+      - ADMIN_PW=admin123!
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.4
+
+  nest:
+    build:
+      context: listeners/nest/
+    ports:
+      - "45678:45678"
+    volumes:
+      - /var/log/meteor/nest:/var/log/meteor/nest
     restart: always
     networks:
       meteornet: 
-        ipv4_address: 172.69.1.3
+        ipv4_address: 172.16.77.5
 
   petrie:
     build:
-      context: modules/petrie/
+      context: listeners/petrie/
     ports:
-      - "5657:5657"
+      - "10666:10666"
     volumes:
       - /var/log/meteor/petrie:/var/log/meteor/petrie
+    environment:
+      - PETRIE_PORT=10666
+      - CORE_SERVER=172.16.77.2:9999
+      - LOGPATH=/var/log/meteor/petrie/petrie.log
     restart: always
     networks:
-      meteornet:
-        ipv4_address: 172.69.1.4
-
-  littlefoot:
+      meteornet: 
+        ipv4_address: 172.16.77.6
+  
+  cera:
     build:
-      context: modules/little_foot/
-    ports:
-      - "80:80"
+      context: listeners/cera/
     volumes:
-      - /var/log/meteor/littlefoot:/var/log/meteor/littlefoot
-    restart: always
+      - /var/log/meteor/cera:/var/log/meteor/cera
+      - ./bin:/app
+    environment:
+      - CORE_SERVER=172.16.77.2:9999
+      - LOGPATH=/var/log/meteor/cera/cera.log
     networks:
-      meteornet:
-        ipv4_address: 172.69.1.5
+      meteornet: 
+        ipv4_address: 172.16.77.7
+
+  little_foot:
+    build:
+      context: listeners/little_foot/
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/log/meteor/little_foot:/var/log/meteor/little_foot
+      - ./bin:/app
+    environment:
+      - CORE_SERVER=172.16.77.2:9999
+      - LOGPATH=/var/log/meteor/little_foot/little_foot.log
+      - LF_PORT=8080
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.8
+
 
 networks:
   meteornet:
     ipam:
       driver: default
       config:
-        - subnet: 172.69.0.0/16
+        - subnet: 172.16.77.0/24
