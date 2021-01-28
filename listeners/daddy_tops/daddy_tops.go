@@ -41,6 +41,7 @@ func main() {
 	http.HandleFunc("/register/group", forwardReq)
 	http.HandleFunc("/register/hostgroup", forwardReq)
 	http.HandleFunc("/register/user", registerUser)
+	http.HandleFunc("/changepassword", changeUserPassword)
 	http.HandleFunc("/add/action/single", forwardReq)
 	http.HandleFunc("/add/action/group", forwardReq)
 	http.HandleFunc("/add/result", forwardReq)
