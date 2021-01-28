@@ -5,7 +5,7 @@
 # Meteor
 A cross-platform C2/teamserver supporting multiple transport protocols, written in Go. 
 
-Disclaimer: This is in development and as such is _not exactly stable_. Documentation is also lacking, but will be improved gradually over time. 
+Note: This is in development and as such is _not exactly stable_. Documentation is also lacking, but will be improved gradually over time. 
 
 
 
