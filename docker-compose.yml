@@ -29,6 +29,18 @@ services:
     networks:
       meteornet:
         ipv4_address: 172.16.77.3
+
+  crater:
+    build:
+      context: listeners/crater/
+    volumes:
+      - /var/log/meteor/crater:/var/log/meteor/crater
+    environment: 
+      - CORE_SERVER=172.16.77.2
+      - LOGPATH=/var/log/meteor/crater/crater.log
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.9
   
   daddytops:
     build:
@@ -80,6 +92,18 @@ services:
       meteornet: 
         ipv4_address: 172.16.77.6
 
+  cera:
+    build:
+      context: listeners/cera
+    volumes:
+      - ./bin:/app
+    args:
+      - CORE_SERVER=127.0.0.1:10999
+      - LOGPATH=/var/log/meteor/cera/cera.log
+    networks:
+      meteornet: 
+        ipv4_address: 172.16.77.7
+
   little_foot:
     build:
       context: listeners/little_foot/
@@ -87,7 +111,6 @@ services:
       - "8080:8080"
     volumes:
       - /var/log/meteor/little_foot:/var/log/meteor/little_foot
-      - ./bin:/app
     environment:
       - CORE_SERVER=172.16.77.2:9999
       - LOGPATH=/var/log/meteor/little_foot/little_foot.log

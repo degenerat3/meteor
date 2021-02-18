@@ -11,7 +11,7 @@ import (
 func status(w http.ResponseWriter, r *http.Request) {
 	resp := &mcs.MCS{
 		Status: 200,
-		Desc:   "Core is running...\n",
+		Desc:   "Crater is running...\n",
 	}
 	rdata, _ := proto.Marshal(resp)
 	w.Write(rdata)
