@@ -14,7 +14,7 @@ import (
 	"github.com/degenerat3/meteor/core/ent/predicate"
 	"github.com/degenerat3/meteor/core/ent/user"
 
-	"github.com/facebook/ent"
+	"entgo.io/ent"
 )
 
 const (
