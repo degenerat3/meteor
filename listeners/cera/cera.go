@@ -8,7 +8,6 @@ import (
 	"golang.org/x/net/icmp"
 	"log"
 	"net"
-	"os"
 )
 
 type session struct {
@@ -23,10 +22,10 @@ type session struct {
 
 var (
 	// CORESERVER is the IP:Port of the Meteor core
-	CORESERVER = os.Getenv("CORE_SERVER") // format: 9.9.9.9:9999
+	CORESERVER string // format: 9.9.9.9:9999
 
 	// LOGPATH is the output path (including fname) for the listener logs
-	LOGPATH = os.Getenv("LOGPATH")
+	LOGPATH string
 
 	// write info logs to this
 	infoLog *log.Logger
