@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/degenerat3/meteor/core/ent/user"
-	"github.com/facebook/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql"
 )
 
 // User is the model entity for the User schema.

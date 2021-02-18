@@ -8,7 +8,7 @@ import (
 
 	"github.com/degenerat3/meteor/core/ent/action"
 	"github.com/degenerat3/meteor/core/ent/host"
-	"github.com/facebook/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql"
 )
 
 // Action is the model entity for the Action schema.

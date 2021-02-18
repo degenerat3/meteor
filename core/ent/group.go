@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/degenerat3/meteor/core/ent/group"
-	"github.com/facebook/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql"
 )
 
 // Group is the model entity for the Group schema.

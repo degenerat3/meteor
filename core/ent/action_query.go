@@ -11,9 +11,9 @@ import (
 	"github.com/degenerat3/meteor/core/ent/action"
 	"github.com/degenerat3/meteor/core/ent/host"
 	"github.com/degenerat3/meteor/core/ent/predicate"
-	"github.com/facebook/ent/dialect/sql"
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 )
 
 // ActionQuery is the builder for querying Action entities.

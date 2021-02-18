@@ -4,7 +4,7 @@ package user
 
 import (
 	"github.com/degenerat3/meteor/core/ent/predicate"
-	"github.com/facebook/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql"
 )
 
 // ID filters vertices based on their ID field.

@@ -8,8 +8,8 @@ import (
 	"fmt"
 
 	"github.com/degenerat3/meteor/core/ent/user"
-	"github.com/facebook/ent/dialect/sql/sqlgraph"
-	"github.com/facebook/ent/schema/field"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 )
 
 // UserCreate is the builder for creating a User entity.

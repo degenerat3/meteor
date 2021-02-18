@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/degenerat3/meteor/core/ent/host"
-	"github.com/facebook/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql"
 )
 
 // Host is the model entity for the Host schema.
