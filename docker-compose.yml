@@ -95,11 +95,11 @@ services:
   cera:
     build:
       context: listeners/cera
+      args:
+        - CORE_SERVER=127.0.0.1:10999
+        - LOGPATH=/var/log/meteor/cera/cera.log
     volumes:
       - ./bin:/app
-    args:
-      - CORE_SERVER=127.0.0.1:10999
-      - LOGPATH=/var/log/meteor/cera/cera.log
     networks:
       meteornet: 
         ipv4_address: 172.16.77.7
