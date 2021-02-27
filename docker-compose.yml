@@ -33,6 +33,8 @@ services:
   crater:
     build:
       context: listeners/crater/
+    ports:
+      - "10999:10999"
     volumes:
       - /var/log/meteor/crater:/var/log/meteor/crater
     environment: 
