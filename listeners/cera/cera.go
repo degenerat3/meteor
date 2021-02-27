@@ -52,6 +52,9 @@ func main() {
 	conn := getListener("0.0.0.0")
 	for {
 		respProto, peer := readFromListener(conn)
+		if respProto == nil {
+			continue
+		}
 		go handleCTPPayload(respProto, peer, conn)
 	}
 }

@@ -3,13 +3,15 @@ package main
 import (
 	"crypto/sha1"
 	"encoding/base64"
-	"github.com/degenerat3/meteor/pbuf"
-	"github.com/golang/protobuf/proto"
-	"golang.org/x/net/icmp"
-	"golang.org/x/net/ipv4"
+	"fmt"
 	"log"
 	"net"
 	"time"
+
+	mcs "github.com/degenerat3/meteor/pbuf"
+	"github.com/golang/protobuf/proto"
+	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
 )
 
 // icmpConst is usually one, used for protocol marshalling (ipv6 support has a diff one)
@@ -60,7 +62,8 @@ func buildProto(sid int32, payld []byte, chksum []byte, typ mcs.CTP_Flag) []byte
 func decodeProto(data []byte) *mcs.CTP {
 	iftppMesage := &mcs.CTP{}
 	if err := proto.Unmarshal(data, iftppMesage); err != nil {
-		log.Fatalln("Failed to unmarshal IFTPP:", err)
+		fmt.Println("Failed to unmarshal IFTPP:", err)
+		return nil
 	}
 	return iftppMesage
 }
@@ -84,11 +87,11 @@ func buildICMP(payload []byte) []byte {
 func disasICMP(msg []byte, n int) []byte {
 	parsed, err := icmp.ParseMessage(icmpConst, msg[:n])
 	if err != nil {
-		log.Fatal(err)
+		return nil
 	}
 	bod, err := parsed.Body.Marshal(icmpConst)
 	if err != nil {
-		log.Fatal(err)
+		return nil
 	}
 
 	return bod
@@ -113,14 +116,17 @@ func readFromListener(conn *icmp.PacketConn) (*mcs.CTP, net.Addr) {
 	msg := make([]byte, readSize)
 	err := conn.SetReadDeadline(time.Now().Add(10 * time.Second))
 	if err != nil {
-		log.Fatal(err)
+		return nil, nil
 	}
 	n, peer, err := conn.ReadFrom(msg)
 	if err != nil {
-		log.Fatal(err)
+		return nil, nil
 	}
 
 	protoMsg := disasPacket(msg, n)
+	if protoMsg == nil {
+		return nil, nil
+	}
 
 	return protoMsg, peer
 }
