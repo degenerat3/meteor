@@ -2,12 +2,14 @@ package main
 
 import (
 	"encoding/base64"
-	lUtils "github.com/degenerat3/meteor/listeners/utils"
-	"github.com/degenerat3/meteor/pbuf"
-	"github.com/golang/protobuf/proto"
-	"golang.org/x/net/icmp"
+	"fmt"
 	"log"
 	"net"
+
+	lUtils "github.com/degenerat3/meteor/listeners/utils"
+	mcs "github.com/degenerat3/meteor/pbuf"
+	"github.com/golang/protobuf/proto"
+	"golang.org/x/net/icmp"
 )
 
 type session struct {
@@ -44,6 +46,8 @@ var (
 )
 
 func main() {
+	fmt.Printf("CORE: %s", CORESERVER)
+	fmt.Printf("LOG: %s", LOGPATH)
 	infoLog, warnLog, errLog = lUtils.InitLogger(LOGPATH)
 	conn := getListener("0.0.0.0")
 	for {
